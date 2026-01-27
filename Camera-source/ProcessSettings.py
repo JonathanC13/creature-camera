@@ -1,11 +1,14 @@
 import time
+import math
 from datetime import datetime, timedelta
 
 class ProcessSettings:
     def __init__(self):
+        
         self.settings = {
             'Duration in minutes': {'q': 'Enter the duration, in minutes, the camera should be active: ', 'a': 0, 'cb': self.setDurationMin, 'get': self.getDurationMin},
-            'Record minimum in seconds': {'q': 'Enter the duration, in seconds, the camera should record when there is motion: ', 'a': 0, 'cb': self.setRecordTimeMinimumSeconds, 'get': self.getRecordTimeMinimumSeconds},
+            'Record minimum in seconds': {'q': 'Enter the duration, in seconds, the camera should record when there is motion (Note, when duration ends recording will also end.): ', 'a': 0, 'cb': self.setRecordTimeMinimumSeconds, 'get': self.getRecordTimeMinimumSeconds},
+            'Extend multiple': {'q': 'Enter the number of times to extend recording if motion continues at minimum recording time (if decimal entered, it will round up): ', 'a': 0, 'cb': self.setRecordExtendMultiple, 'get': self.getRecordExtendMultiple},
             'Threshold change percent': {'q': 'Enter the percent, [0 to 100], of change between images that indicate motion: ', 'a': 0, 'cb': self.setThresholdPercent, 'get': self.getThresholdPercent}
         }
         
@@ -14,12 +17,26 @@ class ProcessSettings:
             '2': {'text': 'Restart duration', 'q': '', 'cb': self.restartDuration},
             '3': {'text': 'Request remaining time', 'q': '', 'cb': self.getRemainingTime},
             '4': {'text': 'Change record duration', 'q': 'Enter the new duration, in seconds, the camera should record when there is motion: ', 'cb': self.setRecordTimeMinimumSeconds},
-            '5': {'text': 'Change threshold percent', 'q': 'Enter the new percent, [0 to 100], of change between images that indicate motion: ', 'cb': self.setThresholdPercent},
-            '6': {'text': 'Show current settings', 'q': '', 'cb': self.getCurrentSettings}
+            '5': {'text': 'Change extend multiple', 'q': 'Enter the new extend multiple: ', 'cb': self.setRecordExtendMultiple},
+            '6': {'text': 'Change threshold percent', 'q': 'Enter the new percent, [0 to 100], of change between images that indicate motion: ', 'cb': self.setThresholdPercent},
+            '7': {'text': 'Show current settings', 'q': '', 'cb': self.getCurrentSettings}
         }
+        
+        self.recordExtendMultiple = 1
         
         self.startTime = time.time()
         self.running = False
+        
+    def setRecordExtendMultiple(self, i):
+        if (i < 0):
+            print('Please enter a value > 0')
+            return False
+        else:
+            self.settings['Extend multiple']['a'] = math.ceil(i)
+            return True
+        
+    def getRecordExtendMultiple(self):
+        return self.settings['Extend multiple']['a']
         
     def setRunning(self, state):
         self.running = state
@@ -68,6 +85,8 @@ class ProcessSettings:
         return self.settings['Duration in minutes']['a']
     
     def setRecordTimeMinimumSeconds(self, recordTimeMinimumSeconds):
+        if (recordTimeMinimumSeconds > 60):
+            recordTimeMinimumSeconds = 60
         self.settings['Record minimum in seconds']['a'] = recordTimeMinimumSeconds
         return True
         

@@ -4,13 +4,18 @@ import numpy as np
 import os.path
 
 class OpenCVControl:
-    def __init__(self, currPath, logger, rtspStreamURL):
-        self.logger = logger
+    def __init__(self, rtspStreamURL):
+        currPath = os.getcwd()
+        config = configparser.ConfigParser()
+        config_file_path=os.path.join(currPath, "config", "config.ini")
+        config.read(config_file_path)
+        
+        self.logger = logging.getLogger(config['LOG_INFO']['loggerName'])
         self.rtspStreamURL = rtspStreamURL
         self.capture = cv2.VideoCapture(rtspStreamURL)
         self.quit = False
         self.record = False
-        self.recordPath = currPath +'/output/defRecord.mpg'
+        self.recordPath = ""
         
         self.ret = False
         self.frame = np.ndarray(shape=(0,0))
@@ -28,15 +33,15 @@ class OpenCVControl:
         return self.capture.isOpened()
         
     def endStream(self):
-        if (self.out is not None):
+        if (self.out is not None):	# end record if ongoing.
             self.out.release()
         self.capture.release() # Release the VideoCapture object
         cv2.destroyAllWindows() # Close all OpenCV windows
         
-    def setRecord(self, record, path=os.getcwd()+'/output/defRecord.mpg'):
+    def setRecord(self, record, path):
         self.record = record
         #print('\n')
-        if (record == True): 
+        if (record == True and path != ""): 
             #print(f"OpenCVControl: **Trying to record to {path}")
             self.logger.info(f"OpenCVControl: setRecord: **Trying to record to {path}")
             self.recordPath = path
@@ -62,7 +67,7 @@ class OpenCVControl:
             self.out.write(self.frame)
         elif (self.out is None):
             #print("OpenCVControl: Could not write for record.")
-            self.logger.error("OpenCVControl: writeFrame: Could not write for record.")
+            self.logger.error("ERR: OpenCVControl: writeFrame: Could not write for record.")
         elif (self.record == False):
             #print("OpenCVControl: Record == False.")
             self.logger.info("OpenCVControl: writeFrame: Record == False.")
@@ -97,13 +102,13 @@ class OpenCVControl:
             self.logger.info(f"OpenCVControl: saveCurrentFrameLocally: Frame saved successfully as {fullPath}")
         except Exception as e:
             #print(f"OpenCVControl: Frame could not be saved. {e}")
-            self.logger.error(f"OpenCVControl: Frame could not be saved. {e}")
+            self.logger.error(f"ERR: OpenCVControl: Frame could not be saved. {e}")
     
     def retryOpenStream(self):
         retry = 1
         while (not self.capture.isOpened() and retry <= self.maxReOpenRetry):
             #print(f"OpenCVControl capture: Retrying to re-open stream... {retry}")
-            self.logger.warning(f"OpenCVControl capture: Retrying to re-open stream... {retry}")
+            self.logger.warning(f"WARN: OpenCVControl capture: Retrying to re-open stream... {retry}")
             self.capture = cv2.VideoCapture(rtspStreamURL)
             
             # record properties with new capture
@@ -118,7 +123,7 @@ class OpenCVControl:
             
         if (not self.capture.isOpened()):
             #print(f"OpenCVControl capture: Could not open video stream with URL {self.rtspStreamURL}")
-            self.logger.critical(f"OpenCVControl: captureStream: Could not open video stream with URL {self.rtspStreamURL}")
+            self.logger.critical(f"ERR: OpenCVControl: captureStream: Could not open video stream with URL {self.rtspStreamURL}")
             #print("==/ OpenCVControl capture: returned.")
             self.logger.info("==/ OpenCVControl: captureStream: returned.")
             return
@@ -134,7 +139,7 @@ class OpenCVControl:
             if (not self.ret):
                 if (frameRetry >= self.maxFrameRetry):
                     #print(f"OpenCVControl capture: {self.maxFrameRetry} frame retries reached. Break.")
-                    self.logger.warning(f"OpenCVControl capture: {self.maxFrameRetry} frame retries reached. Break.")
+                    self.logger.warning(f"WARN: OpenCVControl capture: {self.maxFrameRetry} frame retries reached. Break.")
                     break
                 frameRetry += 1
                 self.retryOpenStream()
