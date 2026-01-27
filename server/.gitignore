@@ -1,0 +1,3 @@
+# ignore any file named .env in the root directory and all its subdirectories.
+.env
+node_modules/
