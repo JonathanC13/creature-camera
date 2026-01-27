@@ -4,8 +4,14 @@ import numpy as np
 from PIL import Image
 
 class CompareImages:
-    def __init__(self, currPath, logger, resizeW, resizeH, thresholdPercent):
-        self.logger = logger
+    def __init__(self, resizeW, resizeH, thresholdPercent):
+        currPath = os.getcwd()
+        self.config = configparser.ConfigParser()
+        config_file_path=os.path.join(currPath, "config", "config.ini")
+        config.read(config_file_path)
+        
+        self.logger = logging.getLogger(config['LOG_INFO']['loggerName'])
+        
         # resizeW * resizeH and grayscale each element is 0-255. Therefore resizeW * resizeH * 255 = totalPixels.
         # threshold pixel changes = totalPixels * thresholdPercent / 100
         self.threshold = 0
@@ -47,11 +53,11 @@ class CompareImages:
             return matrix
         
     def saveDiffImage(self, matrix, suffix):
-        savePath = self.currPath + f'/output/diffImg_{suffix}.png'
+        savePath = self.currPath + self.config['FOLDERS']['imageOutputFolder'] + f'/output/diffImg_{suffix}.png'
         
         if os.path.exists(savePath):
             #print(f'CompareImages: Cannot save diff image, file name exists - {savePath}')
-            self.logger.error(f'CompareImages: Cannot save diff image, file name exists - {savePath}')
+            self.logger.error(f'ERR: CompareImages: Cannot save diff image, file name exists - {savePath}')
             return
         
         pixelData = []
@@ -72,7 +78,7 @@ class CompareImages:
             self.logger.info(f'CompareImages: Image saved at {savePath}')
         except Exception as e:
             #print(f'CompareImages: saveDiffImage() failed. {e}')
-            self.logger.error(f'CompareImages: saveDiffImage() failed. {e}')
+            self.logger.error(f'ERR: CompareImages: saveDiffImage() failed. {e}')
         
     def funcCompareImages(self, save=False, suffix='', debug=False):
         
@@ -85,7 +91,7 @@ class CompareImages:
         # + str(diffValue > self.getThreshold()
         if (debug == True):
             #print(f"CompareImages: diff value at {suffix}: {diffValue}, past threshold: " + str(diffValue > self.getThreshold()))
-            self.logger(f"CompareImages: diff value at {suffix}: {diffValue}, past threshold: " + str(diffValue > self.getThreshold()))
+            self.logger.info(f"CompareImages: diff value at {suffix}: {diffValue}, past threshold: " + str(diffValue > self.getThreshold()))
         
         if (save == True):
             self.saveDiffImage(diffMatrix, suffix)

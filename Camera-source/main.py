@@ -4,24 +4,38 @@ import time
 import os
 import logging
 import sys
+import configparser
+from dotenv import load_dotenv
+from collections import deque
 from OpenCVControl import OpenCVControl
 from CompareImages import CompareImages
 from ProcessSettings import ProcessSettings
-from dotenv import load_dotenv
+from req_uploadVideo import req_uploadVideo
+import CreateConfigSettings
 
 
-def threadFuncAnalyzeVideoStream(currPath, rtspStreamURL, processSettingsObj, logger):
+def threadFuncAnalyzeVideoStream(processSettingsObj):
+    load_dotenv()
+    
+    currPath = os.getcwd()
+    config = configparser.ConfigParser()
+    config_file_path=os.path.join(currPath, "config", "config.ini")
+    config.read(config_file_path)
+    
+    logger = logging.getLogger(config['LOG_INFO']['loggerName'])
+    
     #print('=== Camera Thread ===')
     logger.info('== Camera Thread: Started')
         
-    OpenCVControlObj = OpenCVControl(currPath, logger, rtspStreamURL)
+    OpenCVControlObj = OpenCVControl(os.getenv('RTSP_STREAM_URL'))
     
     if (not OpenCVControlObj.getCaptureOpened()):
         #print(f"ERR: Could not open video stream with URL {rtspStreamURL}")
-        logger.critical(f"ERR: Could not open video stream with URL {rtspStreamURL}")
+        logger.critical(f"ERR: Could not open video stream with URL, check .env")
         return
         
-    CompareImagesObj = CompareImages(currPath, logger, 32, 32, processSettingsObj.getThresholdPercent())
+    CompareImagesObj = CompareImages(32, 32, processSettingsObj.getThresholdPercent())
+    req_uploadVideo
     
     #captureDelayNs = captureDelayMs * 1000000		#captureDelayMs from param. May need to set capture delay for read() because if unrestricted capture for frames to compare it will sometimes grab the old
     
@@ -29,7 +43,7 @@ def threadFuncAnalyzeVideoStream(currPath, rtspStreamURL, processSettingsObj, lo
     #maxRun = processSettingsObj.durationMin * 60	# seconds
     #threadCaptureStream = OpenCVControlObj.startThread()
     #time.sleep(1)	# time to start up stream.
-    threadCompareImages = None
+    uploadVideoThreadsQueue = deque()
     
     # record properties
     #currRecordLen = 0
@@ -44,6 +58,10 @@ def threadFuncAnalyzeVideoStream(currPath, rtspStreamURL, processSettingsObj, lo
     frameRetry = 0
     maxFrameRetry = 3
     
+    recordExtended = 0
+    
+    recordFilename = ""
+    
     #print('Camera running...')
     #while (True):
     while (time.time() - processSettingsObj.getStartTime() < processSettingsObj.getDurationMin() * 60 and processSettingsObj.getRunning() == True):
@@ -56,7 +74,7 @@ def threadFuncAnalyzeVideoStream(currPath, rtspStreamURL, processSettingsObj, lo
         if (not ret):
             if (frameRetry >= maxFrameRetry):
                 #print(f"Frame: {maxFrameRetry} frame retries reached. Break.")
-                logger.error(f"Frame: {maxFrameRetry} frame retries reached. Break.")
+                logger.error(f"ERR: {maxFrameRetry} frame retries reached. Break.")
                 break
             frameRetry += 1
             OpenCVControlObj.retryOpenStream()
@@ -76,7 +94,7 @@ def threadFuncAnalyzeVideoStream(currPath, rtspStreamURL, processSettingsObj, lo
         timeObj = time.localtime()
         timeStamp = "{tm_year}{tm_mon}{tm_mday}_{tm_hour}h{tm_min}m{tm_sec}s".format(tm_year=str(timeObj.tm_year), tm_mon=str(timeObj.tm_mon), tm_mday=str(timeObj.tm_mday), tm_hour=str(timeObj.tm_hour), tm_min=str(timeObj.tm_min), tm_sec=str(timeObj.tm_sec))
     
-        #savePath = currPath + f"/output/image_{timeStamp}.png"
+        #savePath = currPath + f"/recorded/image_{timeStamp}.png"
         #OpenCVControlObj.saveCurrentFrameLocally(savePath)
     
         CompareImagesObj.setCurrentImage(frame)
@@ -85,37 +103,78 @@ def threadFuncAnalyzeVideoStream(currPath, rtspStreamURL, processSettingsObj, lo
         #print(f"{timeStamp}: {motionFlag}")
         
         if (OpenCVControlObj.getRecord() == True and time.time() - startRecordTime >= processSettingsObj.getRecordTimeMinimumSeconds()):
+            # when recording duration completed
             startRecordTime = time.time()
             #print(f"**Checking if extend {motionFlag}, thres: {CompareImagesObj.threshold}, diff: {diffValue}")
             #CompareImagesObj.saveImages(timeStamp)
-            if (motionFlag == False):
+            if (motionFlag == False or recordExtended >= processSettingsObj.getRecordExtendMultiple()):
                 OpenCVControlObj.setRecord(False)
-            # else, if still has 'motion' allow to keep recording.
+                
+                # clear finished threads. Once found a thread still running, break.
+                while (len(uploadVideoThreadsQueue) > 0):
+                    if (uploadVideoThreadsQueue[0].is_alive() == False):
+                        uploadVideoThreadsQueue.popleft()
+                    else:
+                        break
+                
+                # once recording is finised upload to server create thread to upload to server
+                #threadUploadVideo = threading.Thread(target=req_uploadVideo, args=(recordFilename))
+                #threadUploadVideo.start()
+                #uploadVideoThreadsQueue.append(threadUploadVideo)
+                
+                recordFilename = ""
+                
+            else:
+                # still has 'motion', therefore keep recording.
+                # need to track how many times extended
+                recordExtended += 1
         
         if (OpenCVControlObj.getRecord() == False and motionFlag == True):
+            # start recording
+            recordExtended = 0
             startRecordTime = time.time()
-            OpenCVControlObj.setRecord(True, currPath + f"/output/recorded_{timeStamp}.avi")
+            recordFilename = f"recorded_{timeStamp}.avi"
+            OpenCVControlObj.setRecord(True, config['FOLDERS']['recordedFolder'] + "f/{recordFilename}")
         
         if (OpenCVControlObj.getRecord() == True):
+            # during record, write the frame
             OpenCVControlObj.writeFrame()
     
     
     OpenCVControlObj.endStream()
+    logger.info('OpenCV stream closed')
     processSettingsObj.setRunning(False)
+    
+    logger.info(f'uploadVideoThreads to join: {len(uploadVideoThreadsQueue)}')
+    while (len(uploadVideoThreadsQueue) > 0):
+        thread = uploadVideoThreadsQueue.popleft()
+        if (uploadVideoThreadsQueue[0].is_alive() == True):
+            # wait for join
+            thread.join()
+        logger.info('Joined.')
+            
     #print('Camera ended')
     #OpenCVControlObj.quit = True
     #if (threadCaptureStream.is_alive()):
         # wait for join
     #    threadCaptureStream.join()
     #print('===/ Camera Thread ===\n')
+    print('**Current camera session completed.**')
     logger.info('===/ Camera Thread ===\n')
     return
         
-def main(logger, currPath, rtspStreamURL):
-    #print('= Main: Start')
+def main():
+    
+    currPath = os.getcwd()
+    config = configparser.ConfigParser()
+    config_file_path=os.path.join(currPath, "config", "config.ini")
+    config.read(config_file_path)
+    
+    logger = logging.getLogger(config['LOG_INFO']['loggerName'])
     logger.info('= Main: Start')
     
-    processSettingsObj = processSettings()
+    processSettingsObj = ProcessSettings()
+    
     settingOpts = []
     for k, v in processSettingsObj.settings.items():
         settingOpts.append(k)
@@ -158,7 +217,7 @@ def main(logger, currPath, rtspStreamURL):
             break
 
         processSettingsObj.setRunning(True)
-        threadAnalyzeVideoStream = threading.Thread(target=threadFuncAnalyzeVideoStream, args=(currPath, rtspStreamURL, processSettingsObj, logger))
+        threadAnalyzeVideoStream = threading.Thread(target=threadFuncAnalyzeVideoStream, args=(processSettingsObj,))
         threadAnalyzeVideoStream.start()
         
         options = ''
@@ -229,27 +288,45 @@ if __name__ == '__main__':
     
     
     # project's folders
-    folders = ["output", "logging"]
-    for folder_name in folders:
+    print("Folders: checking...")
+    folders = {
+            'imageOutputFolder' : 'imageOutput',
+            'recordedFolder' : 'recorded',
+            'loggingFolder' : 'logging',
+            'configFolder' : 'config'
+        }
+    for k, folder_name in folders.items():
         folder_path = currPath + "/" + folder_name
         if os.path.isdir(folder_path):
-            print(f"The folder '{folder_path}' exists.")
+            print(f"The folder '{folder_path}' exists... GOOD")
         else:
             print(f"The folder '{folder_path}' does not exist. Creating...")
             try:
                 os.mkdir(folder_path)
-                print(f"The folder '{folder_path}' created successfully.")
+                print(f"The folder '{folder_path}' created successfully... GOOD")
             except Exception as e:
-                print(f"The folder '{folder_path}' could not be created. {e}")
-                print("Could not initialize program. Quitting...")
+                print(f"ERR: The folder '{folder_path}' could not be created. {e}")
+                print("ERR: Could not initialize program. Quitting...")
                 sys.exit(1)
-                
+    print("Folders: GOOD")
+    
+    logInfo = {
+            'loggerName' : "my_camera_logger",
+            'loggerFile' : "camera_application.log"
+        }
+    configInfo = {
+            'configFileName' : "config.ini"
+        }
+    
     
     # logger
-    logger = logging.getLogger('my_camera_logger')
+    loggerName = logInfo['loggerName']
+    logger_file_path = os.path.join(currPath, folders['loggingFolder'], logInfo['loggerFile'])
+    
+    logger = logging.getLogger(loggerName)
     logger.setLevel(logging.DEBUG) # Set the desired logging level
     # Create a file handler
-    file_handler = logging.FileHandler(currPath + '/logging/camera_application.log')
+    file_handler = logging.FileHandler(logger_file_path)
     file_handler.setLevel(logging.DEBUG)
     # Create a formatter
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -257,26 +334,14 @@ if __name__ == '__main__':
     # Add the file handler to the logger
     if not logger.handlers: # Prevent adding multiple handlers if the logger is re-configured
         logger.addHandler(file_handler)
-    logger.info("Start")
+        
+    logger.info("Logger started.")
     
     
-    # .env
-    envVals = []
-    load_dotenv() # This loads the variables from .env
-    key = "RTSP_STREAM_URL"
-    rtspStreamURL = os.getenv(key)
-    envVals.append([key, rtspStreamURL])
+    configStatus = CreateConfigSettings.main(folders, logInfo, configInfo)
+    if (configStatus == False):
+        sys.exit(1)
     
-    logMsg = ''
-    for val in envVals:
-        if (val[1] is None):
-            logMsg += f"env: {val[0]} missing.\n"
-            
-    if (len(logMsg) > 0):
-        logger.critical(logMsg)
-        logger.info("End")
-    
-    
-    sys.exit(0)
-    main(logger, rtspStreamURL)
+        
+    main()
     logger.info("End")
