@@ -284,8 +284,8 @@ def main():
     logger.info('=/ Main: End')
     
 if __name__ == '__main__':
-    if setup() == False:
+    if setup.setup() == False:
         sys.exit(1)
-    return	# temp stop
+    sys.exit(0)	# temp stop
     main()
     logger.info("End")
