@@ -22,6 +22,16 @@ def verifyFolders(folders):
                 print(f"ERR: The folder '{folder_path}' could not be created. {e}")
                 print("ERR: Could not initialize program. Quitting...")
                 return False
+            
+        try:
+            with open(folder_path + "/" + ".gitignore", 'w') as file:
+                file.write("*\n")
+                file.write("!.gitignore")
+        except Exception as e:
+            print(f"ERR: Could not create .gitignore in the folder '{folder_path}'. {e}")
+            print("ERR: Could not initialize program. Quitting...")
+            return False
+            
     print("Folders: complete.")
     
     return True
@@ -164,7 +174,7 @@ def checkConfigFileExists(configInfo, folders, logInfo):
         return False
     
     print('Config file: complete.')
-    retrun True
+    return True
 
 # setup Folders and logger
 def setup():
@@ -178,6 +188,7 @@ def setup():
     if verifyFolders(folders) == False:
         print('Necessary folders could not be created... Quitting')
         return False
+    return True
     
     logInfo = {
             'loggerName' : "my_camera_logger",
