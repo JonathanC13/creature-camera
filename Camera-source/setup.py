@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+from dotenv.main import set_key
 import os
 import configparser
 import logging
@@ -37,9 +38,10 @@ def verifyFolders(folders):
     return True
 
 
-def setLogger(logInfo):
+def setLogger(logInfo, folders):
     currPath = os.getcwd()
     
+    print("Logger: checking...")
     # logger
     loggerName = logInfo['loggerName']
     logger_file_path = os.path.join(currPath, folders['loggingFolder'], logInfo['loggerFile'])
@@ -79,7 +81,7 @@ def verifyEnv(envKeys, logInfo):
         logger.info(f".env file exists... GOOD")
     except Exception as e:
         logger.error(f"ERR: Error creating .env file occurred: {e}")
-        print(f"Error checking .env file... see log file.")
+        print(f"Error creating .env file... see log file.")
         return False
         
     load_dotenv(override=True) # This loads the variables from .env
@@ -100,7 +102,7 @@ def verifyEnv(envKeys, logInfo):
         if (val == ""):
             while (val == ""):
                 # prompt user for value
-                val = input(f"Value for .env key is empty. Enter value:")
+                val = input(f".env: Value for {key} is empty. Enter value: ")
             
             set_key(envPath, key, val)
     
@@ -188,15 +190,15 @@ def setup():
     if verifyFolders(folders) == False:
         print('Necessary folders could not be created... Quitting')
         return False
-    return True
     
     logInfo = {
             'loggerName' : "my_camera_logger",
             'loggerFile' : "camera_application.log"
         }
-    if setLogger(logInfo) == False:
+    if setLogger(logInfo, folders) == False:
         print('Logger could not be created... Quitting')
         return False
+    print("Logger: complete.")
     
     envKeys = ["RTSP_STREAM_URL", "CAMERA_JWT_KEY", "API_uploadVideoURL"]
     if verifyEnv(envKeys, logInfo) == False:
