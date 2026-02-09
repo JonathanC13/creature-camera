@@ -110,6 +110,10 @@ def verifyEnv(envKeys, logInfo):
     return True
 
 def validateConfigKeys(config_dict, configResources):
+    
+    if not (isinstance(config_dict, dict) and isinstance(configResources, dict)):
+        return
+    
     for key in configResources:
         if key not in config_dict:
             config_dict[key] = configResources[key]
@@ -151,7 +155,7 @@ def checkConfigFileExists(configInfo, folders, logInfo):
     except FileExistsError:
         logger.info(f"Config file exists... GOOD... If application has config errors, either manually configure or delete {config_file_path} then re-run.")
         
-        config.read('config.ini')
+        config.read(config_file_path)
         # check keys
         config_dict = {}
         for section in config.sections():
@@ -174,6 +178,10 @@ def checkConfigFileExists(configInfo, folders, logInfo):
     except Exception as e:
         logger.error(f"ERR: Config file: Error creating configuration file '{config_file_path}': {e}")
         return False
+    
+    # test grab a value
+    #config.read(config_file_path)
+    #print(config['SETTINGS']['recordedpath'])
     
     print('Config file: complete.')
     return True
