@@ -4,9 +4,41 @@ import os
 import configparser
 import logging
 
-def verifyFolders(folders):
-    currPath = os.getcwd()    
-    
+projectSettings = {
+        'folders':{
+            'image_output_folder' : 'imageOutput',
+            'recorded_folder' : 'recorded',
+            'logging_folder' : 'logging',
+            'config_folder' : 'config'
+        },
+        'log_info': {
+            'logger_name' : "my_camera_logger",
+            'logger_file' : "camera_application.log"
+        },
+        'env_keys': ["RTSP_STREAM_URL", "CAMERA_JWT_KEY", "API_uploadVideoURL"],
+        'config_info': {
+            'config_file_name' : "config.ini"
+        }
+        
+    }
+
+currPath = os.getcwd()
+
+def getLoggingPath():
+    folders = projectSettings['folders']
+    logInfo = projectSettings['log_info']
+    return os.path.join(currPath, folders['logging_folder'], logInfo['logger_file'])
+
+def getEnvPath():
+    return currPath + "/" + ".env"
+
+def getConfigPath():
+    folders = projectSettings['folders']
+    configInfo = projectSettings['config_info']
+    return os.path.join(currPath, folders['config_folder'], configInfo['config_file_name'])
+
+def verifyFolders():  
+    folders = projectSettings['folders']
     # project's folders
     print("Folders: checking...")
     
@@ -38,13 +70,14 @@ def verifyFolders(folders):
     return True
 
 
-def setLogger(logInfo, folders):
-    currPath = os.getcwd()
+def setLogger():
+    logInfo = projectSettings['log_info']
+    folders = projectSettings['folders']
     
     print("Logger: checking...")
     # logger
-    loggerName = logInfo['loggerName']
-    logger_file_path = os.path.join(currPath, folders['loggingFolder'], logInfo['loggerFile'])
+    loggerName = logInfo['logger_name']
+    logger_file_path = getLoggingPath()
     
     logger = logging.getLogger(loggerName)
     logger.setLevel(logging.DEBUG) # Set the desired logging level
@@ -58,16 +91,17 @@ def setLogger(logInfo, folders):
     if not logger.handlers: # Prevent adding multiple handlers if the logger is re-configured
         logger.addHandler(file_handler)
         
-    return logInfo['loggerName'] in logging.Logger.manager.loggerDict
+    return logInfo['logger_name'] in logging.Logger.manager.loggerDict
 
 
-def verifyEnv(envKeys, logInfo):
-    currPath = os.getcwd()
+def verifyEnv():
+    envKeys = projectSettings['env_keys']
+    logInfo = projectSettings['log_info']
     
     print(f".env: checking...")
-    envPath = currPath + "/" + ".env"
+    envPath = getEnvPath()
     
-    loggerName = logInfo['loggerName']
+    loggerName = logInfo['logger_name']
     logger = logging.getLogger(loggerName)
     
     # check if .env file exists
@@ -121,9 +155,11 @@ def validateConfigKeys(config_dict, configResources):
             validateConfigKeys(config_dict[key], configResources[key])
         
 
-def checkConfigFileExists(configInfo, folders, logInfo):
-    currPath = os.getcwd()
-    config_file_path = os.path.join(currPath, folders['configFolder'], configInfo['configFileName'])
+def checkConfigFileExists():
+    configInfo = projectSettings['config_info']
+    folders = projectSettings['folders']
+    logInfo = projectSettings['log_info']
+    config_file_path = getConfigPath()
     
     print('Config file: checking...')
     
@@ -131,8 +167,9 @@ def checkConfigFileExists(configInfo, folders, logInfo):
         
     configSettings = {
             "comment" : "If application has erros related to this config file, either manually configure or delete this file then re-run.",
-            "cameraName" : "this camera",
-            "recordedPath" : currPath + "/recorded"
+            "camera_name" : "this camera",
+            "recorded_path" : currPath + "/recorded",
+            "max_recording_length_in_seconds" : "60"
             #"api_uploadVideoURL" : "http://192.168.1.2:5000/api/v1/uploadVideo"
         }
     
@@ -145,7 +182,7 @@ def checkConfigFileExists(configInfo, folders, logInfo):
     
     config.read_dict(configResources)
     
-    loggerName = logInfo['loggerName']
+    loggerName = logInfo['logger_name']
     logger = logging.getLogger(loggerName)
     
     try:
@@ -186,36 +223,31 @@ def checkConfigFileExists(configInfo, folders, logInfo):
     print('Config file: complete.')
     return True
 
+def getConfigSettings():
+    folders = projectSettings['folders']
+    configInfo = projectSettings['config_info']
+    config = configparser.ConfigParser()
+    config_file_path = getConfigPath()
+    config.read(config_file_path)
+    
+    return config
+
 # setup Folders and logger
 def setup():
     
-    folders = {
-            'imageOutputFolder' : 'imageOutput',
-            'recordedFolder' : 'recorded',
-            'loggingFolder' : 'logging',
-            'configFolder' : 'config'
-        }
-    if verifyFolders(folders) == False:
+    if verifyFolders() == False:
         print('Necessary folders could not be created... Quitting')
         return False
     
-    logInfo = {
-            'loggerName' : "my_camera_logger",
-            'loggerFile' : "camera_application.log"
-        }
-    if setLogger(logInfo, folders) == False:
+    if setLogger() == False:
         print('Logger could not be created... Quitting')
         return False
     print("Logger: complete.")
-    
-    envKeys = ["RTSP_STREAM_URL", "CAMERA_JWT_KEY", "API_uploadVideoURL"]
-    if verifyEnv(envKeys, logInfo) == False:
+
+    if verifyEnv() == False:
         return False
     
-    configInfo = {
-            'configFileName' : "config.ini"
-        }
-    if checkConfigFileExists(configInfo, folders, logInfo) == False:
+    if checkConfigFileExists() == False:
         print('Config file could not be created... Quitting')
         return False
         

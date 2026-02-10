@@ -1,13 +1,18 @@
+import os
 import time
 import math
 from datetime import datetime, timedelta
+from setup import getConfigSettings
 
 class ProcessSettings:
     def __init__(self):
+        config = getConfigSettings()
+        
+        self.maxRecordingLengthInSeconds = config['SETTINGS']['max_recording_length_in_seconds']
         
         self.settings = {
             'Duration in minutes': {'q': 'Enter the duration, in minutes, the camera should be active: ', 'a': 0, 'cb': self.setDurationMin, 'get': self.getDurationMin},
-            'Record minimum in seconds': {'q': 'Enter the duration, in seconds, the camera should record when there is motion (Note, when duration ends recording will also end.): ', 'a': 0, 'cb': self.setRecordTimeMinimumSeconds, 'get': self.getRecordTimeMinimumSeconds},
+            'Record minimum in seconds': {'q': 'Enter the duration, in seconds, the camera should record when there is motion (Note: When duration ends recording will also end.): ', 'a': 0, 'cb': self.setRecordTimeMinimumSeconds, 'get': self.getRecordTimeMinimumSeconds},
             'Extend multiple': {'q': 'Enter the number of times to extend recording if motion continues at minimum recording time (if decimal entered, it will round up): ', 'a': 0, 'cb': self.setRecordExtendMultiple, 'get': self.getRecordExtendMultiple},
             'Threshold change percent': {'q': 'Enter the percent, [0 to 100], of change between images that indicate motion: ', 'a': 0, 'cb': self.setThresholdPercent, 'get': self.getThresholdPercent}
         }
