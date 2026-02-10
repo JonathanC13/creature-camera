@@ -11,18 +11,16 @@ from OpenCVControl import OpenCVControl
 from CompareImages import CompareImages
 from ProcessSettings import ProcessSettings
 from req_uploadVideo import req_uploadVideo
-import setup
+from setup import setup, getConfigPath, getConfigSettings
 
 
 def threadFuncAnalyzeVideoStream(processSettingsObj):
     load_dotenv()
     
     currPath = os.getcwd()
-    config = configparser.ConfigParser()
-    config_file_path=os.path.join(currPath, "config", "config.ini")
-    config.read(config_file_path)
+    config = getConfigSettings
     
-    logger = logging.getLogger(config['LOG_INFO']['loggerName'])
+    logger = logging.getLogger(config['LOG_INFO']['logger_name'])
     
     #print('=== Camera Thread ===')
     logger.info('== Camera Thread: Started')
@@ -107,7 +105,8 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
             startRecordTime = time.time()
             #print(f"**Checking if extend {motionFlag}, thres: {CompareImagesObj.threshold}, diff: {diffValue}")
             #CompareImagesObj.saveImages(timeStamp)
-            if (motionFlag == False or recordExtended >= processSettingsObj.getRecordExtendMultiple()):
+            # Do not extend if; 1. no motion, 2. extended the current recorded max number of times. 3. At max recording length for a single file.
+            if (motionFlag == False or recordExtended >= processSettingsObj.getRecordExtendMultiple() or time.time() - startRecordTime >= processSettingsObj.maxRecordingLengthInSeconds):
                 OpenCVControlObj.setRecord(False)
                 
                 # clear finished threads. Once found a thread still running, break.
@@ -134,7 +133,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
             recordExtended = 0
             startRecordTime = time.time()
             recordFilename = f"recorded_{timeStamp}.avi"
-            OpenCVControlObj.setRecord(True, config['FOLDERS']['recordedFolder'] + "f/{recordFilename}")
+            OpenCVControlObj.setRecord(True, config['FOLDERS']['recorded_folder'] + "f/{recordFilename}")
         
         if (OpenCVControlObj.getRecord() == True):
             # during record, write the frame
@@ -164,13 +163,9 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
     return
         
 def main():
+    config = getConfigSettings()
     
-    currPath = os.getcwd()
-    config = configparser.ConfigParser()
-    config_file_path=os.path.join(currPath, "config", "config.ini")
-    config.read(config_file_path)
-    
-    logger = logging.getLogger(config['LOG_INFO']['loggerName'])
+    logger = logging.getLogger(config['LOG_INFO']['logger_name'])
     logger.info('= Main: Start')
     
     processSettingsObj = ProcessSettings()
@@ -185,6 +180,7 @@ def main():
         print('=== Configure settings ===')
         print("*Enter 'back' to go to previous setting.")
         print("*Enter 'quit' to quit the program.")
+        print(f"Reminder: Maxiumum recording length of single file is {ProcessSettings.maxRecordingLengthInSeconds} seconds. Set in {getConfigPath}")
         i = 0
         while (running == True and newSettings == True and i < len(settingOpts)):
             while (True):
@@ -219,12 +215,13 @@ def main():
         processSettingsObj.setRunning(True)
         threadAnalyzeVideoStream = threading.Thread(target=threadFuncAnalyzeVideoStream, args=(processSettingsObj,))
         threadAnalyzeVideoStream.start()
+        print('Camera: Running...')
         
         options = ''
         for k, v in processSettingsObj.changeOptions.items():
             text = v['text']
             options += f"{k}: {text}\n"
-            
+         
         while (running):
             print("=== Change settings ===")
             print(options)
@@ -278,14 +275,16 @@ def main():
             print('\n')
         print('\n')
     
+    print('Camera: Stopped.')
     processSettingsObj.setRunning(False)    
     threadAnalyzeVideoStream.join()
     #print('=/ Main: End')
     logger.info('=/ Main: End')
     
 if __name__ == '__main__':
-    if setup.setup() == False:
+    if setup() == False:
         sys.exit(1)
-    sys.exit(0)	# temp stop
+        
+    sys.exit(0) # temp stop
     main()
     logger.info("End")
