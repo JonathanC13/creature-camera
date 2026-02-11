@@ -180,7 +180,7 @@ def main():
         print('=== Configure settings ===')
         print("*Enter 'back' to go to previous setting.")
         print("*Enter 'quit' to quit the program.")
-        print(f"Reminder: Maxiumum recording length of single file is {ProcessSettings.maxRecordingLengthInSeconds} seconds. Set in {getConfigPath}")
+        print(f"Reminder: Absolute maxiumum video recording length is {ProcessSettings.maxRecordingLengthInSeconds} seconds. Set in {getConfigPath}")
         i = 0
         while (running == True and newSettings == True and i < len(settingOpts)):
             while (True):

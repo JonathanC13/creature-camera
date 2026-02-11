@@ -3,6 +3,7 @@ import os
 import logging
 import requests
 from dotenv import load_dotenv
+from setup import getConfigSettings
 
 def req_uploadVideo(recordFilename):
     if (filename == ""):
@@ -11,13 +12,12 @@ def req_uploadVideo(recordFilename):
     load_dotenv()
     
     currPath = os.getcwd()
-    config = configparser.ConfigParser()
-    config_file_path=os.path.join(currPath, "config", "config.ini")
-    config.read(config_file_path)
+    config = getConfigSettings()
     
-    logger = logging.getLogger(config['LOG_INFO']['loggerName'])
+    load_dotenv(override=True)
+    api_uploadVideoURL = os.getenv('API_uploadVideoURL')
     
-    url = config["SETTINGS"]["api_uploadVideoURL"]
+    logger = logging.getLogger(config['LOG_INFO']['logger_name'])
     # Create a dictionary of headers
     # Header keys are typically strings, and values are also strings.
     token = os.getenv("CAMERA_JWT_KEY")
@@ -27,13 +27,14 @@ def req_uploadVideo(recordFilename):
 
     # Open a file named 'example.txt' in read mode
     try:
-        with open(config["FOLDERS"]["recordedFolder"] + f"/{recordFilename}", 'rb') as openedFile:
+        with open(config["FOLDERS"]["recorded_folder"] + f"/{recordFilename}", 'rb') as openedFile:
             
             # POST request
             # (fieldname: (filename, file_object, content_type, headers))
             file = {'file': (f"{recordFilename}", openedFile, 'video/avi')}
-            data = {"cameraName": configSettingsObj["cameraName"]}
-            response = requests.post(url, files=file, data=data, headers=headers)
+            data = {"cameraName": config['SETTINGS']["camera_name"]}
+            response = requests.post(api_uploadVideoURL, files=file, data=data, headers=headers)
+            logger.info(f'req_uploadVideo: Upload sending to {api_uploadVideoURL}...')
         
             #print(response.status_code, response.text)
             # status_code: The HTTP status code (e.g., 200 for success, 404 for not found).
