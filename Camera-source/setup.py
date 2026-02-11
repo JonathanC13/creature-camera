@@ -37,6 +37,15 @@ def getConfigPath():
     configInfo = projectSettings['config_info']
     return os.path.join(currPath, folders['config_folder'], configInfo['config_file_name'])
 
+def getConfigSettings():
+    folders = projectSettings['folders']
+    configInfo = projectSettings['config_info']
+    config = configparser.ConfigParser()
+    config_file_path = getConfigPath()
+    config.read(config_file_path)
+    
+    return config
+
 def verifyFolders():  
     folders = projectSettings['folders']
     # project's folders
@@ -223,14 +232,6 @@ def checkConfigFileExists():
     print('Config file: complete.')
     return True
 
-def getConfigSettings():
-    folders = projectSettings['folders']
-    configInfo = projectSettings['config_info']
-    config = configparser.ConfigParser()
-    config_file_path = getConfigPath()
-    config.read(config_file_path)
-    
-    return config
 
 # setup Folders and logger
 def setup():

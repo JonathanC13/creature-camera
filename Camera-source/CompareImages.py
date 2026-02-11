@@ -2,15 +2,14 @@ import cv2
 import os.path
 import numpy as np
 from PIL import Image
+from setup import getConfigSettings
 
 class CompareImages:
     def __init__(self, resizeW, resizeH, thresholdPercent):
         currPath = os.getcwd()
-        self.config = configparser.ConfigParser()
-        config_file_path=os.path.join(currPath, "config", "config.ini")
-        config.read(config_file_path)
+        self.config = getConfigSettings()
         
-        self.logger = logging.getLogger(config['LOG_INFO']['loggerName'])
+        self.logger = logging.getLogger(self.config['LOG_INFO']['logger_name'])
         
         # resizeW * resizeH and grayscale each element is 0-255. Therefore resizeW * resizeH * 255 = totalPixels.
         # threshold pixel changes = totalPixels * thresholdPercent / 100
@@ -53,7 +52,7 @@ class CompareImages:
             return matrix
         
     def saveDiffImage(self, matrix, suffix):
-        savePath = self.currPath + self.config['FOLDERS']['imageOutputFolder'] + f'/output/diffImg_{suffix}.png'
+        savePath = self.currPath + self.config['FOLDERS']['image_output_folder'] + f'/output/diffImg_{suffix}.png'
         
         if os.path.exists(savePath):
             #print(f'CompareImages: Cannot save diff image, file name exists - {savePath}')
