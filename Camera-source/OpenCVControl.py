@@ -2,12 +2,13 @@ import cv2
 import threading
 import numpy as np
 import os.path
+import logging
 from setup import getConfigSettings
 
 class OpenCVControl:
     def __init__(self, rtspStreamURL):
         currPath = os.getcwd()
-        config = getConfigSettings()
+        self.config = getConfigSettings()
         
         self.logger = logging.getLogger(self.config['LOG_INFO']['logger_name'])
         self.rtspStreamURL = rtspStreamURL

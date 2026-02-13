@@ -1,6 +1,7 @@
 import cv2
 import os.path
 import numpy as np
+import logging
 from PIL import Image
 from setup import getConfigSettings
 
