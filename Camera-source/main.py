@@ -18,7 +18,8 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
     load_dotenv()
     
     currPath = os.getcwd()
-    config = getConfigSettings
+    configPath = getConfigPath()
+    config = getConfigSettings()
     
     logger = logging.getLogger(config['LOG_INFO']['logger_name'])
     
@@ -33,7 +34,6 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         return
         
     CompareImagesObj = CompareImages(32, 32, processSettingsObj.getThresholdPercent())
-    req_uploadVideo
     
     #captureDelayNs = captureDelayMs * 1000000		#captureDelayMs from param. May need to set capture delay for read() because if unrestricted capture for frames to compare it will sometimes grab the old
     
@@ -57,7 +57,16 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
     maxFrameRetry = 3
     
     recordExtended = 0
+    try:
+        maxRecordingLengthInSeconds = float(processSettingsObj.maxRecordingLengthInSeconds)
+    except ValueError:
+        print(f"Error: '{maxRecordingLengthInSeconds}' is not a valid number. Please correct in {configPath} and restart program.")
+        logger.critical(f"Error: '{maxRecordingLengthInSeconds}' is not a valid number. Please correct in {configPath}")
+        print('\n**Current camera session completed.**\n')
+        logger.info('===/ Camera Thread ===\n')
+        return
     
+    recordFolder = config['FOLDERS']['recorded_folder'] 
     recordFilename = ""
     
     #print('Camera running...')
@@ -100,14 +109,16 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         motionFlag, diffValue = CompareImagesObj.funcCompareImages()
         #print(f"{timeStamp}: {motionFlag}")
         
-        if (OpenCVControlObj.getRecord() == True and time.time() - startRecordTime >= processSettingsObj.getRecordTimeMinimumSeconds()):
+        currentRecordTime = time.time() - startRecordTime
+        
+        if (OpenCVControlObj.getRecord() == True and currentRecordTime >= processSettingsObj.getRecordTimeMinimumSeconds() or currentRecordTime >= maxRecordingLengthInSeconds):
             # when recording duration completed
             startRecordTime = time.time()
             #print(f"**Checking if extend {motionFlag}, thres: {CompareImagesObj.threshold}, diff: {diffValue}")
             #CompareImagesObj.saveImages(timeStamp)
             # Do not extend if; 1. no motion, 2. extended the current recorded max number of times. 3. At max recording length for a single file.
-            if (motionFlag == False or recordExtended >= processSettingsObj.getRecordExtendMultiple() or time.time() - startRecordTime >= processSettingsObj.maxRecordingLengthInSeconds):
-                OpenCVControlObj.setRecord(False)
+            if (motionFlag == False or recordExtended >= processSettingsObj.getRecordExtendMultiple() or currentRecordTime >= maxRecordingLengthInSeconds):
+                OpenCVControlObj.setRecord(False, '')
                 
                 # clear finished threads. Once found a thread still running, break.
                 while (len(uploadVideoThreadsQueue) > 0):
@@ -133,7 +144,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
             recordExtended = 0
             startRecordTime = time.time()
             recordFilename = f"recorded_{timeStamp}.avi"
-            OpenCVControlObj.setRecord(True, config['FOLDERS']['recorded_folder'] + "f/{recordFilename}")
+            OpenCVControlObj.setRecord(True, recordFolder + f"/{recordFilename}")
         
         if (OpenCVControlObj.getRecord() == True):
             # during record, write the frame
@@ -158,7 +169,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         # wait for join
     #    threadCaptureStream.join()
     #print('===/ Camera Thread ===\n')
-    print('**Current camera session completed.**')
+    print('\n**Current camera session completed.**\n')
     logger.info('===/ Camera Thread ===\n')
     return
         
@@ -170,9 +181,17 @@ def main():
     
     processSettingsObj = ProcessSettings()
     
+    try:
+        maxRecordingLengthInSeconds = float(processSettingsObj.maxRecordingLengthInSeconds)
+    except ValueError:
+        print(f"Error: '{maxRecordingLengthInSeconds}' is not a valid number. Please correct in {getConfigPath()}")
+        return
+    
     settingOpts = []
     for k, v in processSettingsObj.settings.items():
         settingOpts.append(k)
+    
+    threadAnalyzeVideoStream = None
     
     running = True
     newSettings = True
@@ -180,7 +199,7 @@ def main():
         print('=== Configure settings ===')
         print("*Enter 'back' to go to previous setting.")
         print("*Enter 'quit' to quit the program.")
-        print(f"Reminder: Absolute maxiumum video recording length is {ProcessSettings.maxRecordingLengthInSeconds} seconds. Set in {getConfigPath}")
+        print(f"Reminder: Absolute maxiumum video recording length is {processSettingsObj.maxRecordingLengthInSeconds} seconds. Set in {getConfigPath()}")
         i = 0
         while (running == True and newSettings == True and i < len(settingOpts)):
             while (True):
@@ -276,8 +295,9 @@ def main():
         print('\n')
     
     print('Camera: Stopped.')
-    processSettingsObj.setRunning(False)    
-    threadAnalyzeVideoStream.join()
+    processSettingsObj.setRunning(False)
+    if (threadAnalyzeVideoStream is not None):  
+        threadAnalyzeVideoStream.join()
     #print('=/ Main: End')
     logger.info('=/ Main: End')
     
@@ -285,6 +305,4 @@ if __name__ == '__main__':
     if setup() == False:
         sys.exit(1)
         
-    sys.exit(0) # temp stop
     main()
-    logger.info("End")

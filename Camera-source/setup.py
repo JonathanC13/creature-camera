@@ -159,6 +159,7 @@ def validateConfigKeys(config_dict, configResources):
     
     for key in configResources:
         if key not in config_dict:
+            print(key)
             config_dict[key] = configResources[key]
         else:
             validateConfigKeys(config_dict[key], configResources[key])
@@ -210,7 +211,7 @@ def checkConfigFileExists():
         validateConfigKeys(config_dict, configResources)
         
         configVal = configparser.ConfigParser()
-        configVal.read_dict(configResources)
+        configVal.read_dict(config_dict)
 
         try:
             with open(config_file_path, 'w') as configfileVal:
