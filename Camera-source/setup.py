@@ -253,4 +253,5 @@ def setup():
         print('Config file could not be created... Quitting')
         return False
         
+    print('\n\n')
     return True
