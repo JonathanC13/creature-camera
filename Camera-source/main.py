@@ -47,6 +47,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
     #currRecordLen = 0
     #minRecordLen = 1	# seconds
     
+    startRecordIntervalTime = time.time()
     startRecordTime = time.time()
     
     processSettingsObj.setStartTime(time.time())
@@ -57,6 +58,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
     maxFrameRetry = 3
     
     recordExtended = 0
+    
     try:
         maxRecordingLengthInSeconds = float(processSettingsObj.maxRecordingLengthInSeconds)
     except ValueError:
@@ -109,15 +111,15 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         motionFlag, diffValue = CompareImagesObj.funcCompareImages()
         #print(f"{timeStamp}: {motionFlag}")
         
-        currentRecordTime = time.time() - startRecordTime
-        
-        if (OpenCVControlObj.getRecord() == True and currentRecordTime >= processSettingsObj.getRecordTimeMinimumSeconds() or currentRecordTime >= maxRecordingLengthInSeconds):
+        # if recording and (record length >= min record length for interval or total record time >= max record length)
+        if (OpenCVControlObj.getRecord() == True and (time.time() - startRecordIntervalTime >= processSettingsObj.getRecordTimeMinimumSeconds() or time.time() - startRecordTime >= maxRecordingLengthInSeconds)):
             # when recording duration completed
-            startRecordTime = time.time()
+            
             #print(f"**Checking if extend {motionFlag}, thres: {CompareImagesObj.threshold}, diff: {diffValue}")
             #CompareImagesObj.saveImages(timeStamp)
             # Do not extend if; 1. no motion, 2. extended the current recorded max number of times. 3. At max recording length for a single file.
-            if (motionFlag == False or recordExtended >= processSettingsObj.getRecordExtendMultiple() or currentRecordTime >= maxRecordingLengthInSeconds):
+            if (motionFlag == False or recordExtended >= processSettingsObj.getRecordExtendMultiple() or time.time() - startRecordTime >= maxRecordingLengthInSeconds):
+                print(time.time() - startRecordTime)
                 OpenCVControlObj.setRecord(False, '')
                 
                 # clear finished threads. Once found a thread still running, break.
@@ -137,11 +139,13 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
             else:
                 # still has 'motion', therefore keep recording.
                 # need to track how many times extended
+                startRecordIntervalTime = time.time()
                 recordExtended += 1
         
         if (OpenCVControlObj.getRecord() == False and motionFlag == True):
             # start recording
             recordExtended = 0
+            startRecordIntervalTime = time.time()
             startRecordTime = time.time()
             recordFilename = f"recorded_{timeStamp}.avi"
             OpenCVControlObj.setRecord(True, recordFolder + f"/{recordFilename}")
