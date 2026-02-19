@@ -10,6 +10,7 @@ const cors = require('cors')
 const rateLimit = require('express-rate-limit')
 const xss = require('./middleware/xss-clean')
 const cookieParser = require('cookie-parser')
+const logger = require('./logging/logger')
 
 // check directories
 if (validateProjectDirectories() === false) {
@@ -28,6 +29,7 @@ const uploadVideoSingleRouter = require("./routes/uploadVideoSingle")
 
 // middleware
 const verifyCameraMiddleware = require('./middleware/verifyCamera')
+const errorHandlerMiddleware = require('./middleware/errorHandler');
 
 // app
 const app = express()
@@ -69,16 +71,18 @@ app.use('/api/v1/uploadVideo', verifyCameraMiddleware, uploadVideoSingleRouter)
 
 // /routes
 
+app.use(errorHandlerMiddleware) // catch errors
+
 const start = async() => {
     try {
         //await connectDB(process.env.MONGO_URI)
 
         app.listen(port, '0.0.0.0', async() => {
-            console.log(`Listening on port ${port}...`)
+            logger.info(`Listening on port ${port}...`)
         })
 
     } catch (err) {
-        console.log(`Listen error: ${err}`)
+        logger.error(`Listen error: ${err}`)
     }
 }
 

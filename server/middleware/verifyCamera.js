@@ -7,13 +7,13 @@ const { UnauthenticatedError } = require('../errors')
 const verifyCamera = async(req, res, next) => {
     // const { cameraName } = req.body
     // console.log(req.headers) // good
-    // note, since using multer. The req.body will be undefined if middleware runs before the multer upload since multer will populate the req.file and req.body with the data.
+    // note: since using multer. The req.body will be undefined if this middleware runs before the multer upload since multer will populate the req.file and req.body with the data. Therefore just validate header.
 
     // request has the token in the header:
     // authentication: Bearer token // note, the token is purposely not a json web token. Just allow pair of plain text to be configured.
     const authHeader = req.headers.authorization || req.headers.Authorization
     if (!authHeader?.startsWith('Bearer')) {
-        throw new UnauthenticatedError('Not authenticated!')  // later
+        throw new UnauthenticatedError('verifyCamera: Not authenticated!')  // later
     }
 
     // compare camera name and token to DB
