@@ -10,7 +10,7 @@ from collections import deque
 from OpenCVControl import OpenCVControl
 from CompareImages import CompareImages
 from ProcessSettings import ProcessSettings
-from req_uploadVideo import req_uploadVideo
+from req_uploadVideo import req_uploadVideo, test
 from setup import setup, getConfigPath, getConfigSettings
 
 
@@ -108,7 +108,8 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
     
         CompareImagesObj.setCurrentImage(frame)
         #motionFlag = CompareImagesObj.funcCompareImages(True, f"{timeStamp}", True)
-        motionFlag, diffValue = CompareImagesObj.funcCompareImages()
+        motionFlag, rectanglePoints, diffValue = CompareImagesObj.funcCompareImages()
+        
         #print(f"{timeStamp}: {motionFlag}")
         
         # if recording and (record length >= min record length for interval or total record time >= max record length)
@@ -119,7 +120,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
             #CompareImagesObj.saveImages(timeStamp)
             # Do not extend if; 1. no motion, 2. extended the current recorded max number of times. 3. At max recording length for a single file.
             if (motionFlag == False or recordExtended >= processSettingsObj.getRecordExtendMultiple() or time.time() - startRecordTime >= maxRecordingLengthInSeconds):
-                print(time.time() - startRecordTime)
+                #print(time.time() - startRecordTime)
                 OpenCVControlObj.setRecord(False, '')
                 
                 # clear finished threads. Once found a thread still running, break.
@@ -130,7 +131,8 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
                         break
                 
                 # once recording is finised upload to server create thread to upload to server
-                #threadUploadVideo = threading.Thread(target=req_uploadVideo, args=(recordFilename))
+                #print(recordFilename)
+                #threadUploadVideo = threading.Thread(target=req_uploadVideo, args=(recordFilename,))
                 #threadUploadVideo.start()
                 #uploadVideoThreadsQueue.append(threadUploadVideo)
                 
@@ -152,7 +154,8 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         
         if (OpenCVControlObj.getRecord() == True):
             # during record, write the frame
-            OpenCVControlObj.writeFrame()
+            break#for testing 1 frame
+            OpenCVControlObj.writeFrame(rectanglePoints)
     
     
     OpenCVControlObj.endStream()
@@ -161,8 +164,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
     
     logger.info(f'uploadVideoThreads to join: {len(uploadVideoThreadsQueue)}')
     while (len(uploadVideoThreadsQueue) > 0):
-        thread = uploadVideoThreadsQueue.popleft()
-        if (uploadVideoThreadsQueue[0].is_alive() == True):
+        if (uploadVideoThreadsQueue.popleft().is_alive() == True):
             # wait for join
             thread.join()
         logger.info('Joined.')
@@ -174,7 +176,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
     #    threadCaptureStream.join()
     #print('===/ Camera Thread ===\n')
     print('\n**Current camera session completed.**\n')
-    logger.info('===/ Camera Thread ===\n')
+    logger.info('===/ Camera Thread ===')
     return
         
 def main():
@@ -303,9 +305,11 @@ def main():
     if (threadAnalyzeVideoStream is not None):  
         threadAnalyzeVideoStream.join()
     #print('=/ Main: End')
-    logger.info('=/ Main: End')
+    logger.info('=/ Main: End/n')
     
 if __name__ == '__main__':
+    #test()
+    
     if setup() == False:
         sys.exit(1)
         

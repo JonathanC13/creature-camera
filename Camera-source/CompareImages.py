@@ -2,7 +2,7 @@ import cv2
 import os.path
 import numpy as np
 import logging
-from PIL import Image
+from PIL import Image, ImageDraw
 from setup import getConfigSettings
 
 class CompareImages:
@@ -52,7 +52,7 @@ class CompareImages:
         finally:
             return matrix
         
-    def saveDiffImage(self, matrix, suffix):
+    def saveDiffImage(self, matrix, rectanglePoints, suffix):
         savePath = self.currPath + self.config['FOLDERS']['image_output_folder'] + f'/output/diffImg_{suffix}.png'
         
         if os.path.exists(savePath):
@@ -70,10 +70,14 @@ class CompareImages:
         imgBytes = bytes(pixelData)
 
         img = Image.frombytes("L", (cols, rows), imgBytes)
+        
+        # draw rectangle
+        draw = ImageDraw.Draw(img)
+        draw.rectangle(rectanglePoints, None, (0,255,0),1)
 
         # Save or display the image
         try:
-            img.save(savePath)
+            img.save(savePath, 'PNG')
             #print(f'CompareImages: Image saved at {savePath}')
             self.logger.info(f'CompareImages: Image saved at {savePath}')
         except Exception as e:
@@ -83,7 +87,7 @@ class CompareImages:
     def funcCompareImages(self, save=False, suffix='', debug=False):
         
         if (np.size(self.arrImages[0]) == 0 or np.size(self.arrImages[1]) == 0):
-            return False, 0
+            return False, [(0,0), (0,0)], 0
         
         diffMatrix = np.abs(self.arrImages[0] - self.arrImages[1])
         diffValue = diffMatrix.sum()
@@ -92,11 +96,50 @@ class CompareImages:
         if (debug == True):
             #print(f"CompareImages: diff value at {suffix}: {diffValue}, past threshold: " + str(diffValue > self.getThreshold()))
             self.logger.info(f"CompareImages: diff value at {suffix}: {diffValue}, past threshold: " + str(diffValue > self.getThreshold()))
+            
+        rectanglePoints = findDiffRectangle(diffMatrix) if diffValue > self.getThreshold() else [(0,0),(0,0)]
+        ret = (True if diffValue > self.getThreshold() else False, rectanglePoints, diffValue)
         
         if (save == True):
-            self.saveDiffImage(diffMatrix, suffix)
+            self.saveDiffImage(diffMatrix, rectanglePoints, suffix)
+            
+        return ret
         
-        return True if diffValue > self.getThreshold() else False, diffValue
+    def findDiffRectangle(self, diffMatrix):
+        rectanglePoints = [(0,0),(0,0)]
+        if (diffMatrix is None):
+            return [(0,0),(0,0)]
+            
+        rows = len(diffMatrix)
+        cols = len(diffMatrix[0])    
+        diffSensitivity = 10
+            
+        # get top left
+        found = False
+        for r in range(0,rows,1):
+            for c in range(0,cols,1):
+                if (diffMatrix[r][c] >= diffSensitivity):
+                    rectanglePoints[0] = (r,c)
+                    found = True
+                    break
+            if (found == True):
+                break
+        
+        found = False
+        # get bottom right
+        for r in range(rows-1, 0, -1):
+            for c in range(cols-1, 0, -1):
+                if (diffMatrix[r][c] >= diffSensitivity):
+                    if (r >= rectanglePoints[0][0] and c >= rectanglePoints[0][1]):
+                        rectanglePoints[1] = (r,c)
+                    else:
+                        rectanglePoints[1] = rectanglePoints[0]
+                    found = True
+                    break
+            if (found == True):
+                break
+        
+        return rectanglePoints
         
     def startThread(self, save=False, suffix=''):
         thread = threading.Thread(target=self.funcCompareImages, args=(save, suffix))
