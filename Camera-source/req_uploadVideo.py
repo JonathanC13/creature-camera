@@ -5,8 +5,16 @@ import requests
 from dotenv import load_dotenv
 from setup import getConfigSettings
 
+def test():
+    url = 'http://192.168.1.22:5000/' # Example URL
+    response = requests.get(url)
+
+    # Check the status code (200 means success)
+    print(f"Response: {response}")
+    
+
 def req_uploadVideo(recordFilename):
-    if (filename == ""):
+    if (recordFilename == ""):
         return
     
     load_dotenv()
@@ -30,7 +38,7 @@ def req_uploadVideo(recordFilename):
         with open(config["FOLDERS"]["recorded_folder"] + f"/{recordFilename}", 'rb') as openedFile:
             
             # POST request
-            # (fieldname: (filename, file_object, content_type, headers))
+            # (fieldname: (recordFilename, file_object, content_type, headers))
             file = {'file': (f"{recordFilename}", openedFile, 'video/avi')}
             data = {"cameraName": config['SETTINGS']["camera_name"]}
             response = requests.post(api_uploadVideoURL, files=file, data=data, headers=headers)
@@ -52,9 +60,9 @@ def req_uploadVideo(recordFilename):
                 logger.info(f"req_uploadVideo: Response content: {msg}.")
                 
             except requests.exceptions.RequestException as e:
-                print("WARN: req_uploadVideo: Could not parse response conent to JSON format.")
+                #print("WARN: req_uploadVideo: Could not parse response conent to JSON format.")
                 logger.warning(f"req_uploadVideo: Could not parse response conent to JSON format.")      
 
     except FileNotFoundError:
-        print("ERR: req_uploadVideo: Record filename was not found.")
-        logger.critical('ERR: req_uploadVideo: Record filename was not found.')
+        #print("ERR: req_uploadVideo: Record filename was not found.")
+        logger.critical(f'ERR: req_uploadVideo: Record filename {recordFilename} was not found.')

@@ -13,6 +13,7 @@ class OpenCVControl:
         self.logger = logging.getLogger(self.config['LOG_INFO']['logger_name'])
         self.rtspStreamURL = rtspStreamURL
         self.capture = cv2.VideoCapture(rtspStreamURL)
+        self.out = None
         self.quit = False
         self.record = False
         self.recordPath = ""
@@ -45,7 +46,7 @@ class OpenCVControl:
             #print(f"OpenCVControl: **Trying to record to {path}")
             self.logger.info(f"OpenCVControl: setRecord: **Trying to record to {path}")
             self.recordPath = path
-            self.out = cv2.VideoWriter(path, self.fourcc, self.fps, (self.width, self.height))
+            self.out = cv2.VideoWriter(path, self.fourcc, self.fps, (self.width, self.height), True)
         else:
             #print("OpenCVControl: **Recording end.")
             self.logger.info("OpenCVControl: setRecord: **Recording end.")
@@ -62,8 +63,9 @@ class OpenCVControl:
         self.height = int(self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.out = None
         
-    def writeFrame(self):
+    def writeFrame(self, rectanglePoints):
         if (self.record == True and self.out is not None):
+            cv2.rectangle(self.frame,rectanglePoints[0],rectanglePoints[1],(0,255,0),1)
             self.out.write(self.frame)
         elif (self.out is None):
             #print("OpenCVControl: Could not write for record.")
@@ -109,7 +111,7 @@ class OpenCVControl:
         while (not self.capture.isOpened() and retry <= self.maxReOpenRetry):
             #print(f"OpenCVControl capture: Retrying to re-open stream... {retry}")
             self.logger.warning(f"WARN: OpenCVControl capture: Retrying to re-open stream... {retry}")
-            self.capture = cv2.VideoCapture(rtspStreamURL)
+            self.capture.open()
             
             # record properties with new capture
             self.setRecordProperties()
