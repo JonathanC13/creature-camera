@@ -44,7 +44,7 @@ class CompareImages:
         
         try:
             image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)	# convert to grayscale
-            image = cv2.resize(image, (32, 32), None, None, None, interpolation=cv2.INTER_CUBIC)	# reduce size and smooth a bit using PIL
+            #image = cv2.resize(image, (32, 32), None, None, None, interpolation=cv2.INTER_CUBIC)	# reduce size and smooth a bit using PIL
             matrix = image.astype(np.int64)   # convert from unsigned bytes to signed int using numpy
             
         except Exception as e:
@@ -53,7 +53,7 @@ class CompareImages:
             return matrix
         
     def saveDiffImage(self, matrix, rectanglePoints, suffix):
-        savePath = self.currPath + self.config['FOLDERS']['image_output_folder'] + f'/output/diffImg_{suffix}.png'
+        savePath = self.currPath + f'/{self.config["FOLDERS"]["image_output_folder"]}/diffImg_{suffix}.png'
         
         if os.path.exists(savePath):
             #print(f'CompareImages: Cannot save diff image, file name exists - {savePath}')
@@ -73,7 +73,7 @@ class CompareImages:
         
         # draw rectangle
         draw = ImageDraw.Draw(img)
-        draw.rectangle(rectanglePoints, None, (0,255,0),1)
+        draw.rectangle(rectanglePoints, None, 'white',1)        # since "L" gray scale, the colour cannot be other than a grayscale value.
 
         # Save or display the image
         try:
@@ -97,10 +97,10 @@ class CompareImages:
             #print(f"CompareImages: diff value at {suffix}: {diffValue}, past threshold: " + str(diffValue > self.getThreshold()))
             self.logger.info(f"CompareImages: diff value at {suffix}: {diffValue}, past threshold: " + str(diffValue > self.getThreshold()))
             
-        rectanglePoints = findDiffRectangle(diffMatrix) if diffValue > self.getThreshold() else [(0,0),(0,0)]
+        rectanglePoints = self.findDiffRectangle(diffMatrix) if diffValue > self.getThreshold() else [(0,0),(0,0)]
         ret = (True if diffValue > self.getThreshold() else False, rectanglePoints, diffValue)
         
-        if (save == True):
+        if (diffValue > self.getThreshold() and save == True):
             self.saveDiffImage(diffMatrix, rectanglePoints, suffix)
             
         return ret
@@ -108,36 +108,25 @@ class CompareImages:
     def findDiffRectangle(self, diffMatrix):
         rectanglePoints = [(0,0),(0,0)]
         if (diffMatrix is None):
-            return [(0,0),(0,0)]
+            return rectanglePoints
             
         rows = len(diffMatrix)
         cols = len(diffMatrix[0])    
         diffSensitivity = 10
+        
+        topLeft = [rows-1, cols-1]
+        botRight = [0,0]
             
         # get top left
-        found = False
         for r in range(0,rows,1):
             for c in range(0,cols,1):
                 if (diffMatrix[r][c] >= diffSensitivity):
-                    rectanglePoints[0] = (r,c)
-                    found = True
-                    break
-            if (found == True):
-                break
+                    topLeft = [min(topLeft[0], r), min(topLeft[1], c)]
+                    botRight = [max(botRight[0], r), max(botRight[1], c)]
         
-        found = False
-        # get bottom right
-        for r in range(rows-1, 0, -1):
-            for c in range(cols-1, 0, -1):
-                if (diffMatrix[r][c] >= diffSensitivity):
-                    if (r >= rectanglePoints[0][0] and c >= rectanglePoints[0][1]):
-                        rectanglePoints[1] = (r,c)
-                    else:
-                        rectanglePoints[1] = rectanglePoints[0]
-                    found = True
-                    break
-            if (found == True):
-                break
+        # ensure topLeft <= botRight
+        topLeft = [min(topLeft[0], botRight[0]), min(topLeft[1], botRight[1])]
+        rectanglePoints = [topLeft, botRight]   
         
         return rectanglePoints
         

@@ -107,10 +107,10 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         #OpenCVControlObj.saveCurrentFrameLocally(savePath)
     
         CompareImagesObj.setCurrentImage(frame)
-        #motionFlag = CompareImagesObj.funcCompareImages(True, f"{timeStamp}", True)
-        motionFlag, rectanglePoints, diffValue = CompareImagesObj.funcCompareImages()
+        motionFlag, rectanglePoints, diffValue  = CompareImagesObj.funcCompareImages(True, f"{timeStamp}", False)
+        #motionFlag, rectanglePoints, diffValue = CompareImagesObj.funcCompareImages()
         
-        #print(f"{timeStamp}: {motionFlag}")
+        #print(f"{timeStamp}: {motionFlag}: {diffValue}")
         
         # if recording and (record length >= min record length for interval or total record time >= max record length)
         if (OpenCVControlObj.getRecord() == True and (time.time() - startRecordIntervalTime >= processSettingsObj.getRecordTimeMinimumSeconds() or time.time() - startRecordTime >= maxRecordingLengthInSeconds)):
@@ -146,6 +146,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         
         if (OpenCVControlObj.getRecord() == False and motionFlag == True):
             # start recording
+            print('recording')
             recordExtended = 0
             startRecordIntervalTime = time.time()
             startRecordTime = time.time()
@@ -154,7 +155,6 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         
         if (OpenCVControlObj.getRecord() == True):
             # during record, write the frame
-            break#for testing 1 frame
             OpenCVControlObj.writeFrame(rectanglePoints)
     
     
