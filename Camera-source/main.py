@@ -33,7 +33,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         logger.critical(f"ERR: Could not open video stream with URL, check .env")
         return
         
-    CompareImagesObj = CompareImages(32, 32, processSettingsObj.getThresholdPercent())
+    CompareImagesObj = CompareImages(processSettingsObj.getThresholdPercent())
     
     #captureDelayNs = captureDelayMs * 1000000		#captureDelayMs from param. May need to set capture delay for read() because if unrestricted capture for frames to compare it will sometimes grab the old
     
@@ -110,7 +110,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         motionFlag, rectanglePoints, diffValue  = CompareImagesObj.funcCompareImages(True, f"{timeStamp}", False)
         #motionFlag, rectanglePoints, diffValue = CompareImagesObj.funcCompareImages()
         
-        #print(f"{timeStamp}: {motionFlag}: {diffValue}")
+        #print(f"{timeStamp}: {motionFlag}: {diffValue}: {CompareImagesObj.getThreshold()}")
         
         # if recording and (record length >= min record length for interval or total record time >= max record length)
         if (OpenCVControlObj.getRecord() == True and (time.time() - startRecordIntervalTime >= processSettingsObj.getRecordTimeMinimumSeconds() or time.time() - startRecordTime >= maxRecordingLengthInSeconds)):
