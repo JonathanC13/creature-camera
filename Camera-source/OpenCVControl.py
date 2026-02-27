@@ -65,7 +65,8 @@ class OpenCVControl:
         
     def writeFrame(self, rectanglePoints):
         if (self.record == True and self.out is not None):
-            cv2.rectangle(self.frame,rectanglePoints[0],rectanglePoints[1],(0,255,0,255),1)
+            if (rectanglePoints[1][0] != 0 && rectanglePoints[1][1] != 0):
+                cv2.rectangle(self.frame,rectanglePoints[0],rectanglePoints[1],(0,255,0,255),2)
             self.out.write(self.frame)
         elif (self.out is None):
             #print("OpenCVControl: Could not write for record.")

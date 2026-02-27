@@ -121,6 +121,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
             # Do not extend if; 1. no motion, 2. extended the current recorded max number of times. 3. At max recording length for a single file.
             if (motionFlag == False or recordExtended >= processSettingsObj.getRecordExtendMultiple() or time.time() - startRecordTime >= maxRecordingLengthInSeconds):
                 #print(time.time() - startRecordTime)
+                print('recording ended')
                 OpenCVControlObj.setRecord(False, '')
                 
                 # clear finished threads. Once found a thread still running, break.

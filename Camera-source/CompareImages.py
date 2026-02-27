@@ -66,7 +66,7 @@ class CompareImages:
         
         # draw rectangle
         draw = ImageDraw.Draw(img)
-        draw.rectangle(rectanglePoints, None, 'white',1)        # since "L" gray scale, the colour cannot be other than a grayscale value.
+        draw.rectangle(rectanglePoints, None, 'white',2)        # since "L" gray scale, the colour cannot be other than a grayscale value.
 
         # Save or display the image
         try:
@@ -93,7 +93,7 @@ class CompareImages:
         
     def funcCompareImages(self, save=False, suffix='', debug=False):
         
-        if (np.size(self.arrImages[0]) == 0 or np.size(self.arrImages[1]) == 0):
+        if (np.size(self.arrImages[0][0]) == 0 or np.size(self.arrImages[1][0]) == 0):
             # nothing to compare
             return False, [(0,0), (0,0)], 0
         
@@ -108,7 +108,7 @@ class CompareImages:
         rectanglePoints = [(0,0),(0,0)]
         if diffValue > self.getThreshold():
             # find the rectangle points with the original images
-            fullSizeDiffMatrix = np.abs(self.arrImages[0][0] - self.arrImages[1][0])
+            fullSizeDiffMatrix = np.abs(self.arrImages[0][1] - self.arrImages[1][1])
             
             img = self.createDiffImageFromMatrix(fullSizeDiffMatrix)
             
