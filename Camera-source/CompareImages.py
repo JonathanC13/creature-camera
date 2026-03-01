@@ -12,8 +12,9 @@ class CompareImages:
         
         self.logger = logging.getLogger(self.config['LOG_INFO']['logger_name'])
         
-        self.resizeW = 32
-        self.resizeH = 32
+        # if need smaller
+        self.resizeW = 640
+        self.resizeH = 360
         # resizeW * resizeH and grayscale each element is 0-255. Therefore resizeW * resizeH * 255 = totalPixels.
         # threshold pixel changes = totalPixels * thresholdPercent / 100
         self.threshold = 0
@@ -102,9 +103,8 @@ class CompareImages:
         self.diff = diffValue
         # + str(diffValue > self.getThreshold()
         if (debug == True):
-            #print(f"CompareImages: diff value at {suffix}: {diffValue}, past threshold: " + str(diffValue > self.getThreshold()))
-            self.logger.info(f"CompareImages: diff value at {suffix}: {diffValue}, past threshold: " + str(diffValue > self.getThreshold()))
-        
+            self.logger.info(f"CompareImages: diff value of {diffValue}: Threshold: {self.getThreshold()}, past threshold: " + str(diffValue > self.getThreshold()))
+            print(f"CompareImages: diff value of {diffValue}: Threshold: {self.getThreshold()}, past threshold: " + str(diffValue > self.getThreshold()))
         rectanglePoints = [(0,0),(0,0)]
         if diffValue > self.getThreshold():
             # find the rectangle points with the original images
@@ -117,6 +117,7 @@ class CompareImages:
             if (save == True):
                 self.logger.info(f"CompareImages: diffVlaue {diffValue}, threshold: {self.getThreshold()}")
                 self.saveDiffImage(fullSizeDiffMatrix, rectanglePoints, suffix)
+                
             
         ret = (True if diffValue > self.getThreshold() else False, rectanglePoints, diffValue)
             
@@ -129,20 +130,20 @@ class CompareImages:
             
         pixels = diffImage.load()
         width, height = diffImage.size  
-        diffSensitivity = 10
+        diffSensitivity = 10    # arbitrarily chosen
         
-        topLeft = [height-1, width-1]
-        botRight = [0,0]
+        topLeft = (height-1, width-1)
+        botRight = (0,0)
             
         # get top left
         for y in range(0,height,1):
             for x in range(0,width,1):
                 if (pixels[x, y] >= diffSensitivity):
-                    topLeft = [min(topLeft[0], x), min(topLeft[1], y)]
-                    botRight = [max(botRight[0], x), max(botRight[1], y)]
+                    topLeft = (min(topLeft[0], x), min(topLeft[1], y))
+                    botRight = (max(botRight[0], x), max(botRight[1], y))
         
         # ensure topLeft <= botRight
-        topLeft = [min(topLeft[0], botRight[0]), min(topLeft[1], botRight[1])]
+        topLeft = (min(topLeft[0], botRight[0]), min(topLeft[1], botRight[1]))
         rectanglePoints = [topLeft, botRight]   
         
         return rectanglePoints
