@@ -7,7 +7,7 @@ import sys
 import configparser
 from dotenv import load_dotenv
 from collections import deque
-from OpenCVControl import OpenCVControl
+from CameraControl import CameraControl
 from CompareImages import CompareImages
 from ProcessSettings import ProcessSettings
 from req_uploadVideo import req_uploadVideo, test
@@ -26,26 +26,17 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
     #print('=== Camera Thread ===')
     logger.info('== Camera Thread: Started')
         
-    OpenCVControlObj = OpenCVControl(os.getenv('RTSP_STREAM_URL'))
+    CameraControlObj = CameraControl(os.getenv('RTSP_STREAM_URL'))
     
-    if (not OpenCVControlObj.getCaptureOpened()):
+    if (not CameraControlObj.getCaptureOpened()):
         #print(f"ERR: Could not open video stream with URL {rtspStreamURL}")
         logger.critical(f"ERR: Could not open video stream with URL, check .env")
         return
-        
-    CompareImagesObj = CompareImages(processSettingsObj.getThresholdPercent())
     
-    #captureDelayNs = captureDelayMs * 1000000		#captureDelayMs from param. May need to set capture delay for read() because if unrestricted capture for frames to compare it will sometimes grab the old
+    maskDebug = False
+    CompareImagesObj = CompareImages(processSettingsObj.getThresholdPercent(), (CameraControlObj.width, CameraControlObj.height), maskDebug=maskDebug)
     
-    #currRun = 0
-    #maxRun = processSettingsObj.durationMin * 60	# seconds
-    #threadCaptureStream = OpenCVControlObj.startThread()
-    #time.sleep(1)	# time to start up stream.
     uploadVideoThreadsQueue = deque()
-    
-    # record properties
-    #currRecordLen = 0
-    #minRecordLen = 1	# seconds
     
     startRecordIntervalTime = time.time()
     startRecordTime = time.time()
@@ -78,7 +69,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
             #logStart = time.time()
             #print('running...')
             
-        ret, frame = OpenCVControlObj.readStream()
+        ret, frame = CameraControlObj.readStream()
         
         if (not ret):
             if (frameRetry >= maxFrameRetry):
@@ -86,43 +77,33 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
                 logger.error(f"ERR: {maxFrameRetry} frame retries reached. Break.")
                 break
             frameRetry += 1
-            OpenCVControlObj.retryOpenStream()
+            CameraControlObj.retryOpenStream()
             continue
             
         frameRetry = 0
             
-        #if (not threadCaptureStream.is_alive()):
-            #print("Loop: threadCaptureStream dead.")
-            #break
-            
-        # **need to test, without delay need to check if motionFlag is correctly determined. If not, it's probably getting old frame data so it compares the same frame = no motion.
-        # send frame to CompareImages obj
-        #if (time.time_ns() - capTime >= captureDelayNs):
-            #capTime = time.time_ns()
-        #timeStamp = str(time.time_ns())
         timeObj = time.localtime()
         timeStamp = "{tm_year}{tm_mon}{tm_mday}_{tm_hour}h{tm_min}m{tm_sec}s".format(tm_year=str(timeObj.tm_year), tm_mon=str(timeObj.tm_mon), tm_mday=str(timeObj.tm_mday), tm_hour=str(timeObj.tm_hour), tm_min=str(timeObj.tm_min), tm_sec=str(timeObj.tm_sec))
     
         #savePath = currPath + f"/recorded/image_{timeStamp}.png"
-        #OpenCVControlObj.saveCurrentFrameLocally(savePath)
+        #CameraControlObj.saveCurrentFrameLocally(savePath)
     
         CompareImagesObj.setCurrentImage(frame)
-        motionFlag, rectanglePoints, diffValue  = CompareImagesObj.funcCompareImages(True, f"{timeStamp}", False)
-        #motionFlag, rectanglePoints, diffValue = CompareImagesObj.funcCompareImages()
+        #motionFlag, frame  = CompareImagesObj.funcCompareImages(True, f"{timeStamp}")
+        motionFlag, frame = CompareImagesObj.funcCompareImages()
         
         #print(f"{timeStamp}: {motionFlag}: {diffValue}: {CompareImagesObj.getThreshold()}")
         
         # if recording and (record length >= min record length for interval or total record time >= max record length)
-        if (OpenCVControlObj.getRecord() == True and (time.time() - startRecordIntervalTime >= processSettingsObj.getRecordTimeMinimumSeconds() or time.time() - startRecordTime >= maxRecordingLengthInSeconds)):
+        if (CameraControlObj.getRecord() == True and (time.time() - startRecordIntervalTime >= processSettingsObj.getRecordTimeMinimumSeconds() or time.time() - startRecordTime >= maxRecordingLengthInSeconds)):
             # when recording duration completed
             
             #print(f"**Checking if extend {motionFlag}, thres: {CompareImagesObj.threshold}, diff: {diffValue}")
-            #CompareImagesObj.saveImages(timeStamp)
             # Do not extend if; 1. no motion, 2. extended the current recorded max number of times. 3. At max recording length for a single file.
             if (motionFlag == False or recordExtended >= processSettingsObj.getRecordExtendMultiple() or time.time() - startRecordTime >= maxRecordingLengthInSeconds):
                 #print(time.time() - startRecordTime)
-                print('recording ended')
-                OpenCVControlObj.setRecord(False, '')
+                print('Recording ended')
+                CameraControlObj.setRecord(False, '')
                 
                 # clear finished threads. Once found a thread still running, break.
                 while (len(uploadVideoThreadsQueue) > 0):
@@ -139,27 +120,32 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
                 
                 recordFilename = ""
                 
+                # for mask debugging
+                if (maskDebug):
+                    CompareImagesObj.saveMaskImagesToGIF(timeStamp)
+                
             else:
                 # still has 'motion', therefore keep recording.
                 # need to track how many times extended
                 startRecordIntervalTime = time.time()
                 recordExtended += 1
         
-        if (OpenCVControlObj.getRecord() == False and motionFlag == True):
+        if (CameraControlObj.getRecord() == False and motionFlag == True):
             # start recording
-            print('recording')
+            print('Recording started')
+            CompareImages.resetFrameNumber()
             recordExtended = 0
             startRecordIntervalTime = time.time()
             startRecordTime = time.time()
             recordFilename = f"recorded_{timeStamp}.avi"
-            OpenCVControlObj.setRecord(True, recordFolder + f"/{recordFilename}")
+            CameraControlObj.setRecord(True, recordFolder + f"/{recordFilename}")
         
-        if (OpenCVControlObj.getRecord() == True):
+        if (CameraControlObj.getRecord() == True and frame is not None):
             # during record, write the frame
-            OpenCVControlObj.writeFrame(rectanglePoints)
+            CompareImages.increaseFrameNumber()
+            CameraControlObj.writeFrame(frame)
     
-    
-    OpenCVControlObj.endStream()
+    CameraControlObj.endStream()
     logger.info('OpenCV stream closed')
     processSettingsObj.setRunning(False)
     
@@ -170,12 +156,6 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
             thread.join()
         logger.info('Joined.')
             
-    #print('Camera ended')
-    #OpenCVControlObj.quit = True
-    #if (threadCaptureStream.is_alive()):
-        # wait for join
-    #    threadCaptureStream.join()
-    #print('===/ Camera Thread ===\n')
     print('\n**Current camera session completed.**\n')
     logger.info('===/ Camera Thread ===')
     return
