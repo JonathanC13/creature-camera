@@ -19,7 +19,7 @@ class CameraControl:
         self.recordPath = ""
         
         self.ret = False
-        self.frame = np.ndarray(shape=(0,0))
+        self.frame = None
         
         self.maxReOpenRetry = 3
         self.maxFrameRetry = 3
@@ -63,15 +63,21 @@ class CameraControl:
         self.height = int(self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.out = None
         
-    def writeFrame(self, rectanglePoints):
-        if (self.record == True and self.out is not None):
-            self.out.write(self.frame)
+    def writeFrame(self, frame=None):
+        frame = self.frame if frame is None else frame
+        if (frame is not None and self.out is not None):
+            self.out.write(frame)
+        elif (frame is None):
+            self.logger.error("ERR: CameraControl: writeFrame: Frame is None.")
         elif (self.out is None):
             #print("CameraControl: Could not write for record.")
-            self.logger.error("ERR: CameraControl: writeFrame: Could not write for record.")
+            self.logger.error("ERR: CameraControl: writeFrame: Out is None.")
         elif (self.record == False):
             #print("CameraControl: Record == False.")
             self.logger.info("CameraControl: writeFrame: Record == False.")
+            
+    def writeProcessedFrame(self, frame):
+        self.writeFrame(frame)
         
     def getFrame(self):
         #self.frameLock.acquire(blocking=True)

@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw
 from setup import getConfigSettings
 
 class CompareImages:
-        def __init__(self, thresholdPercent, videoDimensions, maskDebug=False):
+        def __init__(self, videoDimensions, maskDebug=False):
                 currPath = os.getcwd()
                 self.config = getConfigSettings()
                 
@@ -22,21 +22,21 @@ class CompareImages:
                 # threshold pixel changes = totalPixels * thresholdPercent / 100
                 self.threshold = 400 / self.reductionFactor
                 
-                self.arrImages = [[None, None], [None, None]     # [original grayscaled for rectangle determination, for motion detection]
+                self.arrImages = [[None, None], [None, None]]     # [original grayscaled for rectangle determination, for motion detection]
                 self.frameNumber = 0
                 self.maskDebug = maskDebug
                 self.maskFrames = []
                 self.currPath = currPath
                 self.diff = 0
                 
-        def saveMaskImagesToGIF(suffix):
-                if (maskDebug == False or len(self.maskFrames) == 0):
-                        retrun
-                pil_images = [Image.fromarray(frame) for frame in frames]
+        def saveMaskImagesToGIF(self, suffix):
+                if (self.maskDebug == False or len(self.maskFrames) == 0):
+                        return
+                pil_images = [Image.fromarray(frame) for frame in self.maskFrames]
                 
                 if pil_images:
                         pil_images[0].save(
-                                f'maskFrames_{suffix}.gif',
+                                f'{self.config["FOLDERS"]["image_output_folder"]}/maskFrames_{suffix}.gif',
                                 save_all=True,
                                 append_images=pil_images[1:],
                                 duration=100,  # Duration per frame in milliseconds
@@ -61,10 +61,10 @@ class CompareImages:
                 
         def setCurrentImage(self, image):
                 self.arrImages[0] = self.arrImages[1].copy()
-                width, height, _ = image.shape
+                height, width, _ = image.shape
                 self.arrImages[1] = [image, cv2.resize(image, (int(width / self.reductionFactor), int(height / self.reductionFactor)), None, None, None, interpolation=cv2.INTER_AREA)]
                 
-        def get_mask(frame1, frame2, kernel=np.array((9,9), dtype=np.uint8)):
+        def get_mask(self, frame1, frame2, kernel=np.array((9,9), dtype=np.uint8)):
                 """ Obtains image mask
                 Inputs: 
                     frame1 - frame at time t
@@ -112,7 +112,7 @@ class CompareImages:
 
                 return mask
                 
-        def get_contour_detections(mask, thresh=400):
+        def get_contour_detections(self, mask, thresh=400):
                 """ Obtains initial proposed detections from contours discoverd on the mask. 
                 Scores are taken as the bbox area, larger is higher.
                 Inputs:
@@ -132,7 +132,7 @@ class CompareImages:
 
                 return np.array(detections)
                 
-        def remove_contained_bboxes(boxes):
+        def remove_contained_bboxes(self, boxes):
             """ Removes all smaller boxes that are contained within larger boxes.
                 Requires bboxes to be soirted by area (score)
                 Inputs:
@@ -155,7 +155,7 @@ class CompareImages:
                             continue
             return keep
     
-        def non_max_suppression(boxes, scores, threshold=1e-1):
+        def non_max_suppression(self, boxes, scores, threshold=1e-1):
             """
             Perform non-max suppression on a set of bounding boxes and corresponding scores.
             Inputs:
@@ -169,7 +169,7 @@ class CompareImages:
             boxes = boxes[np.argsort(scores)[::-1]] if len(boxes) > 0 else np.array([])
 
             # remove all contained bounding boxes and get ordered index
-            order = remove_contained_bboxes(boxes)
+            order = self.remove_contained_bboxes(boxes)
 
             keep = []
             while order:
@@ -190,7 +190,7 @@ class CompareImages:
                         
             return boxes[keep]
             
-        def get_detections(frame1, frame2, bbox_thresh=400, nms_thresh=1e-3, mask_kernel=np.array((9,9), dtype=np.uint8), frameNumber=0, mask_frames=[]):
+        def get_detections(self, frame1, frame2, bbox_thresh=400, nms_thresh=1e-3, mask_kernel=np.array((9,9), dtype=np.uint8)):
                 """ Main function to get detections via Frame Differencing
                 Inputs:
                     frame1 - Grayscale frame at time t
@@ -204,22 +204,22 @@ class CompareImages:
                         """
 
                 # get image mask for moving pixels
-                mask = get_mask(frame1, frame2, mask_kernel)
+                mask = self.get_mask(frame1, frame2, mask_kernel)
                 if (self.maskDebug):
                         self.maskFrames.append(mask)
                 #cv2.imwrite(imgPath + f'mask_{frameNumber}.jpg', mask)
 
                 # get initially proposed detections from contours
-                detections = get_contour_detections(mask, bbox_thresh)
+                detections = self.get_contour_detections(mask, bbox_thresh)
                 
                 # separate bboxes and scores
                 bboxes = detections[:, :4] if len(detections) > 0 else np.array([])
                 scores = detections[:, -1] if len(detections) > 0 else np.array([])
 
                 # perform Non-Maximal Supression on initial detections to remove fully contained detections and join detections that surpass IOU
-                return non_max_suppression(bboxes, scores, nms_thresh)
+                return self.non_max_suppression(bboxes, scores, nms_thresh)
                     
-        def draw_bboxes(frame, detections, reductionFactor):
+        def draw_bboxes(self, frame, detections, reductionFactor):
                 for det in detections:
                         x1,y1,x2,y2 = det
                         cv2.rectangle(frame, (x1 * reductionFactor,y1 * reductionFactor), (x2 * reductionFactor,y2 * reductionFactor), (0,255,0), 2)
@@ -243,13 +243,13 @@ class CompareImages:
                 
                 # draw detections
                 img = self.arrImages[0][1].copy()
-                draw_bboxes(img, detections, 1)
+                self.draw_bboxes(img, detections, 1)
 
-                saveImage(img, suffix)
+                self.saveImage(img, suffix)
                 
         def funcCompareImages(self, saveDiffImage=False, suffix=''):
                 
-                if (self.arrImages[0][1] === None or self.arrImages[0][1] != self.arrImages[1][1]):
+                if (self.arrImages[0][1] is None or np.array(self.arrImages[0][1]).shape != np.array(self.arrImages[1][1]).shape):
                     self.logger.info(f"CompareImages: Waiting for 2 valid images to compare.")
                     # nothing to compare
                     return False, None
@@ -262,20 +262,16 @@ class CompareImages:
                 frame2_bgr = self.arrImages[1][1].copy()
 
                 # get detections
-                detections = get_detections(frame1_bgr, frame2_bgr, bbox_thresh=self.threshold, nms_thresh=1e-4, mask_kernel=np.array((9,9), dtype=np.uint8))
+                detections = self.get_detections(frame1_bgr, frame2_bgr, bbox_thresh=self.threshold, nms_thresh=1e-4, mask_kernel=np.array((9,9), dtype=np.uint8))
                                                                 
-                frame2_og = frames[1][0].copy()
+                frame2_og = self.arrImages[1][0].copy()
                 # draw bounding boxes on frame
-                draw_bboxes(frame2_og, detections, self.reductionFactor)
-                
-                if (self.maskDebug == True):
-                    self.logger.info(f"CompareImages: Threshold: {self.getThreshold()}, Detections: {detections}")
-                    print(f"CompareImages: Threshold: {self.getThreshold()}, Detections: {detections}")
+                self.draw_bboxes(frame2_og, detections, self.reductionFactor)
                 
                 if (saveDiffImage == True):
                     self.saveDiffImage(detections, suffix)
                     
-                return True if len(detections) > 0 else False, frame
+                return True if len(detections) > 0 else False, frame2_og
                 
         def startThread(self, save=False, suffix=''):
                 thread = threading.Thread(target=self.funcCompareImages, args=(save, suffix))

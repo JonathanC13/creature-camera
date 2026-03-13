@@ -33,8 +33,8 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         logger.critical(f"ERR: Could not open video stream with URL, check .env")
         return
     
-    maskDebug = False
-    CompareImagesObj = CompareImages(processSettingsObj.getThresholdPercent(), (CameraControlObj.width, CameraControlObj.height), maskDebug=maskDebug)
+    maskDebug = True
+    CompareImagesObj = CompareImages((CameraControlObj.width, CameraControlObj.height), maskDebug=maskDebug)
     
     uploadVideoThreadsQueue = deque()
     
@@ -90,7 +90,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
     
         CompareImagesObj.setCurrentImage(frame)
         #motionFlag, frame  = CompareImagesObj.funcCompareImages(True, f"{timeStamp}")
-        motionFlag, frame = CompareImagesObj.funcCompareImages()
+        motionFlag, processedFrame = CompareImagesObj.funcCompareImages()
         
         #print(f"{timeStamp}: {motionFlag}: {diffValue}: {CompareImagesObj.getThreshold()}")
         
@@ -133,17 +133,17 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         if (CameraControlObj.getRecord() == False and motionFlag == True):
             # start recording
             print('Recording started')
-            CompareImages.resetFrameNumber()
+            CompareImagesObj.resetFrameNumber()
             recordExtended = 0
             startRecordIntervalTime = time.time()
             startRecordTime = time.time()
             recordFilename = f"recorded_{timeStamp}.avi"
             CameraControlObj.setRecord(True, recordFolder + f"/{recordFilename}")
         
-        if (CameraControlObj.getRecord() == True and frame is not None):
+        if (CameraControlObj.getRecord() == True and processedFrame is not None):
             # during record, write the frame
-            CompareImages.increaseFrameNumber()
-            CameraControlObj.writeFrame(frame)
+            CompareImagesObj.increaseFrameNumber()
+            CameraControlObj.writeProcessedFrame(processedFrame)
     
     CameraControlObj.endStream()
     logger.info('OpenCV stream closed')
