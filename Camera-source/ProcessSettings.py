@@ -24,7 +24,7 @@ class ProcessSettings:
             '4': {'text': 'Change record duration', 'q': 'Enter the new duration, in seconds, the camera should record when there is motion: ', 'cb': self.setRecordTimeMinimumSeconds},
             '5': {'text': 'Change extend multiple', 'q': 'Enter the new extend multiple: ', 'cb': self.setRecordExtendMultiple},
             #'6': {'text': 'Change threshold percent', 'q': 'Enter the new percent, [0 to 100], of change between images that indicates motion: ', 'cb': self.setThresholdPercent},
-            '7': {'text': 'Show current settings', 'q': '', 'cb': self.getCurrentSettings}
+            '6': {'text': 'Show current settings', 'q': '', 'cb': self.getCurrentSettings}
         }
         
         self.recordExtendMultiple = 1
