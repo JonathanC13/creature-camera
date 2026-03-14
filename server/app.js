@@ -19,10 +19,7 @@ if (validateProjectDirectories() === false) {
 }
 
 // db
-//const connectDB = require('./db/connect')
-
-// uploads
-// const upload = multer({ dest: config.uploadDir });
+const connectDB = require('./db/connect')
 
 // routers
 const uploadVideoSingleRouter = require("./routes/uploadVideoSingle")
@@ -75,7 +72,7 @@ app.use(errorHandlerMiddleware) // catch errors
 
 const start = async() => {
     try {
-        //await connectDB(process.env.MONGO_URI)
+        await connectDB(config.app.mongoURI)
 
         app.listen(port, '0.0.0.0', async() => {
             logger.info(`Listening on port ${port}...`)

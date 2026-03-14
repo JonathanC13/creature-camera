@@ -1,1 +1,9 @@
 {"level":"INFO","time":"2026-02-19T20:35:46.503Z","pid":21672,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-02-20T20:44:10.233Z","pid":24488,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-02-20T21:10:34.624Z","pid":20496,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-02-21T20:50:23.294Z","pid":8760,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-02-21T20:56:55.591Z","pid":8760,"hostname":"DESKTOP-V4L67RN","msg":"uploadVideoSingle: 201 - Video uploaded successfully to uploads\\recorded_2026221_15h56m35s.avi"}
+{"level":"INFO","time":"2026-02-21T20:57:09.592Z","pid":8760,"hostname":"DESKTOP-V4L67RN","msg":"uploadVideoSingle: 201 - Video uploaded successfully to uploads\\recorded_2026221_15h56m49s.avi"}
+{"level":"INFO","time":"2026-02-21T20:57:16.921Z","pid":8760,"hostname":"DESKTOP-V4L67RN","msg":"uploadVideoSingle: 201 - Video uploaded successfully to uploads\\recorded_2026221_15h56m56s.avi"}
+{"level":"INFO","time":"2026-02-21T21:00:37.445Z","pid":16108,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-02-21T21:00:39.494Z","pid":25856,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
