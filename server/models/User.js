@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Camera name required.'],
         trim: true,
+        unique: true
     },
     email: {
         type: String,
@@ -28,6 +29,8 @@ const UserSchema = new mongoose.Schema({
     },
 }, )
 
+// Document-level operations
+// getters
 UserSchema.methods.getId = function() {
     return this._id.toString()
 }
@@ -44,7 +47,7 @@ UserSchema.methods.getSubscriptions = function() {
     return this.subscriptions
 }
 
-UserSchema.methods.getCameraInfo = function() {
+UserSchema.methods.getUserInfo = function() {
     return {
         id: this._id.toString(),
         name: this.name,
@@ -52,5 +55,11 @@ UserSchema.methods.getCameraInfo = function() {
         subscriptions: this.subscriptions
     }
 }
+
+// setters
+UserSchema.methods.unsubscribe = function(cameraId) {
+  this.subscribed.pull(cameraId);
+  return this.save();
+};
 
 module.exports = mongoose.model('users', UserSchema)

@@ -23,6 +23,7 @@ const connectDB = require('./db/connect')
 
 // routers
 const uploadVideoSingleRouter = require("./routes/uploadVideoSingle")
+const cameraRouter = require('./routes/cameras')
 
 // middleware
 const verifyCameraMiddleware = require('./middleware/verifyCamera')
@@ -65,7 +66,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/v1/uploadVideo', verifyCameraMiddleware, uploadVideoSingleRouter)
-
+app.use('/api/v1/camera', cameraRouter)
 // /routes
 
 app.use(errorHandlerMiddleware) // catch errors
