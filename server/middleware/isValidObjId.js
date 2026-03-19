@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const validateObjId = async(req, res, next) => {
+const isValidObjId = async(req, res, next) => {
     if (!mongoose.isValidObjectId(req.params.id)) {
         throw new BadRequestError('Requires valid camera id!')
     }
@@ -8,4 +8,4 @@ const validateObjId = async(req, res, next) => {
     next()
 }
 
-module.exports = validateObjId
+module.exports = isValidObjId

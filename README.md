@@ -32,10 +32,11 @@ DB will hold:
 
 todo:
     Server ** TODO
-        1. middleware/verifyCameraMiddleware:  // todo setup model for Camera list with keys, verify key sent in header with keys in mongodb. 
-        2. controllers/uploadVideo      // video bytes transferred to server (this PC), saves the video to a directory, mongoDB saves the file path for the video.
-        3. user API
-        4. add auth middleware before all user and camera routes
+        1. middleware/authCameraMiddleware:  // setup model for Camera list with keys, verify key sent in header with keys in mongodb. ** OK
+        2. controllers/uploadVideoSingle      // video bytes transferred to server (this PC), multer saves the video to a directory, mongoDB saves the file path for the video.
+        3. notifications for uploaded video
+        4. user API
+        5. add auth middleware before all user and camera routes
 
     RPI
         1.0. Test folder creation if missing. Also, create .gitignore if missing.   ** GOOD

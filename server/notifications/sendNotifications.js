@@ -1,4 +1,12 @@
-const sendNotifications = async(cameraId, cameraName, usersSubbed, filename) => {
+
+/**
+ * Get all the users subscribed to the cameraId then send email with cameraName and new filename.
+ * @param {*} cameraId 
+ * @param {*} cameraName 
+ * @param {*} filename 
+ * @returns 
+ */
+const sendNotifications = async(cameraId, cameraName, filename) => {
     console.log(`sent notifs for ${filename}`)
     /*
     iterate usersSubbed

@@ -13,7 +13,8 @@ const cookieParser = require('cookie-parser')
 const logger = require('./logging/logger')
 
 // check directories
-if (validateProjectDirectories() === false) {
+if (await validateProjectDirectories() === false) {
+    logger.error('Could not validate or create the required project files. App terminating...')
     console.log('Could not validate or create the required project files. App terminating...')
     process.exit(1)
 }
@@ -26,7 +27,7 @@ const uploadVideoSingleRouter = require("./routes/uploadVideoSingle")
 const cameraRouter = require('./routes/cameras')
 
 // middleware
-const verifyCameraMiddleware = require('./middleware/verifyCamera')
+const authCameraMiddleware = require('./middleware/authCamera')
 const errorHandlerMiddleware = require('./middleware/errorHandler');
 
 // app
@@ -65,7 +66,7 @@ app.get('/', (req, res) => {
     res.send('hello, world!')
 })
 
-app.use('/api/v1/uploadVideo', verifyCameraMiddleware, uploadVideoSingleRouter)
+app.use('/api/v1/uploadVideo', authCameraMiddleware, uploadVideoSingleRouter)
 app.use('/api/v1/camera', cameraRouter)
 // /routes
 
