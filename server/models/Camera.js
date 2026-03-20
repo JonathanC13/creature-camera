@@ -12,7 +12,7 @@ const CameraSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Camera token required.'],
     }
-}, )
+}, {timestamps: true})
 
 // Document-level operations
 // getters

@@ -1,4 +1,4 @@
-const CameraModel = require('../models/Camera')
+const UserModel = require('../models/User')
 const { BadRequestError, NotFoundError } = require('../errors')
 const {StatusCodes} = require('http-status-codes')
 
@@ -17,7 +17,7 @@ const deleteCameraFromSubscribers = async(req, res, next) => {
     // Bulk operation to unsubscribe users from the camera that is being deleted.
     // param 1: filter get documents where subscrided has id
     // param 2: update
-    await User.updateMany(
+    await UserModel.updateMany(
         {
             subscribed: id
         },

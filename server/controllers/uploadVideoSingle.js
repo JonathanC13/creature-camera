@@ -5,7 +5,14 @@ const { UploadError } = require('../errors')
 // const config = require('../config')
 const logger = require('../logging/logger')
 
-const uploadVideoSingle = async(req, res) => {
+/**
+ * Check if file was uploaded, if true: call sendNotifications()
+ * @param {*} req 
+ * @param {*} res
+ * @param {*} next
+ * @returns 
+ */
+const uploadVideoSingle = async(req, res, next) => {
     // console.log('uploadVideoSingle========body=========')
     // console.log(req.body)
     // console.log(req.camera)

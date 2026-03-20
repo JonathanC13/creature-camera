@@ -27,7 +27,19 @@ const UserSchema = new mongoose.Schema({
     subscriptions: {
         type: [mongoose.Types.ObjectId],
     },
-}, )
+    settingNotifyAlways: {
+        type: Boolean,
+        default: false
+    },
+    lastNotifySent: {
+        type: Date,
+        default: null
+    },
+    lastLoggedIn: {
+        type: Date,
+        default: null
+    }
+}, {timestamps: true})
 
 // Document-level operations
 // getters
@@ -52,7 +64,10 @@ UserSchema.methods.getUserInfo = function() {
         id: this._id.toString(),
         name: this.name,
         email: this.email,
-        subscriptions: this.subscriptions
+        subscriptions: this.subscriptions,
+        settingNotifyAlways: this.settingNotifyAlways,
+        notificationSentOnce: this.notificationSentOnce,
+        lastLoggedIn: this.lastLoggedIn
     }
 }
 
@@ -61,5 +76,10 @@ UserSchema.methods.unsubscribe = function(cameraId) {
   this.subscribed.pull(cameraId);
   return this.save();
 };
+
+// functions
+UserSchema.methods.needNotify = function() {
+    return (this.settingNotifyAlways || this.lastNotifySent === null || (this.lastNotifySent !== null && this.lastLoggedIn !== null && this.lastNotifySent < this.lastLoggedIn)) ? true : false
+}
 
 module.exports = mongoose.model('users', UserSchema)
