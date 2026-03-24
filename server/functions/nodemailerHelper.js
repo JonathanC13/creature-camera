@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const send = async(recipient, subject, text) => {
+const sendMail = async(recipient, subject, text) => {
     const mailOptions = {
         from: config.nodeMailer.user,
         to: recipient,
@@ -19,11 +19,11 @@ const send = async(recipient, subject, text) => {
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            config.logger.error(`nodemailer error: ${error}`);
+            config.logger.error(`nodemailer error: ${error}, for ${recipient}`);
             return
         }
         // console.log('Email sent: ' + info.response);
     });
 }
 
-module.exports = send
+module.exports = sendMail

@@ -1,6 +1,6 @@
 const UserModel = require('../models/User')
 const logger = require('../logging/logger')
-const send = require('../functions/nodemailerHelper')
+const sendMail = require('../functions/nodemailerHelper')
 
 /**
  * Get all the users subscribed to the cameraId then send email with cameraName and new filename.
@@ -25,7 +25,7 @@ const sendNotifications = async(cameraId, cameraName, filename) => {
             const body = `Camera ${cameraName} has uploaded ${filename}.` +
                 (!user.settingNotifyAlways) ? '\n\nNote: Since setting [Notify Always] is off, you will not recieve additional notifications for newer uploads until next log in.' : ''
             // send email
-            send(user.email, `New video from creature-camera`, body)
+            sendMail(user.email, `New video from creature-camera`, body)
         }
     }
 

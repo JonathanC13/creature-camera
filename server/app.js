@@ -23,10 +23,13 @@ if (await validateProjectDirectories() === false) {
 const connectDB = require('./db/connect')
 
 // routers
+const authRouter = require('./routes/auth')
 const uploadVideoSingleRouter = require("./routes/uploadVideoSingle")
 const cameraRouter = require('./routes/cameras')
+const userRouter = require('./routes/users')
 
 // middleware
+const authorizationMiddleware = require('./middleware/authorization')
 const authCameraMiddleware = require('./middleware/authCamera')
 const errorHandlerMiddleware = require('./middleware/errorHandler');
 
@@ -66,8 +69,10 @@ app.get('/', (req, res) => {
     res.send('hello, world!')
 })
 
+app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/uploadVideo', authCameraMiddleware, uploadVideoSingleRouter)
-app.use('/api/v1/camera', cameraRouter)
+app.use('/api/v1/camera', authorizationMiddleware, cameraRouter)
+app.use('/api/v1/user/', authorizationMiddleware, userRouter)
 // /routes
 
 app.use(errorHandlerMiddleware) // catch errors

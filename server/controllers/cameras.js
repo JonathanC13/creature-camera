@@ -1,5 +1,4 @@
 const CameraModel = require('../models/Camera')
-const mongoose = require('mongoose')
 const {NotFoundError, BadRequestError} = require('../errors')   // error is a folder and will access error/index.js
 const {StatusCodes} = require('http-status-codes')
 
@@ -69,7 +68,7 @@ const updateCamera = async(req, res, next) => {
     } = req
     
     const optObj = {
-        new: true,
+        returnDocument: true,
         runValidators: true
     }
 
