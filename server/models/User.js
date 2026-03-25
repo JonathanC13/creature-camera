@@ -30,15 +30,20 @@ const UserSchema = new mongoose.Schema({
         trim: true,
         minLength: [6, 'Please provide a password that is 6 or more characters!']
     },
-    refreshToken: {
-        type: String
+    persistentLogin: {
+        type: Boolean,
+        default: false
     },
-    subscriptions: {
-        type: [mongoose.Types.ObjectId],
+    role: {
+        type: String,
+        default: null
     },
     settingNotifyAlways: {
         type: Boolean,
         default: false
+    },
+    subscriptions: {
+        type: [mongoose.Types.ObjectId],
     },
     lastNotifySent: {
         type: Date,
@@ -55,7 +60,10 @@ const UserSchema = new mongoose.Schema({
     expiration_timestamp_OTP: {
         type: Date,
         default: null
-    }
+    },
+    refreshToken: {
+        type: String
+    },
 }, {timestamps: true})
 
 // Document-level operations
@@ -81,10 +89,10 @@ UserSchema.methods.getUserInfo = function() {
         id: this._id.toString(),
         name: this.name,
         email: this.email,
+        persistentLogin: this.persistentLogin,
+        role: this.role,
         subscriptions: this.subscriptions,
-        settingNotifyAlways: this.settingNotifyAlways,
-        notificationSentOnce: this.notificationSentOnce,
-        lastLoggedIn: this.lastLoggedIn
+        settingNotifyAlways: this.settingNotifyAlways
     }
 }
 

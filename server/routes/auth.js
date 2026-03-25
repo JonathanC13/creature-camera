@@ -1,5 +1,6 @@
 const express = require('express')
 const { login, refreshToken, logout, updateUserInfo, updatePassword, forgotPassword, validateOTP } = require('../controllers/auth')
+const isValidObjId = require('../middleware/isValidObjId')
 
 const router = express.Router()
 
@@ -7,9 +8,9 @@ const router = express.Router()
 router.route('/login').post(login)
 router.route('/refreshToken').get(refreshToken)
 router.route('/logout').post(logout)
-router.route('/updateUserInfo/:id').patch(updateUserInfo)
-router.route('/updatePassword/:id').patch(updatePassword)
+router.route('/updateUserInfo/:id').patch(isValidObjId, updateUserInfo)
+router.route('/updatePassword/:id').patch(isValidObjId, updatePassword)
 router.route('/forgotPassword').post(forgotPassword)
-router.route('/validateOTP/:id').post(validateOTP)
+router.route('/validateOTP/:id').post(isValidObjId, validateOTP)
 
 module.exports = router

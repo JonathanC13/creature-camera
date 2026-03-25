@@ -37,7 +37,7 @@ const authorization = async(req, res, next) => {
         }
 
         // attach the user to the route
-        req.user = {userId: payload.userId, name:payload.name}
+        req.user = response
     } catch (err) {
         throw new UnauthenticatedError('Not authenticated! ' + err.message)
     }

@@ -30,6 +30,7 @@ const userRouter = require('./routes/users')
 
 // middleware
 const authorizationMiddleware = require('./middleware/authorization')
+const validAdminMiddleware = require('./middleware/isValidAdmin')
 const authCameraMiddleware = require('./middleware/authCamera')
 const errorHandlerMiddleware = require('./middleware/errorHandler');
 
@@ -71,8 +72,8 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/uploadVideo', authCameraMiddleware, uploadVideoSingleRouter)
-app.use('/api/v1/camera', authorizationMiddleware, cameraRouter)
-app.use('/api/v1/user/', authorizationMiddleware, userRouter)
+app.use('/api/v1/camera', authorizationMiddleware, validAdminMiddleware, cameraRouter)
+app.use('/api/v1/user/', authorizationMiddleware, validAdminMiddleware, userRouter)
 // /routes
 
 app.use(errorHandlerMiddleware) // catch errors
