@@ -30,14 +30,14 @@ const authorization = async(req, res, next) => {
 
     try {
         // validate that the user decoded from the token exists in the DB
-        const response = await UserModel.findById(payload.userId).select('-password')
+        const response = await UserModel.findById(payload.userId).select('-password').exec()
         
         if (!response) {
             throw new Error('User does not exist.')
         }
 
         // attach the user to the route
-        req.user = response
+        req.user = response.getInfo()
     } catch (err) {
         throw new UnauthenticatedError('Not authenticated! ' + err.message)
     }
