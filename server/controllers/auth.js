@@ -1,6 +1,8 @@
 const UserModel = require('../models/User')
-const { BadRequestError, UnauthenticatedError, NotFoundError, ForbiddenError } = require('../errors')
+const { BadRequestError, UnauthenticatedError, NotFoundError, ForbiddenError, InternalServerError } = require('../errors')
 const { StatusCodes } = require('http-status-codes')
+const config = require('../config')
+const sendMail = require('../functions/nodemailerHelper')
 
 const login = async(req, res, next) => {
     const {
@@ -15,26 +17,28 @@ const login = async(req, res, next) => {
     const userDocument = await UserModel.findOne({emailLowercase: email.toLowerCase()}).exec()
 
     if (!userDocument) {
-        throw new UnauthenticatedError()
+        throw new UnauthenticatedError('Credentials incorrect.')
     }
 
     const passwordCorrect = await response.validatePassword(userDocument.password)
 
     if (!passwordCorrect) {
-        throw new UnauthenticatedError()
+        throw new UnauthenticatedError('Credentials incorrect.')
     }
 
     // token for Access Token, refreshToken for refresh token
     const token = userDocument.generateJWT()
     const refreshToken = userDocument.generateRefreshJWT()  // new refresh token to extend persistent log in.
 
+    userDocument.OTP_retries = 0
+    userDocument.expiration_timestamp_OTP = null
+
     // update user document to save the new Refresh token. In Mongoose, once you have the document it can be updated with save()
     try {
         userDocument.refreshToken = refreshToken
         const saveResponse = userDocument.save()
     } catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({'message': 'Server error!'})
-        return
+        throw new InternalServerError('Login failed.')
     }
     
     // send refresh token in a httpOnly cookie
@@ -113,8 +117,7 @@ const logout = async(req, res, next) => {
         const saveResponse = await userDocument.save()
         // console.log(saveResponse)
     } catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({'message': 'Server error!'})
-        return
+        throw new InternalServerError('Logout failed.')
     }
 
     res.status(StatusCodes.NO_CONTENT).json()
@@ -130,13 +133,13 @@ const updateUserInfo = async(req, res, next) => {
     }
 
     const restricted = new Set(['emailLowercase', 'password', 'role', 'subscriptions', 'temp_password', 'expiration_timestamp_OTP', 'refreshToken'])
-    const updateInfo = new Map()
-    for (let [k, v] of req.body.entries()) {
+    const updateInfo = new Object()
+    for (let [k, v] of Object.entries(req.body)) {
         if (!restricted.has(k)) {
-            updateInfo.set(k, v)
+            updateInfo[k] = v
 
             if (k === 'email') {
-                updateInfo.set('emailLowercase', v.toLowerCase())
+                updateInfo['emailLowercase'] = v.toLowerCase()
             }
         }
     }
@@ -173,13 +176,89 @@ const updatePassword = async(req, res, next) => {
     }
 
     userDocument.replacePassword(newPassword)
+    if (userDocument.temp_password) {
+        // once succesful change password, reset temp password info
+        // two paths here: 1. first log in after created by admin, 2. updating password from OTP validated
+        userDocument.temp_password = false
+        userDocument.OTP_retries = 0
+        userDocument.expiration_timestamp_OTP = null
+    }
 
     try {
         await userDocument.save()
         res.status(StatusCodes.OK).json()
     } catch(e) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json()
+        throw new InternalServerError('Update password failed.')
     }
+}
+
+/**
+ * One time password method.
+ * 1. Validate email exists
+ * 2. set one time password and expiration
+ * 3. email OTP
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+const forgotPassword = async(req, res, next) => {
+    const {
+        email
+    } = req.body
+
+    if (!email) {
+        throw new BadRequestError('Must provide email.')
+    }
+
+    const userDocument = await UserModel.findOne({emailLowercase: email.toLowerCase()}).exec()
+    if (!userDocument) {
+        // to prevent brute force guessing, do not indicate existence.
+        res.status(StatusCodes.OK).json()
+        return
+    }
+    if (userDocument.OTP_retries >= config.OTP_max_retries) {
+        throw new ForbiddenError('Max OTP sent, contact admin.')
+    }
+
+    const tempPassword = userDocument.generateOTP()
+    try {
+        await userDocument.save()
+        res.status(StatusCodes.OK).json()
+        const body = `This is your temporary password:\n${tempPassword}\nIt will expire in ${OTP_expire_minutes} minutes.`
+        sendMail(`${projectName}, temporary password`, body)    // send async
+    } catch(e) {
+        throw new InternalServerError('Forgot password failed.')
+    }
+
+    return
+}
+
+const validateOTP = async(req, res, next) => {
+    const {
+        email,
+        tempPassword
+    } = req.body
+
+    const userDocument = await UserModel.findOne({emailLowercase: email.toLowerCase()}).exec()
+    if (userDocument) {
+        if (!userDocument.temp_password || userDocument.expiration_timestamp_OTP === null) {
+            // if somehow requested this api with temp_password === false or no expiration
+            throw new ForbiddenError()
+        }
+        if (new Date() >= userDocument.expiration_timestamp_OTP) {
+            throw new UnauthenticatedError('OTP expired.')
+        }
+        if (!userDocument.validatePassword(tempPassword)) {
+            throw new UnauthenticatedError('Incorrect credentials.')
+        }
+        
+        const oneTimeToken = userDocument.generateJWT()
+        res.status(StatusCodes.OK).json({user: {id: userDocument._id}, token: oneTimeToken})
+    } else {
+        throw new UnauthenticatedError('Incorrect credentials.')
+    }
+    
+    return
 }
 
 module.exports = { login, refreshToken, logout, updateUserInfo, updatePassword, forgotPassword, validateOTP }

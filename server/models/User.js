@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs');
+const otpGenerator = require('otp-generator')
+const config = require('../config')
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -61,6 +63,10 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    OTP_retries: {
+        type: Number,
+        default: 0
+    },
     refreshToken: {
         type: String
     },
@@ -92,7 +98,8 @@ UserSchema.methods.getUserInfo = function() {
         persistentLogin: this.persistentLogin,
         role: this.role,
         subscriptions: this.subscriptions,
-        settingNotifyAlways: this.settingNotifyAlways
+        settingNotifyAlways: this.settingNotifyAlways,
+        temp_password: this.temp_password
     }
 }
 
@@ -114,6 +121,17 @@ UserSchema.methods.generateRefreshJWT = function() {
 UserSchema.methods.replacePassword = function(newPassword) {
     const salt = bcrypt.genSaltSync(10);
     this.password = bcrypt.hashSync(newPassword, salt);
+}
+
+UserSchema.methods.generateTempPassword = function() {
+    const tempPassword = otpGenerator.generate(6, { specialChars: false });
+    this.replacePassword(tempPassword)
+    this.temp_password = true
+    const date = new Date()
+    this.expiration_timestamp_OTP = date.setMinutes(date.getMinutes() + config.OTP_expire_minutes)
+    this.OTP_retries += 1
+
+    return tempPassword
 }
 
 UserSchema.pre('save', function(next) {

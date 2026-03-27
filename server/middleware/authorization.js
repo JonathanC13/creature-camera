@@ -7,7 +7,7 @@ const authorization = async(req, res, next) => {
     // authentication: Bearer token
     const authHeader = req.headers.authorization || req.headers.Authorization
     if (!authHeader?.startsWith('Bearer')) {
-        throw new UnauthenticatedError('Not authenticated!')
+        throw new UnauthenticatedError()
     }
 
     const token = authHeader.split(' ')[1]
@@ -22,7 +22,7 @@ const authorization = async(req, res, next) => {
                 }
             */
 
-                throw new UnauthenticatedError('Access token expired!')
+                throw new UnauthenticatedError()
             }
             return decoded
         }
@@ -33,13 +33,13 @@ const authorization = async(req, res, next) => {
         const response = await UserModel.findById(payload.userId).select('-password').exec()
         
         if (!response) {
-            throw new Error('User does not exist.')
+            throw new UnauthenticatedError()
         }
 
         // attach the user to the route
         req.user = response.getInfo()
     } catch (err) {
-        throw new UnauthenticatedError('Not authenticated! ' + err.message)
+        throw new UnauthenticatedError()
     }
 
     next()

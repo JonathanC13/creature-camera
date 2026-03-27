@@ -4,5 +4,6 @@ const BadRequestError = require('./bad-request')
 const UnauthenticatedError = require('./unauthenticated')
 const NotFoundError = require('./not-found')
 const ForbiddenError = require('./forbidden')
+const InternalServerError = require('./internal-server')
 
-module.exports = { CustomAPIError, UploadError, BadRequestError, UnauthenticatedError, NotFoundError, ForbiddenError }
+module.exports = { CustomAPIError, UploadError, BadRequestError, UnauthenticatedError, NotFoundError, ForbiddenError, InternalServerError }

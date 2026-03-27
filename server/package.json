@@ -23,6 +23,7 @@
     "multer": "^2.0.2",
     "nodemailer": "^8.0.3",
     "nodemon": "^3.1.10",
+    "otp-generator": "^4.0.1",
     "pino": "^10.3.1",
     "xss-filters": "^1.2.7"
   }
