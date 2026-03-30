@@ -216,8 +216,15 @@ const forgotPassword = async(req, res, next) => {
         res.status(StatusCodes.OK).json()
         return
     }
+
+    const cookies = req.cookies
+    const refreshJWT = cookies.jwt
+    if (refreshJWT) {
+        res.clearCookie('jwt', { httpOnly: true, maxAge: process.env.COOKIE_EXPIRY_MS, sameSite: 'None', secure: true })
+    }
+
     if (userDocument.OTP_retries >= config.OTP_max_retries) {
-        throw new ForbiddenError('Max OTP sent, contact admin.')
+        throw new ForbiddenError('Max retries sent, contact admin.')
     }
 
     const tempPassword = userDocument.generateOTP()
@@ -253,7 +260,7 @@ const validateOTP = async(req, res, next) => {
         }
         
         const oneTimeToken = userDocument.generateJWT()
-        res.status(StatusCodes.OK).json({user: {id: userDocument._id}, token: oneTimeToken})
+        res.status(StatusCodes.OK).json({user: {id: userDocument._id, temp_password: userDocument.temp_password}, token: oneTimeToken})
     } else {
         throw new UnauthenticatedError('Incorrect credentials.')
     }

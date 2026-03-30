@@ -10,9 +10,22 @@ Server
     xss-filters
     http-status-codes
     pino    // logging
+    nodemailer // send emails
+    npm install otp-generator
 
     * Setup in .env
+        ACCESS_CONTROL_ALLOW_ORIGIN = "https://www.jonRPI.com"
+        JWT_SECRET
+        JWT_LIFETIME = '2h'
+
+        JWT_REFRESH_SECRET
+        JWT_REFRESH_LIFETIME = '7 days'
+        COOKIE_EXPIRY_MS = 604800000
+        PORT = 5000
         MONGO_URI
+        NODE_MAILER_SERVICE = ''
+        NODE_MAILER_USER = ''
+        NODE_MAILER_PASS = ''
 
 RPI
     .env
@@ -28,15 +41,20 @@ DB will hold:
             1. When need to get all users subscribed to a camera, use filter
                 // Finds documents where the 'tags' array contains "electronics"
                 const docs = await MyModel.find({ tags: "electronics" });
+        roles:
+            * static
+            _id
+            roleName
+            roleLevel
         * When updating, to ensure no duplicates either check myself or https://www.mongodb.com/docs/manual/reference/operator/update/addToSet/ 
 
 todo:
-    Server ** TODO
+    Server ** TO TEST with Postman
         1. middleware/authCameraMiddleware:  // setup model for Camera list with keys, verify key sent in header with keys in mongodb. ** OK
-        2. controllers/uploadVideoSingle      // video bytes transferred to server (this PC), multer saves the video to a directory, mongoDB saves the file path for the video.
-        3. notifications for uploaded video
-        4. user API
-        5. add auth middleware before all user and camera routes
+        2. controllers/uploadVideoSingle      // video bytes transferred to server (this PC), multer saves the video to a directory, mongoDB saves the file path for the video. ** OK
+        3. notifications for uploaded video // ** OK
+        4. user API // **OK
+        5. add auth middleware before all user and camera routes // ** OK
 
     RPI
         1.0. Test folder creation if missing. Also, create .gitignore if missing.   ** GOOD
@@ -110,8 +128,7 @@ todo:
                                 https://medium.com/@christopherhu1992/object-detection-resizing-bounding-box-after-prediction-fe44f03781a8 
                                 https://datascience.stackexchange.com/questions/77719/understanding-scale-boxes-in-yolo-algorithm-of-cnn
 
-        - remove camera name from RPI since doesnt matter, change camera key to camera token. MongoDB has camera name and only configured here.
-        5. Server setup up mongoDB and camera Document
+        5. Server setup up mongoDB and camera Document // ** OK
         6. Test full operation
 
 
