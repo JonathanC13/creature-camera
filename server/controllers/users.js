@@ -1,5 +1,5 @@
 const UserModel = require('../models/User')
-const {NotFoundError, BadRequestError} = require('../errors')   // error is a folder and will access error/index.js
+const {NotFoundError, BadRequestError, InternalServerError} = require('../errors')   // error is a folder and will access error/index.js
 const {StatusCodes} = require('http-status-codes')
 
 // since management registers a user, they create a password and sends it plainly to the user. UserModel has "temp_password", if true goes to update password page.
@@ -51,7 +51,7 @@ const deleteUser = async(req, res, next) => {
     res.status(StatusCodes.OK).send()
 }
 
-const updateSubbedCameras = async(req, res, next) => {
+const updateUser = async(req, res, next) => {
     const {
         id
     } = req.params
@@ -64,17 +64,63 @@ const updateSubbedCameras = async(req, res, next) => {
         throw new BadRequestError('Subscriptions must be an Array.')
     }
 
-    const options = {
-        returnDocument: 'after'
+    req.body.subscriptions = Array.from(new Set(subscriptions))
+
+    const restricted = new Set(['emailLowercase', 'password', 'temp_password', 'expiration_timestamp_OTP', 'refreshToken'])
+    const updateInfo = new Object()
+    for (let [k, v] of Object.entries(req.body)) {
+        if (!restricted.has(k)) {
+            if (k === 'email') {
+                updateInfo['emailLowercase'] = v.toLowerCase()
+            } else {
+                updateInfo[k] = v
+            }
+        }
     }
 
-    const response = UserModel.findByIdAndUpdate(id, {subscriptions: subscriptions}, options)
+    const optObj = {
+        returnDocument: 'after',
+        runValidators: true
+    }
 
+    const response = await UserModel.findByIdAndUpdate(id, updateInfo, optObj).exec()
     if (!response) {
-        throw new NotFoundError('User not found!')
+        throw new NotFoundError('User not found.')
     }
 
-    res.status(StatusCodes.OK).json({response})
+    res.status(StatusCodes.OK).json({user: response.info()})
 }
 
-module.exports = { getAllUsers, getUser, registerUser, deleteUser, updateSubbedCameras }
+const adminSetPassword = async(req, res, next) => {
+    const {
+        id
+    } = req.params
+
+    const {
+        password
+    } = req.body
+    
+    if (!password) {
+        throw new BadRequestError('Missing password.')
+    }
+
+    const userDocument = await UserModel.findById(id).exec()
+    if (!userDocument) {
+        throw new NotFoundError('User does not exist.')
+    }
+    
+    userDocument.replacePassword(password)
+    // set field that causes client to force user to update password on first log in.
+    userDocument.temp_password = true
+
+    try {
+        await userDocument.save()
+        res.status(StatusCodes.OK).json()
+    } catch(e) {
+        throw new InternalServerError('adminSetPassword failed.')
+    }
+
+    return
+}
+
+module.exports = { getAllUsers, getUser, registerUser, deleteUser, updateUser, adminSetPassword }

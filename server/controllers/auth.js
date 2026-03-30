@@ -26,8 +26,20 @@ const login = async(req, res, next) => {
         throw new UnauthenticatedError('Credentials incorrect.')
     }
 
-    // token for Access Token, refreshToken for refresh token
     const token = userDocument.generateJWT()
+    // check if user logging in with OTP password
+    // if not expired, gives the login a token for updatePassword. Since no refreshJWt, after update it redirects back to login page.
+    if (userDocument.expiration_timestamp_OTP !== null) {
+        if (new Date() >= userDocument.expiration_timestamp_OTP) {
+            throw new UnauthenticatedError('OTP expired, use forgot password for new OTP.')
+        }
+
+        res.status(StatusCodes.OK).json({user: {id: userDocument._id, temp_password: userDocument.temp_password}, token: token})
+    }
+    // else if temp_password = true and expirateion = null means first time log in, client goes to update password and since refreshToken in cookies it continues to dashboard.
+
+    // token for Access Token, refreshToken for refresh token
+    // const token = userDocument.generateJWT()
     const refreshToken = userDocument.generateRefreshJWT()  // new refresh token to extend persistent log in.
 
     userDocument.OTP_retries = 0
@@ -36,7 +48,7 @@ const login = async(req, res, next) => {
     // update user document to save the new Refresh token. In Mongoose, once you have the document it can be updated with save()
     try {
         userDocument.refreshToken = refreshToken
-        const saveResponse = userDocument.save()
+        const saveResponse = await userDocument.save()
     } catch (error) {
         throw new InternalServerError('Login failed.')
     }
@@ -132,7 +144,7 @@ const updateUserInfo = async(req, res, next) => {
         throw new ForbiddenError()
     }
 
-    const restricted = new Set(['emailLowercase', 'password', 'role', 'subscriptions', 'temp_password', 'expiration_timestamp_OTP', 'refreshToken'])
+    const restricted = new Set(['emailLowercase', 'password', 'role_id', 'subscriptions', 'temp_password', 'expiration_timestamp_OTP', 'refreshToken'])
     const updateInfo = new Object()
     for (let [k, v] of Object.entries(req.body)) {
         if (!restricted.has(k)) {
@@ -145,7 +157,7 @@ const updateUserInfo = async(req, res, next) => {
     }
 
     const optObj = {
-        returnDocument: true,
+        returnDocument: 'after',
         runValidators: true
     }
 
