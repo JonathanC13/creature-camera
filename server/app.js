@@ -82,6 +82,10 @@ const start = async() => {
     try {
         await connectDB(config.app.mongoURI)
 
+        if (!validateRoleCollection()) {
+            throw new Error('Roles could not be validated.')
+        }
+
         app.listen(port, '0.0.0.0', async() => {
             logger.info(`Listening on port ${port}...`)
         })

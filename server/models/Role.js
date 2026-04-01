@@ -11,6 +11,7 @@ const RoleSchema = new mongoose.Schema({
     roleLevel: {
         type: Number,
         required: [true, 'Role level required.'],
+        unique: true
     }
 }, {timestamps: true})
 
@@ -20,4 +21,4 @@ RoleSchema.methods.getId = function() {
     return this._id.toString()
 }
 
-module.exports = mongoose.model('role', RoleSchema)
+module.exports = mongoose.model('roles', RoleSchema)

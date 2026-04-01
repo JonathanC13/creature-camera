@@ -1,5 +1,5 @@
 const UserModel = require('../models/User')
-const {NotFoundError, BadRequestError, InternalServerError} = require('../errors')   // error is a folder and will access error/index.js
+const {NotFoundError, BadRequestError, InternalServerError, ForbiddenError} = require('../errors')   // error is a folder and will access error/index.js
 const {StatusCodes} = require('http-status-codes')
 
 // since management registers a user, they create a password and sends it plainly to the user. UserModel has "temp_password", if true goes to update password page.
@@ -60,35 +60,37 @@ const updateUser = async(req, res, next) => {
         subscriptions
     } = req.body
 
-    if (subscriptions instanceof Array === false) {
-        throw new BadRequestError('Subscriptions must be an Array.')
+    if (subscriptions) {
+        if (subscriptions instanceof Array === false) {
+            throw new BadRequestError('Subscriptions must be an Array.')
+        }
+        req.body.subscriptions = Array.from(new Set(subscriptions)) // remove duplicates
     }
 
-    req.body.subscriptions = Array.from(new Set(subscriptions))
+    const userDocument = UserModel.findById(id)
+    if (userDocument.roleLevel === 1) {
+        throw new ForbiddenError("Cannot modify this user's role.")
+    }
 
     const restricted = new Set(['emailLowercase', 'password', 'temp_password', 'expiration_timestamp_OTP', 'refreshToken'])
-    const updateInfo = new Object()
+    
     for (let [k, v] of Object.entries(req.body)) {
         if (!restricted.has(k)) {
             if (k === 'email') {
-                updateInfo['emailLowercase'] = v.toLowerCase()
+                userDocument.email = v
+                userDocument.emailLowercase = v.toLowerCase()
             } else {
-                updateInfo[k] = v
+                userDocument.set(k, v)
             }
         }
     }
 
-    const optObj = {
-        returnDocument: 'after',
-        runValidators: true
+    try {
+        const response = await userDocument.save()
+        res.status(StatusCodes.OK).json({user: response.getInfo()})
+    } catch (e) {
+        throw new InternalServerError('update user failed.')
     }
-
-    const response = await UserModel.findByIdAndUpdate(id, updateInfo, optObj).exec()
-    if (!response) {
-        throw new NotFoundError('User not found.')
-    }
-
-    res.status(StatusCodes.OK).json({user: response.info()})
 }
 
 const adminSetPassword = async(req, res, next) => {

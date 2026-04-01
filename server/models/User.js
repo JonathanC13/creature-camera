@@ -38,7 +38,12 @@ const UserSchema = new mongoose.Schema({
     },
     role_id: {
         type: mongoose.Types.ObjectId,
-        default: null
+        default: null,
+        required: [true, 'Please provide a role']
+    },
+    roleLevel: {
+        type: Number,
+        required: [true, 'Please provide a role']
     },
     settingNotifyAlways: {
         type: Boolean,
@@ -97,6 +102,7 @@ UserSchema.methods.getUserInfo = function() {
         email: this.email,
         persistentLogin: this.persistentLogin,
         role_id: this.role_id,
+        roleLevel: this.roleLevel,
         subscriptions: this.subscriptions,
         settingNotifyAlways: this.settingNotifyAlways,
         temp_password: this.temp_password
