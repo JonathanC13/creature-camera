@@ -7,7 +7,7 @@ const config = require('../config')
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, 'Camera name required.'],
+        required: [true, 'Name required.'],
         trim: true,
         unique: true
     },

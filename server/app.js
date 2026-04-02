@@ -4,6 +4,7 @@ const express = require('express')
 // const multer = require("multer");
 const config = require('./config')
 const validateProjectDirectories = require('./functions/validateProjectDirectories')
+const validateRoleCollection = require('./functions/validateRoleCollection')
 // security
 const helmet = require('helmet')
 const cors = require('cors')
