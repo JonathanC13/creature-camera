@@ -19,7 +19,7 @@ const validateRoleCollection = async() => {
 
     try {
         // ordered: false skips duplicated unique keys (roleLevel)
-        await RoleModel.insertMany(roles, { ordered: false });
+        const response = await RoleModel.insertMany(roles, { ordered: false });
     } catch (error) {
         // Check if error is a duplicate key error (code 11000)
         if (error.code !== 11000) {
@@ -27,7 +27,7 @@ const validateRoleCollection = async() => {
             return false
         }
     }
-
+    
     return true
 }
 

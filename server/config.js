@@ -9,7 +9,7 @@ const config = {
         mongoURI: process.env.MONGO_URI
     },
     projectDirectories: {
-        base: path.__dirname(),
+        base: path.__dirname,
         folders: [
             'uploads'
         ]

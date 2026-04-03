@@ -7,3 +7,4 @@
 {"level":"INFO","time":"2026-02-21T20:57:16.921Z","pid":8760,"hostname":"DESKTOP-V4L67RN","msg":"uploadVideoSingle: 201 - Video uploaded successfully to uploads\\recorded_2026221_15h56m56s.avi"}
 {"level":"INFO","time":"2026-02-21T21:00:37.445Z","pid":16108,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
 {"level":"INFO","time":"2026-02-21T21:00:39.494Z","pid":25856,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-03T20:18:14.729Z","pid":12240,"hostname":"DESKTOP-V4L67RN","msg":"Could not populate collection 'role' properly."}

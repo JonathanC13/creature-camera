@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema({
     },
     emailLowercase: {
         type: String,
-        required: [true, 'Please provide an email!'],
+        required: [true, 'Please provide an aaa email!'],
         trim: true,
         lowercase: true,
         match: [/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Please provide a valid email!'],
@@ -39,11 +39,11 @@ const UserSchema = new mongoose.Schema({
     role_id: {
         type: mongoose.Types.ObjectId,
         default: null,
-        required: [true, 'Please provide a role']
+        required: [true, 'Please provide a role id']
     },
     roleLevel: {
         type: Number,
-        required: [true, 'Please provide a role']
+        required: [true, 'Please provide a role level']
     },
     settingNotifyAlways: {
         type: Boolean,
@@ -146,6 +146,7 @@ UserSchema.pre('save', function(next) {
         const salt = bcrypt.genSaltSync(10);
         this.password = bcrypt.hashSync(this.password, salt);
     }
+    
     next()
 })
 
