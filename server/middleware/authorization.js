@@ -30,6 +30,7 @@ const authorization = async(req, res, next) => {
 
     try {
         // validate that the user decoded from the token exists in the DB
+        
         const response = await UserModel.findById(payload.userId).select('-password').exec()
         
         if (!response) {
@@ -37,9 +38,9 @@ const authorization = async(req, res, next) => {
         }
 
         // attach the user to the route
-        req.user = response.getInfo()
+        req.user = response.getUserInfo()
     } catch (err) {
-        throw new UnauthenticatedError()
+        throw new UnauthenticatedError(err)
     }
 
     next()

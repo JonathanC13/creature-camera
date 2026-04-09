@@ -31,4 +31,4 @@ CameraSchema.methods.getCameraInfo = function() {
     }
 }
 
-module.exports = mongoose.model('camera-information', CameraSchema)
+module.exports = mongoose.model('cameras', CameraSchema)

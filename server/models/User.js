@@ -151,7 +151,7 @@ UserSchema.pre('save', function(next) {
 })
 
 UserSchema.methods.validatePassword = async function(password) {
-    return await bcrypt.compare(password, this.password)
+    return await bcrypt.compare(password.toString(), this.password)
 }
 
 UserSchema.methods.needNotify = function() {

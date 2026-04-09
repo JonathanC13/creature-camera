@@ -1,9 +1,9 @@
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require("path");
 
 async function fileExists(filePath) {
   try {
-    await fs.access(filePath);
+    fs.access(filePath);
     return true;
   } catch (error) {
     console.log(`File does not exist or is inaccessible at: ${filePath} . `, error);
@@ -13,7 +13,7 @@ async function fileExists(filePath) {
 
 async function createDirectory(directory) {
   try {
-    await fs.mkdirSync(directory, { recursive: true });
+    fs.mkdirSync(directory, { recursive: true });
   } catch (err) {
     console.error(`Error creating directory: ${directory} . `, err.message);
     return false
@@ -24,7 +24,7 @@ async function createDirectory(directory) {
 
 async function directoryExists(directory) {
   try {
-    const stats = fs.statSync(path);
+    const stats = fs.statSync(directory);
     if (!stats.isDirectory() && !(await createDirectory(directory))) {
       // Directory does not exist, therefore create it
       return false

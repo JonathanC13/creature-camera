@@ -2,14 +2,14 @@ const path = require("path");
 const logger = require('./logging/logger')
 
 const config = {
-    projectName: 'Create camera',
+    projectName: 'Creature camera',
     logger: logger,
     app: {
         port: process.env.PORT || 5000, // Example: Port for the application, can be overridden by environment variable
         mongoURI: process.env.MONGO_URI
     },
     projectDirectories: {
-        base: path.__dirname,
+        base: __dirname,
         folders: [
             'uploads'
         ]

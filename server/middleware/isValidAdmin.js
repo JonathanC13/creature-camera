@@ -1,5 +1,5 @@
 const { ForbiddenError } = require("../errors")
-const RoleModel = requre('../models/Role')
+const RoleModel = require('../models/Role')
 
 const isValidAdmin = async(req, res, next) => {
     const {

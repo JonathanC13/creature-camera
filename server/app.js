@@ -13,13 +13,6 @@ const xss = require('./middleware/xss-clean')
 const cookieParser = require('cookie-parser')
 const logger = require('./logging/logger')
 
-// check directories
-if (await validateProjectDirectories() === false) {
-    logger.error('Could not validate or create the required project files. App terminating...')
-    console.log('Could not validate or create the required project files. App terminating...')
-    process.exit(1)
-}
-
 // db
 const connectDB = require('./db/connect')
 
@@ -81,14 +74,22 @@ app.use(errorHandlerMiddleware) // catch errors
 
 const start = async() => {
     try {
+        // check directories
+        if (!(await validateProjectDirectories())) {
+            logger.error('Could not validate or create the required project files. App terminating...')
+            process.exit(1)
+        }
+
         await connectDB(config.app.mongoURI)
 
-        if (!validateRoleCollection()) {
-            throw new Error('Roles could not be validated.')
+        if (!(await validateRoleCollection())) {
+            logger.error('Could not validate or create the required project Roles. App terminating...')
+            process.exit(1)
         }
 
         app.listen(port, '0.0.0.0', async() => {
             logger.info(`Listening on port ${port}...`)
+            console.log(`Listening on port ${port}...`)
         })
 
     } catch (err) {

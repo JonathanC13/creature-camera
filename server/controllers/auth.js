@@ -1,4 +1,5 @@
 const UserModel = require('../models/User')
+const jwt = require('jsonwebtoken')
 const { BadRequestError, UnauthenticatedError, NotFoundError, ForbiddenError, InternalServerError } = require('../errors')
 const { StatusCodes } = require('http-status-codes')
 const config = require('../config')
@@ -19,9 +20,9 @@ const login = async(req, res, next) => {
     if (!userDocument) {
         throw new UnauthenticatedError('Credentials incorrect.')
     }
-
-    const passwordCorrect = await response.validatePassword(userDocument.password)
-
+    
+    const passwordCorrect = await userDocument.validatePassword(password)
+    
     if (!passwordCorrect) {
         throw new UnauthenticatedError('Credentials incorrect.')
     }
@@ -44,6 +45,7 @@ const login = async(req, res, next) => {
 
     userDocument.OTP_retries = 0
     userDocument.expiration_timestamp_OTP = null
+    userDocument.lastLoggedIn = Date.now()
 
     // update user document to save the new Refresh token. In Mongoose, once you have the document it can be updated with save()
     try {
@@ -71,7 +73,7 @@ const refreshToken = async(req, res, next) => {
     }
 
     const refreshToken = cookies.jwt
-    const userDocument = await UserModel.find({refreshToken: refreshToken}).exec()
+    const userDocument = await UserModel.findOne({refreshToken: refreshToken}).exec()
 
     if (!userDocument) {
         throw new ForbiddenError()
@@ -144,7 +146,7 @@ const updateUserInfo = async(req, res, next) => {
         throw new ForbiddenError()
     }
 
-    const restricted = new Set(['emailLowercase', 'password', 'role_id', 'roleLevel', 'subscriptions', 'temp_password', 'expiration_timestamp_OTP', 'refreshToken'])
+    const restricted = new Set(['emailLowercase', 'password', 'role_id', 'roleLevel', 'subscriptions', 'lastNotifySent', 'lastLoggedIn', 'temp_password', 'expiration_timestamp_OTP', 'OTP_retries', 'refreshToken'])
     const updateInfo = new Object()
     for (let [k, v] of Object.entries(req.body)) {
         if (!restricted.has(k)) {
@@ -166,9 +168,15 @@ const updateUserInfo = async(req, res, next) => {
         throw new NotFoundError('User not found.')
     }
 
-    res.status(StatusCodes.OK).json({user: response.info()})
+    res.status(StatusCodes.OK).json({user: response.getUserInfo()})
 }
 
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const updatePassword = async(req, res, next) => {
     const {
         id
@@ -239,25 +247,23 @@ const forgotPassword = async(req, res, next) => {
         throw new ForbiddenError('Max retries sent, contact admin.')
     }
 
-    const tempPassword = userDocument.generateOTP()
+    const tempPassword = userDocument.generateTempPassword()
     try {
         await userDocument.save()
-        res.status(StatusCodes.OK).json()
-        const body = `This is your temporary password:\n${tempPassword}\nIt will expire in ${OTP_expire_minutes} minutes.`
-        sendMail(`${projectName}, temporary password`, body)    // send async
+        res.status(StatusCodes.OK).json({ user: { id:userDocument.getId(), email: email } })
+        const body = `This is your temporary password:\n${tempPassword}\nIt will expire in ${config.OTP_expire_minutes} minutes.`
+        sendMail(email, `${config.projectName}, temporary password`, body)    // send async
     } catch(e) {
         throw new InternalServerError('Forgot password failed.')
     }
-
-    return
 }
 
 const validateOTP = async(req, res, next) => {
     const {
         email,
-        tempPassword
+        password
     } = req.body
-
+    
     const userDocument = await UserModel.findOne({emailLowercase: email.toLowerCase()}).exec()
     if (userDocument) {
         if (!userDocument.temp_password || userDocument.expiration_timestamp_OTP === null) {
@@ -267,17 +273,15 @@ const validateOTP = async(req, res, next) => {
         if (new Date() >= userDocument.expiration_timestamp_OTP) {
             throw new UnauthenticatedError('OTP expired.')
         }
-        if (!userDocument.validatePassword(tempPassword)) {
+        if (!await userDocument.validatePassword(password)) {
             throw new UnauthenticatedError('Incorrect credentials.')
         }
         
         const oneTimeToken = userDocument.generateJWT()
-        res.status(StatusCodes.OK).json({user: {id: userDocument._id, temp_password: userDocument.temp_password}, token: oneTimeToken})
+        res.status(StatusCodes.OK).json({user: {id: userDocument.getId(), temp_password: userDocument.temp_password}, token: oneTimeToken})
     } else {
         throw new UnauthenticatedError('Incorrect credentials.')
     }
-    
-    return
 }
 
 module.exports = { login, refreshToken, logout, updateUserInfo, updatePassword, forgotPassword, validateOTP }

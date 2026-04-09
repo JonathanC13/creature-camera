@@ -1,10 +1,109 @@
-{"level":"INFO","time":"2026-02-19T20:35:46.503Z","pid":21672,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
-{"level":"INFO","time":"2026-02-20T20:44:10.233Z","pid":24488,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
-{"level":"INFO","time":"2026-02-20T21:10:34.624Z","pid":20496,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
-{"level":"INFO","time":"2026-02-21T20:50:23.294Z","pid":8760,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
-{"level":"INFO","time":"2026-02-21T20:56:55.591Z","pid":8760,"hostname":"DESKTOP-V4L67RN","msg":"uploadVideoSingle: 201 - Video uploaded successfully to uploads\\recorded_2026221_15h56m35s.avi"}
-{"level":"INFO","time":"2026-02-21T20:57:09.592Z","pid":8760,"hostname":"DESKTOP-V4L67RN","msg":"uploadVideoSingle: 201 - Video uploaded successfully to uploads\\recorded_2026221_15h56m49s.avi"}
-{"level":"INFO","time":"2026-02-21T20:57:16.921Z","pid":8760,"hostname":"DESKTOP-V4L67RN","msg":"uploadVideoSingle: 201 - Video uploaded successfully to uploads\\recorded_2026221_15h56m56s.avi"}
-{"level":"INFO","time":"2026-02-21T21:00:37.445Z","pid":16108,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
-{"level":"INFO","time":"2026-02-21T21:00:39.494Z","pid":25856,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
-{"level":"INFO","time":"2026-04-03T20:18:14.729Z","pid":12240,"hostname":"DESKTOP-V4L67RN","msg":"Could not populate collection 'role' properly."}
+{"level":"ERROR","time":"2026-04-06T20:10:01.993Z","pid":12492,"hostname":"DESKTOP-V4L67RN","msg":"Listen error: ReferenceError: directories is not defined"}
+{"level":"ERROR","time":"2026-04-06T20:15:41.897Z","pid":19308,"hostname":"DESKTOP-V4L67RN","msg":"Listen error: ReferenceError: path is not defined"}
+{"level":"ERROR","time":"2026-04-06T20:18:06.849Z","pid":21556,"hostname":"DESKTOP-V4L67RN","msg":"Listen error: TypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string. Received undefined"}
+{"level":"ERROR","time":"2026-04-06T20:19:11.982Z","pid":23632,"hostname":"DESKTOP-V4L67RN","msg":"Listen error: TypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string. Received undefined"}
+{"level":"ERROR","time":"2026-04-06T20:20:26.193Z","pid":23068,"hostname":"DESKTOP-V4L67RN","msg":"Could not validate or create the required project files. App terminating..."}
+{"level":"ERROR","time":"2026-04-06T20:24:28.727Z","pid":19952,"hostname":"DESKTOP-V4L67RN","msg":"Could not validate or create the required project files. App terminating..."}
+{"level":"INFO","time":"2026-04-06T20:26:03.574Z","pid":2944,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-06T20:29:16.034Z","pid":23360,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-06T20:30:18.980Z","pid":23360,"hostname":"DESKTOP-V4L67RN","message":"Something went wrong, try again later.","status":401}
+{"level":"ERROR","time":"2026-04-06T20:32:12.989Z","pid":23360,"hostname":"DESKTOP-V4L67RN","message":"response is not defined","status":500}
+{"level":"INFO","time":"2026-04-06T20:35:09.283Z","pid":24564,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-06T20:35:21.953Z","pid":24564,"hostname":"DESKTOP-V4L67RN","message":"Credentials incorrect.","status":401}
+{"level":"ERROR","time":"2026-04-06T20:36:11.668Z","pid":24564,"hostname":"DESKTOP-V4L67RN","message":"Credentials incorrect.","status":401}
+{"level":"ERROR","time":"2026-04-06T20:37:57.814Z","pid":24564,"hostname":"DESKTOP-V4L67RN","message":"Credentials incorrect.","status":401}
+{"level":"INFO","time":"2026-04-06T20:39:24.618Z","pid":15080,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-06T20:39:27.235Z","pid":15080,"hostname":"DESKTOP-V4L67RN","message":"Credentials incorrect.","status":401}
+{"level":"INFO","time":"2026-04-06T20:39:43.811Z","pid":11920,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-06T20:40:38.632Z","pid":4032,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-06T20:40:46.218Z","pid":4032,"hostname":"DESKTOP-V4L67RN","message":"Credentials incorrect.","status":401}
+{"level":"INFO","time":"2026-04-06T20:40:52.301Z","pid":3724,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-06T20:41:22.327Z","pid":18908,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-06T20:41:48.647Z","pid":22804,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-06T20:41:56.420Z","pid":13404,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-06T20:42:20.861Z","pid":23268,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-06T20:43:45.789Z","pid":4376,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-06T20:44:24.085Z","pid":5524,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-06T20:44:36.513Z","pid":5524,"hostname":"DESKTOP-V4L67RN","message":"Credentials incorrect.","status":401}
+{"level":"ERROR","time":"2026-04-06T20:44:40.235Z","pid":5524,"hostname":"DESKTOP-V4L67RN","message":"Credentials incorrect.","status":401}
+{"level":"INFO","time":"2026-04-06T20:44:56.661Z","pid":24176,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-06T20:45:08.830Z","pid":23676,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-07T19:55:49.180Z","pid":21532,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-07T19:56:18.334Z","pid":21532,"hostname":"DESKTOP-V4L67RN","message":"Unexpected end of JSON input","status":400}
+{"level":"ERROR","time":"2026-04-07T19:57:29.677Z","pid":21532,"hostname":"DESKTOP-V4L67RN","message":"Something went wrong, try again later.","status":401}
+{"level":"ERROR","time":"2026-04-07T19:59:37.327Z","pid":21532,"hostname":"DESKTOP-V4L67RN","message":"Credentials incorrect.","status":401}
+{"level":"ERROR","time":"2026-04-07T20:01:03.297Z","pid":21532,"hostname":"DESKTOP-V4L67RN","message":"jwt is not defined","status":500}
+{"level":"INFO","time":"2026-04-07T20:02:25.091Z","pid":21800,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-07T20:02:27.978Z","pid":21800,"hostname":"DESKTOP-V4L67RN","message":"userDocument.getId is not a function","status":500}
+{"level":"INFO","time":"2026-04-07T20:05:52.101Z","pid":24828,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-07T20:05:58.404Z","pid":24828,"hostname":"DESKTOP-V4L67RN","message":"userDocument.getId is not a function","status":500}
+{"level":"INFO","time":"2026-04-07T20:06:32.469Z","pid":24864,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-07T20:06:34.350Z","pid":24864,"hostname":"DESKTOP-V4L67RN","message":"userDocument.getId is not a function","status":500}
+{"level":"INFO","time":"2026-04-07T20:09:11.125Z","pid":10476,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-07T20:09:42.135Z","pid":12760,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-07T20:18:16.065Z","pid":24700,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-07T20:18:17.950Z","pid":4136,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T18:33:02.391Z","pid":23028,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T18:35:14.388Z","pid":21604,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T18:35:19.183Z","pid":21604,"hostname":"DESKTOP-V4L67RN","message":"Something went wrong, try again later.","status":401}
+{"level":"ERROR","time":"2026-04-09T18:35:46.178Z","pid":21604,"hostname":"DESKTOP-V4L67RN","message":"Something went wrong, try again later.","status":401}
+{"level":"INFO","time":"2026-04-09T18:37:04.976Z","pid":21052,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T18:37:08.616Z","pid":2416,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T18:37:12.536Z","pid":12716,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T18:37:14.418Z","pid":2368,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T18:37:20.797Z","pid":2368,"hostname":"DESKTOP-V4L67RN","message":"d","status":401}
+{"level":"INFO","time":"2026-04-09T18:37:25.974Z","pid":18444,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T18:37:27.292Z","pid":8924,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T18:37:29.581Z","pid":8128,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T18:37:33.192Z","pid":1984,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T18:38:00.772Z","pid":2428,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T18:38:03.197Z","pid":2428,"hostname":"DESKTOP-V4L67RN","message":"TypeError: response.getInfo is not a function","status":401}
+{"level":"INFO","time":"2026-04-09T18:39:25.827Z","pid":24196,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T18:39:28.158Z","pid":24196,"hostname":"DESKTOP-V4L67RN","message":"TypeError: response.getInfo is not a function","status":401}
+{"level":"INFO","time":"2026-04-09T18:41:06.167Z","pid":5472,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T18:41:09.909Z","pid":5472,"hostname":"DESKTOP-V4L67RN","message":"TypeError: response.getInfo is not a function","status":401}
+{"level":"INFO","time":"2026-04-09T18:41:24.214Z","pid":4372,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T18:42:03.970Z","pid":2428,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T18:42:14.022Z","pid":2428,"hostname":"DESKTOP-V4L67RN","message":"response.info is not a function","status":500}
+{"level":"INFO","time":"2026-04-09T18:42:39.459Z","pid":10536,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T18:46:35.685Z","pid":10536,"hostname":"DESKTOP-V4L67RN","message":"Credentials incorrect.","status":401}
+{"level":"ERROR","time":"2026-04-09T18:46:54.265Z","pid":10536,"hostname":"DESKTOP-V4L67RN","message":"Current password incorrect.","status":401}
+{"level":"ERROR","time":"2026-04-09T18:56:10.847Z","pid":10536,"hostname":"DESKTOP-V4L67RN","message":"userDocument.generateOTP is not a function","status":500}
+{"level":"INFO","time":"2026-04-09T18:57:55.181Z","pid":1444,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T18:58:01.077Z","pid":1444,"hostname":"DESKTOP-V4L67RN","message":"Forgot password failed.","status":500}
+{"level":"INFO","time":"2026-04-09T19:00:04.528Z","pid":21020,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T19:00:07.344Z","pid":22260,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T19:00:46.238Z","pid":22260,"hostname":"DESKTOP-V4L67RN","message":"Forgot password failed.","status":500}
+{"level":"INFO","time":"2026-04-09T19:02:24.977Z","pid":14428,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T19:02:42.474Z","pid":14428,"hostname":"DESKTOP-V4L67RN","message":"Forgot password failed.","status":500}
+{"level":"INFO","time":"2026-04-09T19:04:15.167Z","pid":14912,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T19:04:15.703Z","pid":14912,"hostname":"DESKTOP-V4L67RN","message":"Max retries sent, contact admin.","status":403}
+{"level":"INFO","time":"2026-04-09T19:06:05.224Z","pid":12680,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T19:06:16.192Z","pid":12784,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T19:06:42.442Z","pid":5264,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T19:06:53.589Z","pid":4808,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T19:07:29.243Z","pid":4808,"hostname":"DESKTOP-V4L67RN","message":"Forgot password failed.","status":500}
+{"level":"INFO","time":"2026-04-09T19:07:38.911Z","pid":22584,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T19:08:07.318Z","pid":22584,"hostname":"DESKTOP-V4L67RN","msg":"nodemailer error: Error: No recipients defined, for Create camera, temporary password"}
+{"level":"INFO","time":"2026-04-09T19:09:09.324Z","pid":17192,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T19:10:03.531Z","pid":21544,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T19:11:11.609Z","pid":21544,"hostname":"DESKTOP-V4L67RN","message":"BadRequestError is not defined","status":500}
+{"level":"INFO","time":"2026-04-09T19:11:48.469Z","pid":24436,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T19:12:42.969Z","pid":8040,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T19:12:45.813Z","pid":21268,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T19:13:02.334Z","pid":9100,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T19:13:54.313Z","pid":16368,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T19:13:57.313Z","pid":8608,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T19:13:57.841Z","pid":8608,"hostname":"DESKTOP-V4L67RN","message":"Cannot read properties of undefined (reading 'toString')","status":500}
+{"level":"ERROR","time":"2026-04-09T19:14:58.151Z","pid":8608,"hostname":"DESKTOP-V4L67RN","message":"Cannot read properties of undefined (reading 'toString')","status":500}
+{"level":"INFO","time":"2026-04-09T19:15:08.785Z","pid":23072,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T19:15:12.873Z","pid":23740,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T19:15:31.701Z","pid":23740,"hostname":"DESKTOP-V4L67RN","message":"Cannot read properties of undefined (reading 'toString')","status":500}
+{"level":"INFO","time":"2026-04-09T19:15:38.077Z","pid":18404,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T19:16:03.435Z","pid":21604,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"INFO","time":"2026-04-09T19:16:21.684Z","pid":20208,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T19:16:34.350Z","pid":20208,"hostname":"DESKTOP-V4L67RN","message":"Incorrect credentials.","status":401}
+{"level":"INFO","time":"2026-04-09T19:16:43.139Z","pid":23816,"hostname":"DESKTOP-V4L67RN","msg":"Listening on port 5000..."}
+{"level":"ERROR","time":"2026-04-09T19:21:02.617Z","pid":23816,"hostname":"DESKTOP-V4L67RN","message":"Credentials incorrect.","status":401}
+{"level":"ERROR","time":"2026-04-09T19:26:45.096Z","pid":23816,"hostname":"DESKTOP-V4L67RN","message":"Incorrect credentials.","status":401}
+{"level":"ERROR","time":"2026-04-09T19:44:28.113Z","pid":23816,"hostname":"DESKTOP-V4L67RN","message":"OTP expired.","status":401}
