@@ -8,8 +8,7 @@ const UserSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'Name required.'],
-        trim: true,
-        unique: true
+        trim: true
     },
     email: {
         type: String,
@@ -20,7 +19,7 @@ const UserSchema = new mongoose.Schema({
     },
     emailLowercase: {
         type: String,
-        required: [true, 'Please provide an aaa email!'],
+        required: [true, 'Please provide an email!'],
         trim: true,
         lowercase: true,
         match: [/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Please provide a valid email!'],
@@ -75,6 +74,9 @@ const UserSchema = new mongoose.Schema({
     refreshToken: {
         type: String
     },
+    createdBy: {
+        type: mongoose.Types.ObjectId
+    }
 }, {timestamps: true})
 
 // Document-level operations
@@ -105,7 +107,8 @@ UserSchema.methods.getUserInfo = function() {
         roleLevel: this.roleLevel,
         subscriptions: this.subscriptions,
         settingNotifyAlways: this.settingNotifyAlways,
-        temp_password: this.temp_password
+        temp_password: this.temp_password,
+        createdBy: this.createdBy
     }
 }
 

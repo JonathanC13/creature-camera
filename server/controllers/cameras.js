@@ -50,7 +50,7 @@ const createCamera = async(req, res, next) => {
         throw new BadRequestError('Please provide a camera name!')
     }
     
-    const response = await CameraModel.create({...req.body}).exec()
+    const response = await CameraModel.create({...req.body})
 
     res.status(StatusCodes.CREATED).json({response})
 }
@@ -64,7 +64,7 @@ const createCamera = async(req, res, next) => {
  */
 const updateCamera = async(req, res, next) => {
     const {
-        params: { id }    // params: {cameraId} find key 'params', go inside to find key 'cameraId' and then assign value to variable 'cameraId'
+        params: { id: cameraId }    // find key 'params', go inside to find key 'id' and then assign value to variable 'cameraId'
     } = req
     
     const optObj = {
@@ -72,10 +72,10 @@ const updateCamera = async(req, res, next) => {
         runValidators: true
     }
 
-    const response = await CameraModel.findByIdAndUpdate(id, req.body, optObj).exec()
+    const response = await CameraModel.findByIdAndUpdate(cameraId, req.body, optObj).exec()
     
     if (!response) {
-        throw new NotFoundError('Camera not found!')
+        throw new NotFoundError(`Camera with id: ${cameraId} does not exist`)
     }
 
     res.status(StatusCodes.OK).json({response})

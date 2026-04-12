@@ -7,6 +7,7 @@ const CameraSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Camera name required.'],
         trim: true,
+        unqiue: true
     },
     cameraToken: {
         type: String,

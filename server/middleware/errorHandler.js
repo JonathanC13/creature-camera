@@ -21,8 +21,7 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     // Remember that 'unique' in the schema does not fail a validation, it will return an error after commiting to the DB.
     customError.status = StatusCodes.CONFLICT
     const field = new Map([
-      ['emailLowercase', 'Email'],
-      ['cameraName', 'Camera name']
+      ['emailLowercase', 'Email']
     ])
     const errField = Object.keys(err.keyValue)[0]
     const text = field.has(errField) ? field.get(errField) : Object.keys(err.keyValue)

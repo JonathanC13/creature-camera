@@ -141,7 +141,7 @@ const updateUserInfo = async(req, res, next) => {
     const {
         id
     } = req.params
-
+    
     if (id !== req.user.id) {
         throw new ForbiddenError()
     }
@@ -181,7 +181,7 @@ const updatePassword = async(req, res, next) => {
     const {
         id
     } = req.params
-
+    
     if (id !== req.user.id) {
         throw new ForbiddenError()
     }

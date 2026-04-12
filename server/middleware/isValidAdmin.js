@@ -12,7 +12,7 @@ const isValidAdmin = async(req, res, next) => {
         throw new ForbiddenError('User does not have the appropriate role level.')
     }
 
-    req.user.role = { response }
+    // req.user.role = { response }
 
     next()
 }

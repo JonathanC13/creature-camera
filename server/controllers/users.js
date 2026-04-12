@@ -7,8 +7,8 @@ const {StatusCodes} = require('http-status-codes')
 // Since temp_password = true it goes to the reset password page, it is waiting for new password to pass into /updatePassword/:id. After successful change, log in.
 
 const getAllUsers = async(req, res, next) => {
-    const response = await UserModel.find({})
-
+    let response = await UserModel.find({}).select('-password').exec()
+    response = response.map((e) => e.getUserInfo())
     res.status(StatusCodes.OK).json({response, count: response.length})
 }
 
@@ -18,13 +18,13 @@ const getUser = async(req, res, next) => {
         id
     } = req.params
 
-    const response = await UserModel.findById(id)
+    const response = await UserModel.findById(id).exec()
 
     if (!response) {
         throw new NotFoundError(`User with id: ${id} does not exist`)
     }
 
-    res.status(StatusCodes.OK).json({response})
+    res.status(StatusCodes.OK).json({response: response.getUserInfo()})
 }
 
 const registerUser = async(req, res, next) => {
@@ -34,19 +34,27 @@ const registerUser = async(req, res, next) => {
         throw new BadRequestError('Please provide the required fields!')
     }
 
-    req.body[emailLowercase] = email.toLowerCase()
+    req.body["emailLowercase"] = email.toLowerCase()
+    req.body["createdBy"] = req.user.id   // creator is the admin authorized
+    req.body["temp_password"] = true   // client will redirect user to update password
 
-    const response = await UserModel.create({...req.body}).exec()
+    const response = await UserModel.create({...req.body})
     
-    res.status(StatusCodes.CREATED).json({response})
+    res.status(StatusCodes.CREATED).json({response: response.getUserInfo()})
 }
 
+/**
+ * Delete has no admin restriction due to case if an admin account needs to be deleted.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const deleteUser = async(req, res, next) => {
     const {
         id
     } = req.params
 
-    await UserModel.findByIdAndDelete(id)
+    await UserModel.findByIdAndDelete(id).exec()
 
     res.status(StatusCodes.OK).send()
 }
@@ -67,12 +75,15 @@ const updateUser = async(req, res, next) => {
         req.body.subscriptions = Array.from(new Set(subscriptions)) // remove duplicates
     }
 
-    const userDocument = UserModel.findById(id)
+    const userDocument = await UserModel.findById(id).exec()
+    if (!userDocument) {
+        throw new NotFoundError()
+    }
     if (userDocument.roleLevel === 1) {
-        throw new ForbiddenError("Cannot modify this user's role.")
+        throw new ForbiddenError("Cannot modify another admin.")
     }
 
-    const restricted = new Set(['emailLowercase', 'password', 'temp_password', 'expiration_timestamp_OTP', 'refreshToken'])
+    const restricted = new Set(['emailLowercase', 'password', 'lastNotifySent', 'lastLoggedIn', 'temp_password', 'expiration_timestamp_OTP', 'OTP_retries', 'refreshToken'])
     
     for (let [k, v] of Object.entries(req.body)) {
         if (!restricted.has(k)) {
@@ -84,10 +95,10 @@ const updateUser = async(req, res, next) => {
             }
         }
     }
-
+    
     try {
         const response = await userDocument.save()
-        res.status(StatusCodes.OK).json({user: response.getInfo()})
+        res.status(StatusCodes.OK).json({response: response.getUserInfo()})
     } catch (e) {
         throw new InternalServerError('update user failed.')
     }
