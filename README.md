@@ -676,9 +676,9 @@ Client TODO:
     - auth reducer saves the logged in user info and token so apiSlice doesn't need a getMe endpoint to keeping retrieving current profile.
     - Just remember to dispatch to reducer after api queries to save info.
 
-2. User. Should only need ApiSlice and tag: User to invalidate when mutation sent.
+2. User. Should only need ApiSlice and tag: User to invalidate when mutation sent. Should be OK
 
-3. Camera. Should only need ApiSlice and tag: Camera to invalidate when mutation sent.
+3. Camera. Should only need ApiSlice and tag: Camera to invalidate when mutation sent. HERE
 
 4. BACK TO SERVER, need API to get all videos from subscribed cameras.
     - GET /getAllVideos/

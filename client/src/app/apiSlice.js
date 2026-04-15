@@ -49,7 +49,7 @@ export const apiSlice = createApi({
     // All of our requests will have URLs starting with
     baseQuery: baseQueryWithReauth,
     // For cached data, so when it is invalidated it will retrieve.
-    tagTypes: ['User', 'Camera'],
+    tagTypes: ['User', 'Camera'], // , 'UNAUTHORIZED']
     // The "endpoints" represent operations and requests for this server
     endpoints: (builder) => ({})
 })
@@ -58,7 +58,7 @@ export function providesList(resultsWithIds, tagType) {
   return resultsWithIds
     ? [
         { type: tagType, id: 'LIST' },
-        ...resultsWithIds.map(({ id }) => ({ type: tagType, id })),
+        ...resultsWithIds.map(({ id }) => { return { type: tagType, id } }),
       ]
     : [{ type: tagType, id: 'LIST' }]
 }

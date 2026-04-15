@@ -8,7 +8,8 @@ export const apiSliceWithAuth = apiSlice.injectEndpoints({
             method: 'POST',
             url: '/auth/login',
             body: {...credentials}
-        })
+        }),
+        invalidatesTags: (result) => (result ? ['UNAUTHORIZED'] : []),
     }),
     logout: builder.mutation({
         query: (credentials) => ({
