@@ -11,10 +11,10 @@ const uploadVideoMulter = async(req, res, next) => {
         uploadsFolder
     } = config.projectDirectories
     const {
-        cameraName
+        id
     } = req.camera
     // check if folder exists or create
-    if (!(await directoryExists(path.join(base, uploadsFolder, cameraName)))) {
+    if (!(await directoryExists(path.join(base, uploadsFolder, id)))) {
         throw new NotFoundError('Upload directory not found.')
     }
 

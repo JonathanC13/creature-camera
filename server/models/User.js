@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs');
-const otpGenerator = require('otp-generator')
+const generateOTP = require('../functions/generateOTP')
 const config = require('../config')
 
 const UserSchema = new mongoose.Schema({
@@ -133,7 +133,7 @@ UserSchema.methods.replacePassword = function(newPassword) {
 }
 
 UserSchema.methods.generateTempPassword = function() {
-    const tempPassword = otpGenerator.generate(6, { specialChars: false });
+    const tempPassword = generateOTP();
     this.replacePassword(tempPassword)
     this.temp_password = true
     const date = new Date()

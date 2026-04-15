@@ -10,8 +10,10 @@ Server
     xss-filters
     http-status-codes
     pino    // logging
-    nodemailer // send emails
+    nodemailer // send emails   // https://nodemailer.com/guides/using-gmail Method: App Password, config for .env
+    bcryptjs
     npm install otp-generator
+    readline-sync
 
     * Setup in .env
         ACCESS_CONTROL_ALLOW_ORIGIN = "https://www.jonRPI.com"
@@ -26,6 +28,12 @@ Server
         NODE_MAILER_SERVICE = ''
         NODE_MAILER_USER = ''
         NODE_MAILER_PASS = ''
+
+    * When setting up, after mongoDB database created and .env populated, need at least one admin account. For convenience and since project just personal, run: node ./setup/createAdminAcc and it will prompt you for information for the account.
+        Admin account is for manageming cameras, users, and user-camera subscriptions.
+
+Client libraries
+    redux
 
 RPI
     .env
@@ -188,3 +196,502 @@ Run server
 On Pi
 - Have ethernet connect to internet
 - Have wifi card connect to Camera's wifi network. LiveAD
+
+
+
+TESTING:
+1. createAdmin: pass
+    1. uses function validateRoleCollection: pass
+        - creates Roles properly if missing.
+    2. Admin account successfully created
+
+API:
+1. Auth
+    1. POST /auth/login
+        1. Incorrect email:
+            Prerequisites: N/A
+            Route params: N/A
+            Body: JSON { "email": "test1@.c", "password": "123456" }
+            Expected results: 1. status code: 401. 2. response: JSON { message: Credentials incorrect. }. 3. No JWT cookie returned.
+            Status: Pass
+
+        2. Incorrect password:
+            Prerequisites: N/A
+            Route params: N/A
+            Body: JSON { "email": "test1@.com", "password": "12345" }
+            Expected results: 1. status code: 401. 2. response: JSON { message: Credentials incorrect. }. 3. No JWT cookie returned.
+            Status: Pass
+
+        3. Correct credentials
+            Prerequisites: Have an account registered.
+            Route params: N/A
+            Body: JSON { "email": "test1@.com", "password": "123456" }
+            Expected results: 1. status code: 200. 2. response: JSON { user: user's info, token: access token }. 3. User info and generated access token returned, generated JWT cookie stored on client.
+            Status: Pass
+
+    2. POST /auth/logout
+        1. While logged in (has JWT cookie), logout will clear JWT
+            Prerequisites: Logged in and has jwt cookie.
+            Route params: N/A
+            Body: N/A
+            Expected results: 1. status code: 204. 2. response: JSON { }. 3. On client, JWT cookie cleared. Check by running /auth/refreshToken, since no JWT it will not return an access token
+            Status: Pass
+
+        2. While not logged in (no JWT cookie)
+            Prerequisites: N/A
+            Route params: N/A
+            Body: N/A
+            Expected results: 1. status code: 204. 2. response: JSON { }. 3. No JWT to clear.
+            Status: Pass
+
+    3. GET /auth/refreshToken
+        1. Not logged in (no JWT)
+            Prerequisites: N/A
+            Route params: N/A
+            Body: N/A
+            Expected results: 1. status code: 401. 2. response: JSON { }. 3. No user to refresh access token.
+            Status: Pass
+
+        2. Valid login and then request new access Token
+            Prerequisites: Logged in and has jwt cookie.
+            Route params: N/A
+            Body: N/A
+            Expected results: 1. status code: 200. 2. response: JSON { user: user's info, token: access token}. 3. Returns new access token.
+            Status: Pass
+
+    4. PATCH /auth/updateUserInfo/:id
+        1. update own user info. Ignores attempt at updating restricted fields: ['emailLowercase', 'password', 'role_id', 'roleLevel', 'subscriptions', 'lastNotifySent', 'lastLoggedIn', 'temp_password', 'expiration_timestamp_OTP', 'OTP_retries', 'refreshToken']
+            Prerequisites: Logged in and has valid access token.
+            Route params: id
+            Body: 
+                {
+                    "name": "Bob",
+                    "email": "bobert@mail.com",
+                    "emailLowercase":"shouldNotChange@hotmail.com",
+                    "password": "shouldNotChange",
+                    "persistentLogin": true,
+                    "role_id": "69d02172bae91a83dfd23dzz",
+                    "roleLevel": 3,
+                    "settingNotifyAlways": true,
+                    "subscriptions": ["69d02172bae91a83dfd23dba","69d02172bae91a83dfd23dbb"],
+                    "lastNotifySent": "2026-04-06T20:35:00.254+00:00",
+                    "lastLoggedIn": "2026-04-06T20:41:00.254+00:00",
+                    "temp_password": true,
+                    "expiration_timestamp_OTP": "2026-04-06T20:56:00.254+00:00",
+                    "OTP_retries": 1,
+                    "refreshToken": 123
+                }
+            Expected results: 1. status code: 200. 2. response: JSON { user: update user info }. 3. Update non-restricted fields
+            Status: Pass
+
+    5. PATCH /auth/updatePassword/:id
+        1. update account password, valid current password
+            Prerequisites: Logged in and has valid access token.
+            Route params: id
+            Body: 
+                {
+                    "currentPassword": "123456",
+                    "newPassword": "654321"
+                }
+            Expected results: 1. status code: 200. 2. response: JSON {  }. 3. password updated
+            Status: Pass
+
+        2. invalid current password
+            Prerequisites: Logged in and has valid access token.
+            Route params: id
+            Body: 
+                {
+                    "currentPassword": "123450",
+                    "newPassword": "654321"
+                }
+            Expected results: 1. status code: 200. 2. response: JSON {  }. 3. password not updated
+            Status: Pass
+
+    6. Test forgot password 
+        1. Normal steps:
+            1. POST /auth/forgotPassword with valid email
+                Prerequisites: Has valid account
+                Route params: N/A
+                Body: 
+                    { email: 'test@hotmail.com' }
+                Expected results: 1. status code: 200. 2. response: JSON { user: {id, email} }. 3. JWT cookie cleared if present, email receives one time password.
+                Status: Pass
+
+            2. POST /validateOTP/:id
+                1. incorrect temp password
+                    Prerequisites: valid :id
+                    Route params: id
+                    Body: 
+                        { email: 'test@hotmail.com', password: "000001" }
+                    Expected results: 1. status code: 401. 2. response: JSON { message: Incorrect credentials. }. 3. not authenicated to be able proceed to update password.
+                    Status: Pass
+
+                2. Correct temp password
+                    Prerequisites: valid :id
+                    Route params: id
+                    Body: 
+                        { email: 'test@hotmail.com', password: "213432" }
+                    Expected results: 1. status code: 200. 2. response: JSON { user: {id: userDocument.getId(), temp_password: userDocument.temp_password}, token: oneTimeToken}. 3. On success the client displays a field for new password. It will POST /updatePassword/:id authenticated with token, payload { currentPassword: temp, newPassword: pass}. After update, since there is no jwt cookie redirects to login.
+                    Status: Pass
+
+            3. update account password, with the valid temp password
+                Prerequisites: Since has valid access token from validateOTP.
+                Route params: id
+                Body: 
+                    {
+                        "currentPassword": "213432",
+                        "newPassword": "024680"
+                    }
+                Expected results: 1. status code: 200. 2. response: JSON {  }. 3. password updated and since temp_password used the following is set; userDocument.temp_password = false, userDocument.OTP_retries = 0, userDocument.expiration_timestamp_OTP = null
+                Status: Pass
+
+        2. Allow temp password to expire
+            1. Get temp password
+                Prerequisites: Has valid account
+                Route params: N/A
+                Body: 
+                    { email: 'test@hotmail.com' }
+                Expected results: 1. status code: 200. 2. response: JSON { user: {id, email} }. 3. JWT cookie cleared if present, email receives one time password.
+                Status: Pass
+
+            2. Wait until current time > expiration_timestamp_OTP then POST /validateOTP/:id with correct credentials.
+                Prerequisites: valid :id
+                Route params: id
+                Body: 
+                    { email: 'test@hotmail.com', password: "213432" }
+                Expected results: 1. status code: 401. 2. response: JSON { message: OTP expired }. 3. One time password expired, must start process again at /forgotPassword for new temp password and new expiration time.
+                Status: Pass
+
+
+        3. Email not exist: POST /auth/forgotPassword
+            Prerequisites: N/A
+            Route params: N/A
+            Body: 
+                { email: 'test@test.c' }
+            Expected results: 1. status code: 200. 2. response: JSON {  }. 3. Returns OK to prevent indication email exists or not.
+            Status: Pass
+
+        4. OTP retries max: POST /auth/forgotPassword 4 times.
+            Prerequisites: Has valid account
+            Route params: N/A
+            Body: 
+                { email: test@hotmail.com }
+            Expected results: 1. status code: 403. 2. response: JSON { message: Max retries sent, contact admin. }. 3. On 4th request, it exceeds 3 max retries. Note: to reset retries to 0, admin must request /user/adminResetPassword/:id, given the temp password to user, then when user successfully uses the temp password and updates to new password it will reset.
+            Status: Pass
+
+2. user
+    1. POST /user/register
+        1. Not logged in
+            Prerequisites: N/A
+            Route params: N/A
+            Body: 
+                {  }
+            Expected results: 1. status code: 401. 2. response: JSON {  }. 3. Not authenticated.
+            Status: Pass
+
+        2. Valid admin account to register a user
+            Prerequisites: Logged in as Admin
+            Route params: N/A
+            Body: 
+                {
+                    "name": "bobo",
+                    "email": "bob@mail.com",
+                    "password": "123",
+                    "role_id": "69d0213294650c3fb85f1e59",
+                    "roleLevel": "2"
+                }
+            Expected results: 1. status code: 201. 2. response: JSON { response: created user, tempPlain: tempPassword }. 3. User is created and temp password returned plain so admin can give to user.
+            Status: Pass
+
+        3. Valid admin account try to register a user with already existing email
+            Prerequisites: Logged in as Admin
+            Route params: N/A
+            Body: 
+                {
+                    "name": "bobo",
+                    "email": "bob@mail.com",
+                    "password": "123",
+                    "role_id": "69d0213294650c3fb85f1e59",
+                    "roleLevel": "2"
+                }
+            Expected results: 1. status code: 409. 2. response: JSON { message: Duplicate value for Email! Please use a different one. }. 3. User not created due to duplicate.
+            Status: Pass
+
+        4. Logged in as normal user
+            Prerequisites: Logged in as normal user
+            Route params: N/A
+            Body: 
+                {
+                    "name": "bobo2",
+                    "email": "bob2@mail.com",
+                    "password": "123",
+                    "role_id": "69d0213294650c3fb85f1e59",
+                    "roleLevel": "2"
+                }
+            Expected results: 1. status code: 403. 2. response: JSON { message: User does not have the appropriate role level. }. 3. No access due to role level.
+            Status: Pass
+
+    2. GET /user/
+        1. Not logged in
+            Prerequisites: N/A
+            Route params: N/A
+            Body: 
+                {  }
+            Expected results: 1. status code: 401. 2. response: JSON {  }. 3. Not authenticated.
+            Status: Pass
+
+        2. Valid admin account
+            Prerequisites: Logged in as Admin
+            Route params: N/A
+            Body: 
+                {  }
+            Expected results: 1. status code: 200. 2. response: JSON { response: Array of users, count: count }. 3. All users
+            Status: Pass
+
+        3. Logged in as normal user
+            Prerequisites: Logged in as normal user
+            Route params: N/A
+            Body: 
+                {  }
+            Expected results: 1. status code: 403. 2. response: JSON { message: User does not have the appropriate role level. }. 3. No access due to role level.
+            Status: Pass
+
+    3. GET /user/:id
+        1. Not logged in
+            Prerequisites: N/A
+            Route params: valid id
+            Body: 
+                {  }
+            Expected results: 1. status code: 401. 2. response: JSON {  }. 3. Not authenticated.
+            Status: Pass
+
+        2. Valid admin account with invalid user id
+            Prerequisites: Logged in as Admin
+            Route params: invalid id
+            Body: 
+                {  }
+            Expected results: 1. status code: 404. 2. response: JSON { messsage: User with id: ${id} does not exist }. 3. Not found
+            Status: Pass
+
+        3. Valid admin account with valid user id
+            Prerequisites: Logged in as Admin
+            Route params: valid id
+            Body: 
+                {  }
+            Expected results: 1. status code: 200. 2. response: JSON { response: user info }. 3. receives user info
+            Status: Pass
+
+    4. PATCH /user/:id
+        1. Not logged in
+            Prerequisites: N/A
+            Route params: valid id
+            Body: 
+                {
+                    "name": "boboChange",
+                    "email": "bobChange@mail.com",
+                    "password": "shouldNotChange",
+                    "persistentLogin": "true",
+                    "role": "69d02172bae91a83dfd23dba",
+                    "roleLevel": 1,
+                    "settingNotifyAlways": "false",
+                    "subscriptions": ["69d02172bae91a83dfd23dba", "69d02172bae91a83dfd23dba"]
+                }
+            Expected results: 1. status code: 401. 2. response: JSON {  }. 3. Not authenticated.
+            Status: Pass
+
+        2. Valid admin account with invalid user id
+            Prerequisites: Logged in as Admin
+            Route params: invalid id
+            Body: 
+                {
+                    "name": "boboChange",
+                    "email": "bobChange@mail.com",
+                    "password": "shouldNotChange",
+                    "persistentLogin": "true",
+                    "role": "69d02172bae91a83dfd23dba",
+                    "roleLevel": 1,
+                    "settingNotifyAlways": "false",
+                    "subscriptions": ["69d02172bae91a83dfd23dba", "69d02172bae91a83dfd23dba"]
+                }
+            Expected results: 1. status code: 404. 2. response: JSON {  }. 3. Not found
+            Status: Pass
+
+        3. Valid admin account with valid user id
+            Prerequisites: Logged in as Admin
+            Route params: valid id
+            Body: 
+                {
+                    "name": "boboChange",
+                    "email": "bobChange@mail.com",
+                    "password": "shouldNotChange",
+                    "persistentLogin": "true",
+                    "role": "69d02172bae91a83dfd23dba",
+                    "roleLevel": 1,
+                    "settingNotifyAlways": "false",
+                    "subscriptions": ["69d02172bae91a83dfd23dba", "69d02172bae91a83dfd23dba"]
+                }
+            Expected results: 1. status code: 200. 2. response: JSON { response: updated user info }. 3. updates the user info
+            Status: Pass
+        
+        4. Valid admin account with valid admin user id
+            Prerequisites: Logged in as Admin
+            Route params: valid admin id
+            Body: 
+                {
+                    "name": "bobo",
+                    "email": "bob@mail.com",
+                    "password": "shouldNotChange",
+                    "persistentLogin": "true",
+                    "role": "need id",
+                    "settingNotifyAlways": "false",
+                    "subscriptions": ["need id", "need id"]
+                }
+            Expected results: 1. status code: 403. 2. response: JSON { message: Cannot modify another admin. }. 3. cannot update another admin
+            Status: Pass
+
+    5. DELETE /user/:id 
+        1. Valid admin account with invalid user id
+            Prerequisites: Logged in as Admin
+            Route params: invalid id
+            Body: 
+                {  }
+            Expected results: 1. status code: 200. 2. response: JSON {  }. 3. Nothing to delete.
+            Status: Pass
+
+        2. Valid admin account with valid user id
+            Prerequisites: Logged in as Admin
+            Route params: valid id
+            Body: 
+                {  }
+            Expected results: 1. status code: 200. 2. response: JSON {  }. 3. Deletes the user regardless of role level.
+            Status: Pass
+
+    6. POST /adminResetPassword/:id
+        1. Valid admin account with invalid user id
+            Prerequisites: Logged in as Admin
+            Route params: invalid id
+            Body: 
+                {  }
+            Expected results: 1. status code: 404. 2. response: JSON { message: User does not exist. }. 3. User not found.
+            Status: Pass
+
+        2. Valid admin account with valid user id
+            Prerequisites: Logged in as Admin
+            Route params: valid id
+            Body: 
+                {  }
+            Expected results: 1. status code: 200. 2. response: JSON { password: plain text }. 3. User assigned new password and temp_password = true so that client will redirect user to set new password. Log in with temp password.
+            Status: Pass
+
+3. camera
+    1. POST /camera/
+        1. Logged in as Admin, create a camera
+            Prerequisites: Logged in as an Admin. Optional to have a token that is on the RPI for the camera
+            Route params: N/A
+            Body: 
+                {
+                    "cameraName": "camera 1",
+                    "cameraToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjYW1lcmFfbnVtYmVyIjoiMSIsImNhbWVyYV9uYW1lIjoiRmlyc3QgY2FtZXJhIn0.Af5bzfUQGgYVvR9yl42F3ovi47RuMbuJ4iJEj68nOm8"
+                }
+            Expected results: 1. status code: 200. 2. response: JSON { response: camera information }. 3. camera document created.
+            Status: Pass
+
+    2. GET /camera/
+        1. Logged in as Admin, get all the cameras
+            Prerequisites: Logged in as an Admin.
+            Route params: N/A
+            Body: 
+                {  }
+            Expected results: 1. status code: 200. 2. response: JSON { response: Array of camera documents, count: count of cameras in Array }. 3. Return all cameras in Array
+        Status: Pass
+
+    3. GET /camera/:id
+        1. Logged in as Admin, get specific camera
+            Prerequisites: Logged in as an Admin.
+            Route params: valid camera id
+            Body: 
+                {  }
+            Expected results: 1. status code: 200. 2. response: JSON { response: camera document }. 3. Return desired camera document
+        Status: Pass
+
+        2. Logged in as Admin, invalid camera id
+            Prerequisites: Logged in as an Admin.
+            Route params: invalid camera id
+            Body: 
+                {  }
+            Expected results: 1. status code: 404. 2. response: JSON { message: Camera with id: ${cameraId} does not exist }. 3. not found.
+        Status: Pass
+
+    4. PATCH /camera/:id
+        1. Logged in as Admin, update specific camera
+            Prerequisites: Logged in as an Admin.
+            Route params: valid camera id
+            Body: 
+                {
+                    "cameraName": "camera 1 change",
+                    "cameraToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjYW1lcmFfbnVtYmVyIjoiMSIsImNhbWVyYV9uYW1lIjoiRmlyc3QgY2FtZXJhIn0.Af5bzfUQGgYVvR9yl42F3ovi47RuMbuJ4iJEj68nOm8"
+                }
+            Expected results: 1. status code: 200. 2. response: JSON { response: updated camera document }. 3. Return upated camera document
+        Status: Pass
+
+        2. Logged in as Admin, invalid camera id
+            Prerequisites: Logged in as an Admin.
+            Route params: invalid camera id
+            Body: 
+                {
+                    "cameraName": "camera 1 change",
+                    "cameraToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjYW1lcmFfbnVtYmVyIjoiMSIsImNhbWVyYV9uYW1lIjoiRmlyc3QgY2FtZXJhIn0.Af5bzfUQGgYVvR9yl42F3ovi47RuMbuJ4iJEj68nOm8"
+                }
+            Expected results: 1. status code: 404. 2. response: JSON { message: Camera with id: ${cameraId} does not exist }. 3. not found.
+        Status: Pass
+
+    5. DELETE /camera/:id
+        1. Logged in as Admin, update specific camera
+            Prerequisites: Logged in as an Admin.
+            Route params: valid camera id
+            Body: 
+                {  }
+            Expected results: 1. status code: 200. 2. response: JSON {  }. 3. Delete desired camera.
+        Status: Pass
+
+        2. Logged in as Admin, invalid camera id
+            Prerequisites: Logged in as an Admin.
+            Route params: invalid camera id
+            Body: 
+                {  }
+            Expected results: 1. status code: 200. 2. response: JSON {  }. 3. Doesn't care not found, since desired result is deletion.
+        Status: Pass
+
+Prerequisites: 
+Route params: 
+Body: 
+    {  }
+Expected results: 1. status code: . 2. response: JSON {  }. 3. 
+Status: 
+
+
+
+Client TODO:
+1. auth reducer and apiSlice: should be OK
+    - auth reducer saves the logged in user info and token so apiSlice doesn't need a getMe endpoint to keeping retrieving current profile.
+    - Just remember to dispatch to reducer after api queries to save info.
+
+2. User. Should only need ApiSlice and tag: User to invalidate when mutation sent.
+
+3. Camera. Should only need ApiSlice and tag: Camera to invalidate when mutation sent.
+
+4. BACK TO SERVER, need API to get all videos from subscribed cameras.
+    - GET /getAllVideos/
+        body: user's camera subscribed Array
+
+        return: [
+            {cameraName, cameraid, [{filename, createddate, thumbnail}, ...]}
+        ]
+
+    - GET /getVideo
+        body: [cameraid, filename]
+        directory of requested file at: /base/cameraid/filename
+
+        return video file to play
+
+5. Videos apiSlice auto refetch all every x minutes since only GETS, no mutations will trigger a tag invalidation.

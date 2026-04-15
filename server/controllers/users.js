@@ -1,4 +1,5 @@
 const UserModel = require('../models/User')
+const generateOTP = require('../functions/generateOTP')
 const {NotFoundError, BadRequestError, InternalServerError, ForbiddenError} = require('../errors')   // error is a folder and will access error/index.js
 const {StatusCodes} = require('http-status-codes')
 
@@ -28,19 +29,21 @@ const getUser = async(req, res, next) => {
 }
 
 const registerUser = async(req, res, next) => {
-    const { name, email, password } = req.body
+    const { name, email } = req.body
 
-    if (!name || !email || !password) {
+    if (!name || !email) {
         throw new BadRequestError('Please provide the required fields!')
     }
 
+    const tempPassword = generateOTP();
+    req.body["password"] = tempPassword
     req.body["emailLowercase"] = email.toLowerCase()
     req.body["createdBy"] = req.user.id   // creator is the admin authorized
     req.body["temp_password"] = true   // client will redirect user to update password
 
     const response = await UserModel.create({...req.body})
     
-    res.status(StatusCodes.CREATED).json({response: response.getUserInfo()})
+    res.status(StatusCodes.CREATED).json({response: response.getUserInfo(), tempPlain: tempPassword})
 }
 
 /**
@@ -104,25 +107,17 @@ const updateUser = async(req, res, next) => {
     }
 }
 
-const adminSetPassword = async(req, res, next) => {
+const adminResetPassword = async(req, res, next) => {
     const {
         id
     } = req.params
-
-    const {
-        password
-    } = req.body
-    
-    if (!password) {
-        throw new BadRequestError('Missing password.')
-    }
 
     const userDocument = await UserModel.findById(id).exec()
     if (!userDocument) {
         throw new NotFoundError('User does not exist.')
     }
     
-    userDocument.replacePassword(password)
+    userDocument.replacePassword(generateOTP())
     // set field that causes client to force user to update password on first log in.
     userDocument.temp_password = true
 
@@ -130,10 +125,10 @@ const adminSetPassword = async(req, res, next) => {
         await userDocument.save()
         res.status(StatusCodes.OK).json()
     } catch(e) {
-        throw new InternalServerError('adminSetPassword failed.')
+        throw new InternalServerError('adminResetPassword failed.')
     }
 
     return
 }
 
-module.exports = { getAllUsers, getUser, registerUser, deleteUser, updateUser, adminSetPassword }
+module.exports = { getAllUsers, getUser, registerUser, deleteUser, updateUser, adminResetPassword }

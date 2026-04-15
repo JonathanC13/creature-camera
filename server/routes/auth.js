@@ -12,6 +12,6 @@ router.route('/logout').post(logout)
 router.route('/updateUserInfo/:id').patch(authorization, isValidObjId, updateUserInfo)
 router.route('/updatePassword/:id').patch(authorization, isValidObjId, updatePassword)
 router.route('/forgotPassword').post(forgotPassword)
-router.route('/validateOTP/:id').post(isValidObjId, validateOTP)
+router.route('/validateOTP').post(validateOTP)
 
 module.exports = router
