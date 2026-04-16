@@ -14,9 +14,10 @@ export const apiSliceWithUsers = apiSlice.injectEndpoints({
             providesTags: (result, error) => {
                 return providesList(result, 'User')
             },
-            transformResponse: (response, meta, arg) => {
-                // transform to put into entity adapter so the response Array of objects can normalized to {id, userinfo: {}}
-                return usersAdapter.setAll(initialState, response.response)
+            transformResponse: (result, meta, arg) => {
+                // Here to flatten then normalized into an EntityAdapter
+                // response: { reponse, count}
+                return usersAdapter.setAll(initialState, result.response)
             }
         }),
         getUser: builder.query({
@@ -71,6 +72,7 @@ export const apiSliceWithUsers = apiSlice.injectEndpoints({
 
 // Where the data is cached
 export const selectUsersResult = apiSliceWithUsers.endpoints.getAllUsers.select()
+// createSelector(...inputSelectors, resultFunction
 const selectUsersData = createSelector( // memoized. Use in apiSlice for lookups of the cached data. Use in components to reduce re-renders.
   selectUsersResult,    // inputs
   // Fall back to the empty entity state if no response yet.
