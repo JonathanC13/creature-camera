@@ -28,7 +28,7 @@ const authCamera = async(req, res, next) => {
         if (!response) {
             throw new NotFoundError('Camera is not registered!')
         }
-
+        
         // attach the user to the route
         req.camera = response.getCameraInfo()
     } catch (err) {

@@ -3,24 +3,27 @@ const path = require("path");
 const { videoFileFilter } = require('../functions/videoFileFilter')
 const { BadRequestError, NotFoundError } = require('../errors')
 const config = require('../config')
-const { directoryExists } = require('../functions/fileSystem');
+const { directoryExistsOrCreate } = require('../functions/fileSystem');
 
 const uploadVideoMulter = async(req, res, next) => {
+
     const {
-        base,
-        uploadsFolder
-    } = config.projectDirectories
+        base
+    } = config
+    const { uploadsFolder } = config
     const {
         id
     } = req.camera
+    
+    const dest = path.join(base, uploadsFolder, id)
     // check if folder exists or create
-    if (!(await directoryExists(path.join(base, uploadsFolder, id)))) {
+    if (!(await directoryExistsOrCreate(dest))) {
         throw new NotFoundError('Upload directory not found.')
     }
-
+    
     const storage = multer.diskStorage({
         destination: function (req, file, callback) {
-            callback(null, uploadsFolder);
+            callback(null, dest);
         },
         filename: function (req, file, callback) {
             callback(null, file.originalname);

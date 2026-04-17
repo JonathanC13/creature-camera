@@ -11,6 +11,19 @@ async function fileExists(filePath) {
   }
 }
 
+async function directoryExists(directory) {
+  try {
+    const stats = fs.statSync(directory);
+    if (!stats.isDirectory()) {
+      return false
+    }
+  } catch (err) {
+    return false
+  }
+  
+  return true
+}
+
 async function createDirectory(directory) {
   try {
     fs.mkdirSync(directory, { recursive: true });
@@ -22,7 +35,7 @@ async function createDirectory(directory) {
   return true
 }
 
-async function directoryExists(directory) {
+async function directoryExistsOrCreate(directory) {
   try {
     const stats = fs.statSync(directory);
     if (!stats.isDirectory() && !(await createDirectory(directory))) {
@@ -40,8 +53,8 @@ async function directoryExists(directory) {
       return false
     }
   }
-
+  
   return true
 }
 
-module.exports = { fileExists, directoryExists }
+module.exports = { fileExists, directoryExists, directoryExistsOrCreate }

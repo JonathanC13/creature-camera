@@ -12,6 +12,7 @@ const CameraSchema = new mongoose.Schema({
     cameraToken: {
         type: String,
         required: [true, 'Camera token required.'],
+        unique: true
     }
 }, {timestamps: true})
 

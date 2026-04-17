@@ -21,6 +21,7 @@ const authRouter = require('./routes/auth')
 const uploadVideoSingleRouter = require("./routes/uploadVideoSingle")
 const cameraRouter = require('./routes/cameras')
 const userRouter = require('./routes/users')
+const videoRouter = require('./routes/videos')
 
 // middleware
 const authorizationMiddleware = require('./middleware/authorization')
@@ -31,8 +32,11 @@ const errorHandlerMiddleware = require('./middleware/errorHandler');
 // app
 const app = express()
 const port = config.app.port
-// Middleware to parse JSON bodies
-app.use(express.json());
+// Serve files from the 'public' folder
+// File Location: public/images/logo.png
+// Access URL: http://localhost:3000/images/logo.png
+app.use(express.static('public'));
+
 // Middleware to parse URL-encoded bodies (form submissions)
 app.use(express.urlencoded({ extended: true }));
 
@@ -64,10 +68,16 @@ app.get('/', (req, res) => {
     res.send('hello, world!')
 })
 
-app.use('/api/v1/auth', authRouter)
+// Put before app.use(express.json()), potential body is consumed before multer processes it?
 app.use('/api/v1/uploadVideo', authCameraMiddleware, uploadVideoSingleRouter)
+
+// Middleware to parse JSON bodies
+app.use(express.json());
+
+app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/camera', authorizationMiddleware, validAdminMiddleware, cameraRouter)
 app.use('/api/v1/user/', authorizationMiddleware, validAdminMiddleware, userRouter)
+app.use('/api/v1/video/', authorizationMiddleware, videoRouter)
 // /routes
 
 app.use(errorHandlerMiddleware) // catch errors

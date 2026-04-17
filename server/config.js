@@ -8,13 +8,12 @@ const config = {
         port: process.env.PORT || 5000, // Example: Port for the application, can be overridden by environment variable
         mongoURI: process.env.MONGO_URI
     },
-    projectDirectories: {
-        base: __dirname,
-        folders: [
-            'uploads'
-        ]
+    base: __dirname,
+    folders: {
+        uploadFolder: 'uploads'
     },
-    uploadsFolder: 'uploads/',
+    projectDirectories: new Array(),
+    thumbnailFolder: 'thumbnails',
     nodeMailer: {
         service: process.env.NODE_MAILER_SERVICE,
         user: process.env.NODE_MAILER_USER,
@@ -23,5 +22,7 @@ const config = {
     OTP_max_retries: 3,
     OTP_expire_minutes: 15
 };
+
+config.projectDirectories = [...config.folders].map(([key, value]) => path.join(config.base, value))
 
 module.exports = config;

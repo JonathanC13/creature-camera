@@ -1,17 +1,14 @@
-const { directoryExists } = require('./fileSystem')
+const { directoryExistsOrCreate } = require('./fileSystem')
 const config = require('../config')
 const path = require('path');
 
 async function validateProjectDirectories() {
     const {
-        base,
-        folders
-    } = config.projectDirectories
+        projectDirectories
+    } = config
 
-    for (let i = 0; i < folders.length; i ++) {
-        const directory = path.join(base, folders[i]);
-
-        if (!(await directoryExists(directory))) {
+    for (let directory of projectDirectories) {
+        if (!(await directoryExistsOrCreate(directory))) {
             return false
         }
     }
