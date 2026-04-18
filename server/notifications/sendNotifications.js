@@ -17,15 +17,16 @@ const sendNotifications = async(cameraId, cameraName, filename) => {
     const users = await UserModel.find({
         subscriptions: cameraId
     }).select('-password').exec()
-
+    // console.log(users)
     const notifiedUsers = new Array()
     for (let user of users) {
         if (user.needNotify()) {
             notifiedUsers.push(user._id)
-
-            const body = `Camera ${cameraName} has uploaded ${filename}.` +
-                (!user.settingNotifyAlways) ? '\n\nNote: Since setting [Notify Always] is off, you will not recieve additional notifications for newer uploads until next log in.' : ''
+            
+            let body = `Camera ${cameraName} has uploaded ${filename}.`
+            body += (!user.settingNotifyAlways) ? '\n\nNote: Since setting [Notify Always] is off, you will not recieve additional notifications for newer uploads until next log in.' : ''
             // send email
+            
             sendMail(user.email, `New video from ${config.projectName}`, body)
         }
     }
@@ -39,7 +40,7 @@ const sendNotifications = async(cameraId, cameraName, filename) => {
             }
         )
     }
-
+    // console.log('fin')
     return
 }
 

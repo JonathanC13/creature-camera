@@ -6,16 +6,15 @@ const config = require('../config')
 const { directoryExistsOrCreate } = require('../functions/fileSystem');
 
 const uploadVideoMulter = async(req, res, next) => {
-
     const {
         base
     } = config
-    const { uploadsFolder } = config
+    const { uploadFolder } = config.folders
     const {
         id
     } = req.camera
     
-    const dest = path.join(base, uploadsFolder, id)
+    const dest = path.join(base, uploadFolder, id)
     // check if folder exists or create
     if (!(await directoryExistsOrCreate(dest))) {
         throw new NotFoundError('Upload directory not found.')

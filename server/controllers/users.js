@@ -82,7 +82,8 @@ const updateUser = async(req, res, next) => {
     if (!userDocument) {
         throw new NotFoundError()
     }
-    if (userDocument.roleLevel === 1) {
+    if (userDocument.roleLevel === 1 && req.user.id !== userDocument.getId()) {
+        // if admin account and not self, cannot modify.
         throw new ForbiddenError("Cannot modify another admin.")
     }
 

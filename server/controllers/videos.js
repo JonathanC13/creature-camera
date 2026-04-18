@@ -4,8 +4,9 @@ const CameraModel = require('../models/Camera')
 const { fileExists, directoryExists } = require('../functions/fileSystem')
 const createThumbnail = require('../functions/createThumbnail')
 const config = require('../config')
-const { InternalServerError } = require('../errors')
+const { InternalServerError, NotFoundError } = require('../errors')
 const { StatusCodes } = require('http-status-codes')
+const { STATUS_CODES } = require('http')
 
 
 const {
@@ -42,7 +43,7 @@ const getSubVideos = async(req, res, next) => {
                     const name = file.split('.')[0]
                     let thumbnailPublic = path.join(config.thumbnailFolder, folderName, name + '-tb.png')
                     const thumbnailFilepath = path.join(config.base, 'public', thumbnailPublic)
-                    if (!await fileExists(thumbnailFilepath)) {
+                    if (!(await fileExists(thumbnailFilepath))) {
                         thumbnailPublic = createThumbnail(filePath, folderName, name)
                     }
                     videoInfo.set('thumbnail', thumbnailPublic)
@@ -58,8 +59,34 @@ const getSubVideos = async(req, res, next) => {
     }
 }
 
-const getVideo = async(req, res, next) => { // HERE
-    res.status(200).json()
+const getVideoFromCamera = async(req, res, next) => {
+    const { id, fileName } = req.query;
+
+    const videoPath = path.join(config.base, config.folders.uploadFolder, id, fileName);
+    try {
+        const stat = fs.statSync(videoPath);
+        const fileSize = stat.size;
+        const range = req.headers.range;    //  React <video> tag automatically provides: Range: bytes=0-999999.
+
+        if (range) {
+            const [start, end] = range.replace(/bytes=/, "").split("-");
+            const startNum = parseInt(start, 10);   // convert to Integer
+            const endNum = end ? parseInt(end, 10) : fileSize - 1;
+
+            res.writeHead(StatusCodes.PARTIAL_CONTENT, {
+                'Content-Range': `bytes ${startNum}-${endNum}/${fileSize}`,
+                'Accept-Ranges': 'bytes',
+                'Content-Length': (endNum - startNum) + 1,
+                'Content-Type': `video/${fileName.split('.')[1]}`,
+            });
+
+            fs.createReadStream(videoPath, { start: startNum, end: endNum }).pipe(res);
+        } else {
+            res.sendFile(videoPath, { root: __dirname });
+        }
+    } catch (e) {
+        throw new NotFoundError('Video not found.')
+    }
 }
 
-module.exports = { getSubVideos, getVideo }
+module.exports = { getSubVideos, getVideoFromCamera }

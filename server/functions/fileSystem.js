@@ -36,16 +36,19 @@ async function createDirectory(directory) {
 }
 
 async function directoryExistsOrCreate(directory) {
+  
   try {
     const stats = fs.statSync(directory);
+    // if not directory, try to create
     if (!stats.isDirectory() && !(await createDirectory(directory))) {
-      // Directory does not exist, therefore create it
+      console.error("Error creating directory: ", err.message);
       return false
     }
   } catch (err) {
     if (err.code === "ENOENT") {
       // Directory does not exist, therefore create it
       if (!(await createDirectory(directory))) {
+        console.error("Error creating directory: ", err.message);
         return false
       }
     } else {

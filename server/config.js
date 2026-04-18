@@ -23,6 +23,6 @@ const config = {
     OTP_expire_minutes: 15
 };
 
-config.projectDirectories = [...config.folders].map(([key, value]) => path.join(config.base, value))
+config.projectDirectories = Object.entries(config.folders).map(([key, value]) => path.join(config.base, value))
 
 module.exports = config;
