@@ -6,6 +6,6 @@ const router = express.Router()
 
 // for management
 router.route('/').get(getSubVideos)
-router.route('/video').get(isValidObjId, getVideoFromCamera)
+router.route('/src').get(getVideoFromCamera)
 
 module.exports = router

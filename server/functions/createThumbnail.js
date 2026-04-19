@@ -19,13 +19,13 @@ function createThumbnail(src, subFolder, filenamePrefix) {
             filename: filename
         })
         .on('end', () => {
-            return path.join(dir, filename)
+            //console.log('thumbnail generated')
         })
         .on('error', (err) => {
             logger.error('createThumbnail: An error occurred: ' + err.message)
         });
 
-    return ''
+    return [dir, filename]
 }
 
 module.exports = createThumbnail

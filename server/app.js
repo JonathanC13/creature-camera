@@ -21,7 +21,7 @@ const authRouter = require('./routes/auth')
 const uploadVideoSingleRouter = require("./routes/uploadVideoSingle")
 const cameraRouter = require('./routes/cameras')
 const userRouter = require('./routes/users')
-// const videoRouter = require('./routes/videos')
+const videoRouter = require('./routes/videos')
 
 // middleware
 const authorizationMiddleware = require('./middleware/authorization')
@@ -77,7 +77,7 @@ app.use(express.json());
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/camera', authorizationMiddleware, validAdminMiddleware, cameraRouter)
 app.use('/api/v1/user/', authorizationMiddleware, validAdminMiddleware, userRouter)
-// app.use('/api/v1/video/', authorizationMiddleware, videoRouter)
+app.use('/api/v1/video/', authorizationMiddleware, videoRouter)
 // /routes
 
 app.use(errorHandlerMiddleware) // catch errors
