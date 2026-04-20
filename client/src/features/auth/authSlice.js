@@ -4,7 +4,8 @@ const initialState = {
     userInfo: {
         persistentLogin: localStorage.getItem('persistentLogin') || false,
     },
-    token: null
+    token: null,
+    authMessage: ''
 }
 
 export const authSlice = createSlice({
@@ -24,7 +25,10 @@ export const authSlice = createSlice({
             localStorage.setItem('persistentLogin', persistentLogin)
         },
         tokenSet: (state, action) => {
-            state.token = token = action.payload.token ?? null
+            state.token = action.payload.token ?? null
+        },
+        authMsgSet: (state, action) => {
+            state.authMessage = action.payload
         },
         loggedOut: state => {
             state.userInfo = {}
@@ -34,6 +38,6 @@ export const authSlice = createSlice({
     }
 })
 
-export const { userInfoSet, persistenLoginSet, tokenSet, loggedOut} = authSlice.actions
+export const { userInfoSet, persistenLoginSet, tokenSet, authMsgSet, loggedOut} = authSlice.actions
 
 export default authSlice.reducer
