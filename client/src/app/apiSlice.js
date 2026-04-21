@@ -49,7 +49,7 @@ export const apiSlice = createApi({
     // All of our requests will have URLs starting with
     baseQuery: baseQueryWithReauth,
     // For cached data, so when it is invalidated it will retrieve.
-    tagTypes: ['User', 'Camera'], // , 'UNAUTHORIZED']
+    tagTypes: ['User', 'Camera', 'Role'], // , 'UNAUTHORIZED']
     // The "endpoints" represent operations and requests for this server
     endpoints: (builder) => ({})
 })

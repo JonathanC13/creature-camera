@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 const { BadRequestError, UnauthenticatedError, NotFoundError, ForbiddenError, InternalServerError } = require('../errors')
 const { StatusCodes } = require('http-status-codes')
 const config = require('../config')
+const logger = require('../logging/logger')
 const sendMail = require('../functions/nodemailerHelper')
 
 const login = async(req, res, next) => {
@@ -51,13 +52,14 @@ const login = async(req, res, next) => {
     try {
         userDocument.refreshToken = refreshToken
         const saveResponse = await userDocument.save()
+            
+        // send refresh token in a httpOnly cookie
+        res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: process.env.COOKIE_EXPIRY_MS, sameSite: 'None', secure: true}) // for prod: secure: true
+        res.status(StatusCodes.OK).json({user: userDocument.getUserInfo(), token: token})
     } catch (error) {
+        logger.error('login: ' + error.message)
         throw new InternalServerError('Login failed.')
     }
-    
-    // send refresh token in a httpOnly cookie
-    res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: process.env.COOKIE_EXPIRY_MS, sameSite: 'None', secure: true}) // for prod: secure: true
-    res.status(StatusCodes.OK).json({user: userDocument.getUserInfo(), token: token})
 }
 
 /**
@@ -130,11 +132,11 @@ const logout = async(req, res, next) => {
     try {
         const saveResponse = await userDocument.save()
         // console.log(saveResponse)
+        res.status(StatusCodes.NO_CONTENT).json()
     } catch (error) {
+        logger.error('logout: ' + error.message)
         throw new InternalServerError('Logout failed.')
     }
-
-    res.status(StatusCodes.NO_CONTENT).json()
 }
 
 const updateUserInfo = async(req, res, next) => {
@@ -163,12 +165,17 @@ const updateUserInfo = async(req, res, next) => {
         runValidators: true
     }
 
-    const response = await UserModel.findByIdAndUpdate(id, updateInfo, optObj).exec()
-    if (!response) {
-        throw new NotFoundError('User not found.')
+    try {
+        const response = await UserModel.findByIdAndUpdate(id, updateInfo, optObj).exec()
+        if (!response) {
+            throw new NotFoundError('User not found.')
+        }
+        
+        res.status(StatusCodes.OK).json({user: response.getUserInfo()})
+    } catch(e) {
+        logger.error('updateUserInfo: ' + e.message)
+        throw new InternalServerError('Update user failed.')
     }
-
-    res.status(StatusCodes.OK).json({user: response.getUserInfo()})
 }
 
 /**
@@ -208,6 +215,7 @@ const updatePassword = async(req, res, next) => {
         await userDocument.save()
         res.status(StatusCodes.OK).json()
     } catch(e) {
+        logger.error('updatePassword: ' + e.message)
         throw new InternalServerError('Update password failed.')
     }
 }
@@ -254,6 +262,7 @@ const forgotPassword = async(req, res, next) => {
         const body = `This is your temporary password:\n${tempPassword}\nIt will expire in ${config.OTP_expire_minutes} minutes.`
         sendMail(email, `${config.projectName}, temporary password`, body)    // send async
     } catch(e) {
+        logger.error('forgotPassword: ' + e.message)
         throw new InternalServerError('Forgot password failed.')
     }
 }

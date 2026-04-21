@@ -14,6 +14,8 @@ Server
     bcryptjs
     npm install otp-generator
     readline-sync
+    npm install @ffmpeg-installer/ffmpeg @ffprobe-installer/ffprobe
+    fluent-ffmpeg
 
     * Setup in .env
         ACCESS_CONTROL_ALLOW_ORIGIN = "https://www.jonRPI.com"
@@ -191,6 +193,9 @@ for Dev:
     ping ipv4 ip:port
 
 Run server
+- npm run dev
+
+Run client
 - npm run dev
 
 On Pi
@@ -400,8 +405,8 @@ API:
                     "role_id": "69d0213294650c3fb85f1e59",
                     "roleLevel": "2"
                 }
-            Expected results: 1. status code: 201. 2. response: JSON { response: created user, tempPlain: tempPassword }. 3. User is created and temp password returned plain so admin can give to user.
-            Status: Pass
+            Expected results: 1. status code: 201. 2. response: JSON { response: created user, tempPlain: tempPassword }. 3. User is created and temp password emailed to submitted email.
+            Status: TODO
 
         3. Valid admin account try to register a user with already existing email
             Prerequisites: Logged in as Admin
@@ -580,8 +585,8 @@ API:
             Route params: valid id
             Body: 
                 {  }
-            Expected results: 1. status code: 200. 2. response: JSON { password: plain text }. 3. User assigned new password and temp_password = true so that client will redirect user to set new password. Log in with temp password.
-            Status: Pass
+            Expected results: 1. status code: 200. 2. response: JSON { password: plain text }. 3. User emailed OTP and temp_password = true so that client will redirect user to set new password. Log in with temp password.
+            Status: TODO
 
 3. camera
     1. POST /camera/
@@ -662,6 +667,43 @@ API:
             Expected results: 1. status code: 200. 2. response: JSON {  }. 3. Doesn't care not found, since desired result is deletion.
         Status: Pass
 
+4. Upload video tests.
+    1. Modify and run node ./test-video-upload-request/request.js
+        Prerequisites: 
+            1. Created a camera in collection cameras. Have the cameraToken
+            2. Have video in ./test-video-upload-request/videos
+
+        Expected results: 
+            1. video file uploaded to: ./uploads/cameraId
+            2. thumbnail created in ./public/cameraId
+            3. notification sent to subscribed users with:
+                1. settingNotifyAlways = true
+                2. lastNotifySent = null
+                2. lastNotifySent < lastLoggedIn
+        Status: Pass
+
+5. video
+    1. GET /video
+        Prerequisites: logged in
+        Route params: N/A
+        Body: 
+            {  }
+        Expected results: 1. status code: 200. 2. response: JSON { response: [{filename, created, thumbnail: url to public folder}, ...], count: number of cameras }. 3. 
+        Status: Pass
+
+    2. GET /video/src TODO
+        Test from client request.
+        Query parameters:
+            ?
+            id=
+            filename=
+        Prerequisites: logged in
+        Route params: N/A
+        Body: 
+            {  }
+        Expected results: 1. status code: 206. 2. response: readStream. 3. For <video><source></source></video>
+        Status: 
+
 Prerequisites: 
 Route params: 
 Body: 
@@ -678,20 +720,60 @@ Client TODO:
 
 2. User. Should only need ApiSlice and tag: User to invalidate when mutation sent. Should be OK
 
-3. Camera. Should only need ApiSlice and tag: Camera to invalidate when mutation sent. HERE
+3. Camera. Should only need ApiSlice and tag: Camera to invalidate when mutation sent. Should be OK
 
-4. BACK TO SERVER, need API to get all videos from subscribed cameras.
-    - GET /getAllVideos/
-        body: user's camera subscribed Array
+4. BACK TO SERVER, 
+    1. On upload of video, create thumbnail in /public/cameraId. Client gets thumbnail URL to public. app.js allow access with: app.use(express.static('public'));
+        OK
 
-        return: [
-            {cameraName, cameraid, [{filename, createddate, thumbnail}, ...]}
-        ]
+    2. need API to get all videos from subscribed cameras. OK
+    /video
+        - GET /
+            body: user's camera subscribed Array
 
-    - GET /getVideo
-        body: [cameraid, filename]
-        directory of requested file at: /base/cameraid/filename
+            For every subscribed cameraid
+                go to uploads/cameraid
+                    create thumbnail if not exist in /public/cameraId
+                    populate videos Array            
 
-        return video file to play
+            return: [
+                {id, cameraName, video: [{filename, created, thumbnail: url to public folder}, ...]}
+            ]
 
-5. Videos apiSlice auto refetch all every x minutes since only GETS, no mutations will trigger a tag invalidation.
+            Test result: Pass
+
+        - GET /src
+            query: id, fileName
+            directory of requested file at: /base/uploads/id/filename
+
+            return video file stream
+
+            *To test with React <video>
+
+            const [error, setError] = useState(false);
+            const [loading, setLoading] = useState(true);
+
+            const source = `http://localhost:3000/video?id=${cameraId}&filename=${filename}
+
+            return (
+                <div>
+                    {error && <p>Video not available</p>}
+                    {loading && <p>Loading video...</p>}
+
+                    <video//localhost:3000/video
+                        controls
+                        onError={() => setError(true)}
+                        onLoadedData={() => setLoading(false)}
+                    >
+                        <!-- Highly recommended to include type -->
+                        <source src=source type="video/avi">
+                        <source src=source type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            )
+
+5. Log in page with auth. HERE
+
+X. Videos apiSlice auto refetch all every x minutes since only GETS, no mutations will trigger a tag invalidation. TODO
+

@@ -1,6 +1,7 @@
 const CameraModel = require('../models/Camera')
-const {NotFoundError, BadRequestError} = require('../errors')   // error is a folder and will access error/index.js
+const {NotFoundError, BadRequestError, InternalServerError} = require('../errors')   // error is a folder and will access error/index.js
 const {StatusCodes} = require('http-status-codes')
+const logger = require('../logging/logger')
 
 /**
  * Responds with all cameras from collection 'camera-information'.
@@ -49,10 +50,14 @@ const createCamera = async(req, res, next) => {
     if (name === '') {
         throw new BadRequestError('Please provide a camera name!')
     }
-    
-    const response = await CameraModel.create({...req.body})
 
-    res.status(StatusCodes.CREATED).json({response})
+    try {
+        const response = await CameraModel.create({...req.body})
+        res.status(StatusCodes.CREATED).json({response})
+    } catch (e) {
+        logger.error('adminResetPassword: ' + e.message)
+        throw new InternalServerError('Create camera failed.')
+    }
 }
 
 /**
@@ -72,13 +77,18 @@ const updateCamera = async(req, res, next) => {
         runValidators: true
     }
 
-    const response = await CameraModel.findByIdAndUpdate(cameraId, req.body, optObj).exec()
-    
-    if (!response) {
-        throw new NotFoundError(`Camera with id: ${cameraId} does not exist`)
-    }
+    try {
+        const response = await CameraModel.findByIdAndUpdate(cameraId, req.body, optObj).exec()
+        
+        if (!response) {
+            throw new NotFoundError(`Camera with id: ${cameraId} does not exist`)
+        }
 
-    res.status(StatusCodes.OK).json({response})
+        res.status(StatusCodes.OK).json({response})
+    } catch (e) {
+        logger.error('updateCamera: ' + e.message)
+        throw new InternalServerError('Update camera failed.')
+    }
 }
 
 /**

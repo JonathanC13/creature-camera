@@ -28,10 +28,10 @@ function App() {
 
                 <Route element={<AuthLayout />}>
                   <Route path="login" element={<Login />} />
-                  <Route path="register" element={<Register />} />
                 </Route>
 
                 {/* protected routes valid logged in users. */}
+                <Route path="register" element={<Register />} /> {/* Admin can only register */}
               </Route>
 
               <Route path='/error' element={<Error/>}></Route>

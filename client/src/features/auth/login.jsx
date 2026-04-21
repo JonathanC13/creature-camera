@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Link, useNavigate, useLocation } from 'react-router'
 
 import FormInput from '../../components/FormInput'
+import ShowPasswordBtn from '../../components/ShowPasswordBtn'
 import { useLoginMutation } from './authApiSlice'
 import { userInfoSet, tokenSet, authMessageSet } from './authSlice'
 
@@ -99,6 +100,7 @@ const login = () => {
   return (
     <section className='login'>
         <form className='login__form' onSubmit={loginFormSubmitHandler}>
+            <h1>Login</h1>
             <FormInput
                 ref = {emailRef}
                 required = {true}
@@ -108,15 +110,21 @@ const login = () => {
                 onChangeCB = {setEmail}
             >
             </FormInput>
-            <FormInput
-                ref = {null}
-                required = {true}
-                text = 'password'
-                inputType = 'password'
-                value = {password}
-                onChangeCB = {setPassword}
-            >
-            </FormInput>
+            <div className="login__form__password">
+                <FormInput
+                    ref = {null}
+                    required = {true}
+                    text = 'password'
+                    inputType = 'password'
+                    value = {password}
+                    onChangeCB = {setPassword}
+                >
+                </FormInput>
+                <ShowPasswordBtn
+                    showPassword={showPassword}
+                    setShowPasswordCB={setShowPassword}
+                ></ShowPasswordBtn>
+            </div>
             <button type='submit' disabled={isLoading}>log in</button>
             <p ref={msgRef}>{msg}</p>
         </form>
