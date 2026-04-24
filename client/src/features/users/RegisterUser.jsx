@@ -17,6 +17,7 @@ const register = () => {
     const emailRef = useRef()
     const msgRef = useRef()
 
+    const { data: roleData, } = useGetRolesQuery()
     const [register, {data, error, isLoading}] = useRegisterMutation()
 
     const resetControlledInputs = () => {
@@ -32,8 +33,8 @@ const register = () => {
         setMsg('')
 
         try {
-            const roleLevel = useSelector((state) => selectRoleById(state, roleId));
-            if (!roleLevel) {
+            const roleInfo = useSelector((state) => selectRoleById(state, roleId));
+            if (!roleInfo) {
                 setMsg('Role error')
                 return
             }
@@ -41,8 +42,9 @@ const register = () => {
             const payload = {
                 name,
                 email,
-                roleId,
-                roleLevel
+                roleId: roleInfo.id,
+                roleLevel: roleInfo.roleLevel,
+                roleName: roleInfo.roleName
             }
 
             const response = await logIn(payload).unwrap()
@@ -97,6 +99,13 @@ const register = () => {
             ></RoleDropDown>
             <button type='submit' disabled={isLoading}>register</button>
             <p ref={msgRef}>{msg}</p>
+            <div className={isLoading ? "loading__div" : "offscreen"}>
+                {
+                    isLoading ? 
+                    <div className="loader"></div> :
+                    <></>
+                }
+            </div>
         </form>
     </section>
   )

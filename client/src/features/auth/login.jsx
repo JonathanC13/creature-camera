@@ -5,7 +5,7 @@ import { Link, useNavigate, useLocation } from 'react-router'
 
 import FormInput from '../../components/FormInput'
 import ShowPasswordBtn from '../../components/ShowPasswordBtn'
-import { useLoginMutation } from './authApiSlice'
+import { useLoginMutation, useLogoutMutation } from './authApiSlice'
 import { userInfoSet, tokenSet, authMessageSet } from './authSlice'
 
 const login = () => {
@@ -28,6 +28,7 @@ const login = () => {
 
     // api
     const [logIn, { data, error, isLoading }] = useLoginMutation();
+    const [logOut, {isLoadingLogOut}] = useLogoutMutation()
 
     const resetControlledInputs = () => {
         setEmail('')
@@ -127,6 +128,13 @@ const login = () => {
             </div>
             <button type='submit' disabled={isLoading}>log in</button>
             <p ref={msgRef}>{msg}</p>
+            <div className={isLoading ? "loading__div" : "offscreen"}>
+                {
+                    isLoading ? 
+                    <div className="loader"></div> :
+                    <></>
+                }
+            </div>
         </form>
     </section>
   )
