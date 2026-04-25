@@ -8,7 +8,11 @@ import { useRegisterMutation } from './userApiSlice'
 import FormInput from '../../components/FormInput'
 import RoleDropDown from '../../components/RoleDropDown'
 
-const register = () => {
+const RegisterUserModal = ({ isOpen, onClose, defaultOpen = false }) => {
+    const [internalOpen, setInternalOpen] = useState(defaultOpen)
+    const isControlled = isOpen !== undefined
+    const open = isControlled ? isOpen : internalOpen
+
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [roleId, setRoleId] = useState('')
@@ -19,6 +23,11 @@ const register = () => {
 
     const { data: roleData, } = useGetRolesQuery()
     const [register, {data, error, isLoading}] = useRegisterMutation()
+
+    const close = () => {
+        if (isControlled) onClose?.();
+        else setInternalOpen(false);
+    };
 
     const resetControlledInputs = () => {
         setName('')
@@ -73,7 +82,7 @@ const register = () => {
         }
     }
 
-  return (
+  return open ? (
     <section className="register">
         <form onSubmit={registerFormSubmitHandler} className="regiser__form">
             <h1>Register user</h1>
@@ -108,7 +117,7 @@ const register = () => {
             </div>
         </form>
     </section>
-  )
+  ) : null
 }
 
-export default register
+export default RegisterUserModal

@@ -3,6 +3,7 @@ import store from './app/store'
 import { BrowserRouter, Routes, Route } from "react-router";
 import RequireAuth from './components/RequireAuth';
 import { ROLES } from './constants/roles'
+import ModalManager from './features/modals/ModalManager';
 /*
 todo elements
 Layout ** OK
@@ -20,14 +21,34 @@ components/formInput ** OK
 adminHome ** OK
 userHome ** OK
 
+videoPlayerModal ** use Portal, OK
 CameraList ** OK
   CameraItem ** OK
     VideoList ** OK
       VideoItem ** OK
-users * get all users ** HERE
-usersPage * for specific and edit
-cameras * get all cameras
-camerasPage * for specific and edit
+
+RegisterUserModel ** use Portal, OK
+users * register user button ** OK
+  usersTable ** structure of table with get all users table, OK
+    usersRow ** row for info, + button to redirect to userPage, OK
+userPage ** HERE, seperate page. display user info, buttons: update(unlocks some fields) and button changes to [cancel][confirm], assign cameras, and delete(only shows when user role !== 1 || id === self id)
+AssignCameraModule ** since want module as popup, place component under Component 'user', use a assignCameraSlice to hold the visiblity, user id, user's current assigned.
+  ** 
+  cameras = refetch cameras since could be changed from other admins
+  refetch button for manual
+  for user subsribed camera id, populate right 'assigned' with <id=id>camera Name. below button: remove
+  for left cameras with removed already subscribed. below button: add
+  multi-select in boxes
+
+  on submit. camera Id Array generated and send to updateUser. storeSlice also updated -> cause rerender.
+  **
+
+cameras ** with button to register new camera and get all cameras
+registerCamera
+  camerasTable ** structure for camera info
+    cameraRow ** + button for redirect to cameraPage
+camerasPage * for edit, delete
+
 accountSettings * to edit and toggle settings
 
 forgotPassword page
@@ -38,44 +59,43 @@ function App() {
     <>
       <Provider store={store}>
         <BrowserRouter>
-            <Routes>
-              {/* Public */}
-              <Route element={<PersistentLogin></PersistentLogin>}>
-                {/* protected routes valid logged in users. */}
-                <Route index element={<RequireAuth />}>
-                  
-                  <Route path='/' element={<Layout/>}>
+          <ModalManager />
+          <Routes>
+            {/* Public */}
+            <Route element={<PersistentLogin></PersistentLogin>}>
+              {/* protected routes valid logged in users. */}
+              <Route index element={<RequireAuth />}>
+                
+                <Route path='/' element={<Layout/>}>
 
-                    <Route path="/admin" element={<RoleProtected allowedRoles={[ROLES.ADMIN]} />}>
-                      <Route index element={<AdminHome />} />
-                      <Route path='/users' element={<Users />}>
-                        <Route path=":id" element={<UserPage />}></Route>
-                        <Route path="register" element={<RegisterUser />} /> {/* Admin can only register */}
-                      </Route>
-                      <Route path='/cameras' element={<Cameras />}>
-                        <Route path=":id" element={<CameraPage />}></Route>
-                        <Route path="register" element={<RegisterCamera />} /> {/* Admin can only register */}
-                      </Route>
+                  <Route path="/admin" element={<RoleProtected allowedRoles={[ROLES.ADMIN]} />}>
+                    <Route index element={<AdminHome />} />
+                    <Route path='/users' element={<Users />}>
+                      <Route path=":id" element={<UserPage />}></Route>
                     </Route>
-                      
-                    <Route path="/user" element={<RoleProtected allowedRoles={[ROLES.USER]} />}>
-                      <Route index element={<UserHome></UserHome>}></Route>
+                    <Route path='/cameras' element={<Cameras />}>
+                      <Route path=":id" element={<CameraPage />}></Route>
                     </Route>
-
                   </Route>
-                </Route>
+                    
+                  <Route path="/user" element={<RoleProtected allowedRoles={[ROLES.USER]} />}>
+                    <Route index element={<UserHome></UserHome>}></Route>
+                  </Route>
 
-                <Route element={<AuthLayout />}>
-                  <Route path="login" element={<Login />} />
                 </Route>
-              
               </Route>
 
-              <Route path='/error' element={<Error/>}></Route>
+              <Route element={<AuthLayout />}>
+                <Route path="login" element={<Login />} />
+              </Route>
+            
+            </Route>
 
-              {/* catach all */}
-              <Route path='*' element={<Missing/>}></Route>
-            </Routes>
+            <Route path='/error' element={<Error/>}></Route>
+
+            {/* catach all */}
+            <Route path='*' element={<Missing/>}></Route>
+          </Routes>
         </BrowserRouter>
       </Provider>
     </>

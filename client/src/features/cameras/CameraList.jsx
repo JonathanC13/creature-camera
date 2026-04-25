@@ -1,6 +1,7 @@
 import React from 'react'
 import CameraItem from './CameraItem'
 import { useGetSubVideosQuery } from './videosApiSlice'
+import VideoPlayerModel from '../modals/VideoPlayerModel'
 
 const createCameraItemComps = (data) => {
   return data.map((e) => {
@@ -18,16 +19,18 @@ const CameraList = () => {
 
   return (
     <section className='camera-list'>
+      <VideoPlayerModel/>
+
       <h1 className='camera-list__h1'>Cameras assigned</h1>
 
       <button onClick={refetch} disabled={isFetching}>
         {isFetching ? 'Refreshing...' : 'Refresh Data'}
       </button>
 
-      {(isLoading || isFetching) && 
+      {(isLoading) && 
         <div className={(isLoading || isFetching) ? "loading__div" : "offscreen"}>
           {
-              (isLoading || isFetching) ? 
+              (isLoading) ? 
               <div className="loader"></div> :
               <></>
           }

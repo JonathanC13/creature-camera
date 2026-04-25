@@ -1,7 +1,7 @@
 import React from 'react'
 import { memo } from 'react'
 import { useDispatch } from 'react-redux'
-import { videoParamsSet, hiddenSet } from '../videoPlayer/videoSlice'
+import { openModal } from "../modals/modalSlice"
 
 const descriptionItem = (tag, info) => {
   return <li className="video-item__li">
@@ -24,9 +24,12 @@ const VideoItem = memo((
     const dispatch = useDispatch()
 
     const thumbnailOnClickHandler = (e) => {
-      // set video params so that the overlay video player module appears.
-      dispatch(videoParamsSet({id: cameraId, filename: filename}))
-      dispatch(hiddenSet({hidden: false}))
+      dispatch(openModal({ type: "videoPlayer", 
+        props: { 
+          filename: filename,
+          url: import.meta.env.VITE_BACKEND_URL + 'video/src/' + `?id=${cameraId}&filename=${filename}`
+        }})
+      )
     }
 
   return (

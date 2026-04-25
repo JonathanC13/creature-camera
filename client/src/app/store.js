@@ -1,13 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 // reducers
 import authReducer from '../features/auth/authSlice'
-import videoReducer from '../features/videoPlayer/videoSlice'
+import modalReducer from '../features/modals/modalSlice'
 import { apiSlice } from './apiSlice'
 
 export default store = configureStore({
     reducer: {
         auth: authReducer,
-        video: videoReducer,
+        modal: modalReducer,
         // api
         [apiSlice.reducerPath]: apiSlice.reducer,
         //[authApiSlice.reducerPath]: authApiSlice.reducer,

@@ -40,7 +40,7 @@ const VideoList = (
 
     could put directly in jsx return 
         {videos.map(video => (
-            <VideoItem key={video.id} item={video} />
+            <VideoItem key={video.id} item={video} />))
         }
     */
     // Component re-renders due to videos state change to re-order memoized VideoItem

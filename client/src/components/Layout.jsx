@@ -1,7 +1,6 @@
 import React from 'react'
 import NavBar from '../features/navbars/Navbar';
 import { Outlet } from 'react-router';
-import VideoModule from '../features/videoPlayer/VideoModule'
 
 const Layout = () => {
   return (
@@ -10,8 +9,6 @@ const Layout = () => {
         <div className='layout__content'>
           <Outlet />
         </div>
-
-        <VideoModule/>
     </section>
   )
 }
