@@ -2,6 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import VideoPlayerModal from './VideoPlayerModel'
 import RegisterUserModal from '../users/RegisterUserModal';
+import AssignCamerasModal from './AssignCamerasModal';
 
 const ModalManager = () => {
     const { type, props } = useSelector((state) => state.modal);
@@ -17,6 +18,9 @@ const ModalManager = () => {
         case "registerUser":
             content = <RegisterUserModal {...props} />;
             break;
+        case "assignCameras":
+            content = <AssignCamerasModal {...props} />;
+            break
         default:
             return null;
     }

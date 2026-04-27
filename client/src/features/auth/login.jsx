@@ -100,7 +100,7 @@ const login = () => {
 
   return (
     <section className='login'>
-        <form className='login__form' onSubmit={loginFormSubmitHandler}>
+        <form className='login__form' action='javascript:void(0)' onSubmit={loginFormSubmitHandler}>
             <h1>Login</h1>
             <FormInput
                 ref = {emailRef}

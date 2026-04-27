@@ -27,7 +27,7 @@ const RoleDropDown = (
     const sortedRoles = useMemo(() => {
         const sortedRoles = []
         for (let [key, val] of Object.entries(data.entities)) {
-        sortedRoles.push(val)
+            sortedRoles.push(val)
         } 
         
         sortedRoles.sort((a, b) => b.roleLevel - a.roleLevel)
@@ -38,12 +38,12 @@ const RoleDropDown = (
 
   return (
     <section className="role-drop-down">
-        <label for="roles">Roles:</label>
+        <label for="roles">roles</label>
         {isError || sortedRoles.length === 0 ? 
             <p>Error</p> :
             <select name="roles" id="roles"
                 value={roleId}
-                onChange={(e) => (setRoleIdCB(e.target.value))}
+                onChange={(e) => (setRoleIdCB(e.target.id))}
             >
                 {createOptionComponents(sortedRoles)}
             </select>

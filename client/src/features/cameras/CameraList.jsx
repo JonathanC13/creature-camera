@@ -17,6 +17,25 @@ const CameraList = () => {
       pollingInterval: 600000,  // 10 minutes
     })
 
+    let content = ''
+    if (isError) {
+      content = <p>Error</p>
+    } else if (isLoading) {
+      content = 
+        <div className={(isLoading) ? "loading__div" : "offscreen"}>
+            {
+                (isLoading) ? 
+                <div className="loader"></div> :
+                <></>
+            }
+          </div>
+    } else {
+      content =
+        <ul className='camera-list__ul'>
+          {createCameraItemComps(data)}
+        </ul>
+    }
+
   return (
     <section className='camera-list'>
       <VideoPlayerModel/>
@@ -27,19 +46,8 @@ const CameraList = () => {
         {isFetching ? 'Refreshing...' : 'Refresh Data'}
       </button>
 
-      {(isLoading) && 
-        <div className={(isLoading || isFetching) ? "loading__div" : "offscreen"}>
-          {
-              (isLoading) ? 
-              <div className="loader"></div> :
-              <></>
-          }
-        </div>
-      }
-
-      <ul className='camera-list__ul'>
-        {createCameraItemComps(data)}
-      </ul>
+      {content}
+      
     </section>
   )
 }

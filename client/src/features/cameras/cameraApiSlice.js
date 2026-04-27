@@ -69,6 +69,6 @@ const selectCamerasData = createSelector(
     (result) => result.data ?? initialState
 )
 
-export const { selectAll: selectAllCameras, selectById: selectCameraById } = camerasAdapter.getSelectors(selectCamerasData)
+export const { selectAll: selectAllCameras, selectEntities: selectCameraEntities, selectById: selectCameraById } = camerasAdapter.getSelectors(selectCamerasData)
 
 export const { useGetAllCamerasQuery, useGetCameraQuery, useCreateCameraMutation, useUpdateCameraMutation, useDeleteCameraMutation } = apiSliceWithCameras

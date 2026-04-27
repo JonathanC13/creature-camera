@@ -19,28 +19,36 @@ const UsersTable = () => {
         pollingInterval: 600000,  // 10 minutes
     })
 
+    let content = ''
+    if (isError) {
+        content = <p>Error</p>
+    } else if (isLoading) {
+        content = 
+            <div className={(isLoading) ? "loading__div" : "offscreen"}>
+                {
+                    (isLoading) ? 
+                    <div className="loader"></div> :
+                    <></>
+                }
+            </div>
+    } else {
+        content =
+            <table className='users-table'>
+                <tr className='users-table__header-tr'>{headerComps}</tr>
+                {data.map(user => (
+                    <UsersRow key={user.id} headers={headers} user={user} />
+                ))}
+            </table>
+    }
+
   return (
     <section className="users-table__section">
         <button onClick={refetch} disabled={isFetching}>
             {isFetching ? 'Refreshing...' : 'Refresh Data'}
         </button>
 
-        {(isLoading) && 
-            <div className={(isLoading || isFetching) ? "loading__div" : "offscreen"}>
-            {
-                (isLoading) ? 
-                <div className="loader"></div> :
-                <></>
-            }
-            </div>
-        }
+        {content}        
         
-        <table className='users-table'>
-            <tr className='users-table__header-tr'>{headerComps}</tr>
-            {data.map(user => (
-                <UsersRow key={user.id} headers={headers} user={user} />
-            ))}
-        </table>
     </section>
   )
 }
