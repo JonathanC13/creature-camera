@@ -21,6 +21,9 @@ const ModalManager = () => {
         case "assignCameras":
             content = <AssignCamerasModal {...props} />;
             break
+        case "registerCamera":
+            content = <RegisterCameraModal {...props} />;
+            break
         default:
             return null;
     }

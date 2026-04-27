@@ -58,7 +58,7 @@ const registerUser = async(req, res, next) => {
 }
 
 /**
- * Delete has no admin restriction due to case if an admin account needs to be deleted.
+ * If admin, only can delete users and self, not other admins
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -67,6 +67,16 @@ const deleteUser = async(req, res, next) => {
     const {
         id
     } = req.params
+
+    const {
+        id: adminId
+    } = req.user.id
+
+    const userDocument = await UserModel.findById(id).exec()
+    if (userDocument.roleLevel === 1 && adminId !== userDocument.getId()) {
+        // if admin account and not self, cannot delete.
+        throw new ForbiddenError("Cannot delete another admin.")
+    }
 
     await UserModel.findByIdAndDelete(id).exec()
 
@@ -77,6 +87,10 @@ const updateUser = async(req, res, next) => {
     const {
         id
     } = req.params
+
+    const {
+        id: adminId
+    } = req.user.id
 
     const {
         subscriptions
@@ -93,7 +107,7 @@ const updateUser = async(req, res, next) => {
     if (!userDocument) {
         throw new NotFoundError()
     }
-    if (userDocument.roleLevel === 1 && req.user.id !== userDocument.getId()) {
+    if (userDocument.roleLevel === 1 && adminId !== userDocument.getId()) {
         // if admin account and not self, cannot modify.
         throw new ForbiddenError("Cannot modify another admin.")
     }

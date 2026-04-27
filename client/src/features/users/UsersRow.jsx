@@ -11,7 +11,7 @@ const UsersRow = memo((
 
     const cellComps = new Array()
     for (const [k, v] of headers) {
-        cellComps.push(<td className='users-row__tr-td'>user[k]</td>)
+        cellComps.push(<td className='users-row__tr-td'>{user[k]}</td>)
     }
     cellComps.push(<td className='users-row__tr-td'>
         <Link to={link} className="users-row__view-link">

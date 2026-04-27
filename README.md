@@ -773,7 +773,7 @@ Client TODO:
                 </div>
             )
 
-5. Log in page with auth. HERE
+5. React client
 
 X. Videos apiSlice auto refetch all every x minutes since only GETS, no mutations will trigger a tag invalidation. TODO
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { useState, useRef } from 'react'
 import { useGetUserQuery, useUpdateUserMutation, useDeleteUserMutation } from './userApiSlice'
 import { selectRoleById } from '../roles/roleApiSlice'
-import { useNavigate, NavLink } from "react-router"
+import { useNavigate, NavLink, useParams } from "react-router"
 import { useSelector } from 'react-redux'
 import FormInput from '../../components/FormInput'
 import RoleDropDown from '../../components/RoleDropDown'
@@ -20,7 +20,7 @@ const UserPage = () => {
 
     const modifyLoading = isLoadingUpdate || isLoadingDelete
 
-    const [name, setName] = useState(data.id ?? '')
+    const [name, setName] = useState(data.name ?? '')
     const [email, setEmail] = useState(data.email ?? '')
     const [roleId, setRoleId] = useState(data.roleId ?? '')
     const [editing, setEditing] = useState(false)
@@ -81,7 +81,7 @@ const UserPage = () => {
       }}))
     }
 
-    const userDeleteBtn = async(e) => {
+    const userDeleteOnClick = async(e) => {
       await deleteUser(id)
       navigate("/users", { replace: true }) // { replace: true } so cannot go back to this page.
     }
@@ -108,6 +108,7 @@ const UserPage = () => {
             inputType = 'text'
             value = {name}
             onChangeCB = {setName}
+            disabled = {!editing}
           ></FormInput>
           <FormInput
             ref = {null}
@@ -116,15 +117,17 @@ const UserPage = () => {
             inputType = 'text'
             value = {email}
             onChangeCB = {setEmail}
+            disabled = {!editing}
           ></FormInput>
 
           <RoleDropDown 
             roleId = {roleId}
             setRoleIdCB = {setRoleId}
+            disabled = {!editing}
           ></RoleDropDown>
 
           <div className="user-page__form__editing-div">
-          {isEditing ? 
+          {editing ? 
             <>
               <button className="user-page__form__editing-div__cancel-btn" onClick={cancelEditOnClick}>cancel</button>
               <button className="user-page__form__editing-div__update-btn" onClick={updateOnClick}>update</button>
@@ -135,7 +138,7 @@ const UserPage = () => {
 
           <button className='user-page__form__assign-cameras-btn' onClick={openAssignCamerasModal}>assign cameras</button>
 
-          <button className='user-page__form__del-btn' onClick={userDeleteBtn}>delete</button>
+          <button className='user-page__form__del-btn' onClick={userDeleteOnClick}>delete</button>
 
           <p ref={msgRef}>{msg}</p>
 
@@ -154,7 +157,7 @@ const UserPage = () => {
   return (
     <section className='user-page'>
       <NavLink 
-        to="/home" 
+        to="/users" 
         className='user-page__navlink-back'
       >
         To all users

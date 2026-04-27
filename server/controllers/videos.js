@@ -1,6 +1,7 @@
 // const fs = require('fs')
 const { readdir, stat } = require('node:fs/promises')
 const { createReadStream } = require('node:fs')
+const ffmpeg = require('fluent-ffmpeg')
 const path = require('path')
 const CameraModel = require('../models/Camera')
 const { fileExists, directoryExists } = require('../functions/fileSystem')
@@ -8,7 +9,6 @@ const createThumbnail = require('../functions/createThumbnail')
 const config = require('../config')
 const { InternalServerError, NotFoundError } = require('../errors')
 const { StatusCodes } = require('http-status-codes')
-const { STATUS_CODES } = require('http')
 
 
 const {
@@ -39,7 +39,11 @@ const getSubVideos = async(req, res, next) => {
                     const stats = await stat(filePath);
                     
                     videoInfo['filename'] = file
-                    videoInfo['created'] = stats.birthtime
+                    videoInfo['birthtime'] = stats.birthtime
+                    videoInfo['size'] = stats.size
+                    ffmpeg.ffprobe(filePath, (err, metadata) => {
+                        videoInfo['length'] = metadata.format.duration
+                    });
 
                     // get thumbnail
                     const name = file.split('.')[0]

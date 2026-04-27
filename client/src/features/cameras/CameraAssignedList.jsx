@@ -31,16 +31,16 @@ const CameraList = () => {
           </div>
     } else {
       content =
-        <ul className='camera-list__ul'>
+        <ul className='camera-assigned__ul'>
           {createCameraItemComps(data)}
         </ul>
     }
 
   return (
-    <section className='camera-list'>
+    <section className='camera-assigned'>
       <VideoPlayerModel/>
 
-      <h1 className='camera-list__h1'>Cameras assigned</h1>
+      <h1 className='camera-assigned__h1'>Cameras assigned</h1>
 
       <button onClick={refetch} disabled={isFetching}>
         {isFetching ? 'Refreshing...' : 'Refresh Data'}

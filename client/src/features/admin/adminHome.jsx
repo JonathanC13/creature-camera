@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink } from "react-router-dom"
-import CameraList from '../cameras/CameraList'
+import CameraAssignedList from '../cameras/CameraAssignedList'
 
 const adminHome = () => {
 
@@ -20,7 +20,7 @@ const adminHome = () => {
             Manage cameras
         </NavLink>
 
-        <CameraList></CameraList>
+        <CameraAssignedList></CameraAssignedList>
     </section>
   )
 }

@@ -44,6 +44,10 @@ const UserSchema = new mongoose.Schema({
         type: Number,
         required: [true, 'Please provide a role level']
     },
+    roleName: {
+        type: String,
+        required: [true, 'Please provide a role name']
+    },
     settingNotifyAlways: {
         type: Boolean,
         default: false
@@ -105,6 +109,7 @@ UserSchema.methods.getUserInfo = function() {
         persistentLogin: this.persistentLogin,
         role_id: this.role_id,
         roleLevel: this.roleLevel,
+        roleName: this.roleName,
         subscriptions: this.subscriptions,
         settingNotifyAlways: this.settingNotifyAlways,
         temp_password: this.temp_password,

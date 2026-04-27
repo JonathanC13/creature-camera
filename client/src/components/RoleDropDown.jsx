@@ -16,7 +16,8 @@ const createOptionComponents = (rolesData) => {
 
 const RoleDropDown = (
     roleId = null,
-    setRoleIdCB
+    setRoleIdCB,
+    disabled = false
 ) => {
 
     const {
@@ -43,7 +44,8 @@ const RoleDropDown = (
             <p>Error</p> :
             <select name="roles" id="roles"
                 value={roleId}
-                onChange={(e) => (setRoleIdCB(e.target.id))}
+                onChange={(e) => (setRoleIdCB(e.target.value))}
+                {...(disabled ? 'disabled' : '')}
             >
                 {createOptionComponents(sortedRoles)}
             </select>

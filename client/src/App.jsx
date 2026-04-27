@@ -31,9 +31,9 @@ RegisterUserModel ** use Portal, OK
 users * register user button ** OK
   usersTable ** structure of table with get all users table, OK
     usersRow ** row for info, + button to redirect to userPage, OK
-userPage ** HERE, seperate page. display user info, buttons: update(unlocks some fields) and button changes to [cancel][confirm], assign cameras, and delete(only shows when user role !== 1 || id === self id)
-AssignCameraModule ** since want module as popup, place component under Component 'user', use a assignCameraSlice to hold the visiblity, user id, user's current assigned.
-  ** 
+userPage ** seperate page. display user info, buttons: update(unlocks some fields) and button changes to [cancel][confirm], assign cameras, and delete(only shows when user role !== 1 || id === self id), ** OK
+AssignCameraModule ** since want module as popup, place component under Component 'user', use a assignCameraSlice to hold the visiblity, user id, user's current assigned. ** OK
+  **
   cameras = refetch cameras since could be changed from other admins
   refetch button for manual
   for user subsribed camera id, populate right 'assigned' with <id=id>camera Name. below button: remove
@@ -43,15 +43,16 @@ AssignCameraModule ** since want module as popup, place component under Componen
   on submit. camera Id Array generated and send to updateUser. storeSlice also updated -> cause rerender.
   **
 
-cameras ** with button to register new camera and get all cameras
-registerCamera
-  camerasTable ** structure for camera info
-    cameraRow ** + button for redirect to cameraPage
-camerasPage * for edit, delete
+cameras ** with button to register new camera and get all cameras  ** OK
+registerCamera  ** OK
+  camerasTable ** structure for camera info  ** OK
+    cameraRow ** + button for redirect to cameraPage  ** OK
+camerasPage * for edit, delete  ** OK
 
-accountSettings * to edit and toggle settings
+accountSettings * to edit and toggle settings ** Todo
 
-forgotPassword page
+forgot password process ** TODO
+
 */
 
 function App() {

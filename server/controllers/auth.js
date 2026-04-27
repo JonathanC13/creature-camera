@@ -148,7 +148,7 @@ const updateUserInfo = async(req, res, next) => {
         throw new ForbiddenError()
     }
 
-    const restricted = new Set(['emailLowercase', 'password', 'role_id', 'roleLevel', 'subscriptions', 'lastNotifySent', 'lastLoggedIn', 'temp_password', 'expiration_timestamp_OTP', 'OTP_retries', 'refreshToken'])
+    const restricted = new Set(['emailLowercase', 'password', 'role_id', 'roleLevel', 'roleName', 'subscriptions', 'lastNotifySent', 'lastLoggedIn', 'temp_password', 'expiration_timestamp_OTP', 'OTP_retries', 'refreshToken'])
     const updateInfo = new Object()
     for (let [k, v] of Object.entries(req.body)) {
         if (!restricted.has(k)) {

@@ -56,7 +56,7 @@ const RegisterUserModal = ({ isOpen, onClose, defaultOpen = false }) => {
                 roleName: roleInfo.roleName
             }
 
-            const response = await logIn(payload).unwrap()
+            const response = await useRegisterMutation(payload).unwrap()
                 .then((res) => {
                     const successMsg = `Registerd. Notify user that an email to ${email} was sent with first time password.`
                     // clear form

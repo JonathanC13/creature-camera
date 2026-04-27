@@ -1,5 +1,5 @@
 import React from 'react'
-import CameraList from '../cameras/CameraList'
+import CameraAssignedList from '../cameras/CameraAssignedList'
 
 const userHome = () => {
 
@@ -9,7 +9,7 @@ const userHome = () => {
   return (
     <secition className='user-home'>
       <h1 className='user-home__h1'>User home</h1>
-      <CameraList></CameraList>
+      <CameraAssignedList></CameraAssignedList>
     </secition>
   )
 }

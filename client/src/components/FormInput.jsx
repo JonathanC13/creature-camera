@@ -7,7 +7,8 @@ const FormInput = (
         text = 'placeholder',
         inputType = 'text',
         value = null,
-        onChangeCB = () => {}
+        onChangeCB = () => {},
+        disabled = false
     }
 ) => {
   return (
@@ -18,6 +19,7 @@ const FormInput = (
             {...(required ? 'required' : '')}
             value = {value}
             onChange= { (elem) => { onChangeCB(elem.target.value) } }
+            {...(disabled ? 'disabled' : '')}
         />
     </section>
   )
