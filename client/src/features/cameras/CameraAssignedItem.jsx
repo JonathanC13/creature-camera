@@ -1,7 +1,7 @@
 import React from 'react'
 import VideoList from './VideoList'
 
-const CameraItem = (
+const CameraAssignedItem = (
   camera
 ) => {
 
@@ -18,4 +18,4 @@ const CameraItem = (
   )
 }
 
-export default CameraItem
+export default CameraAssignedItem

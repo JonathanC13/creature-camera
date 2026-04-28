@@ -14,9 +14,9 @@ const UserPage = () => {
     const navigate = useNavigate()
 
     const { data, isLoading, isError, refetch } = useGetUserQuery(id)
-    const { dataRoles } = useGetRolesQuery()
-    const [updateUser, {isLoadingUpdate}] = useUpdateUserMutation()
-    const [deleteUser, {isLoadingDelete}] = useDeleteUserMutation()
+    const { data: dataRoles } = useGetRolesQuery()
+    const [updateUser, {isLoading: isLoadingUpdate}] = useUpdateUserMutation()
+    const [deleteUser, {isLoading: isLoadingDelete}] = useDeleteUserMutation()
 
     const modifyLoading = isLoadingUpdate || isLoadingDelete
 
@@ -76,8 +76,7 @@ const UserPage = () => {
 
     const openAssignCamerasModal = () => {
       dispatch(openModal({ type: "assignCameras", props: {
-        id: data.id,
-        subscriptions
+        id: data.id
       }}))
     }
 

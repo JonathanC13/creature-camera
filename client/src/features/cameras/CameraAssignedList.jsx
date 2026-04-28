@@ -1,11 +1,10 @@
 import React from 'react'
-import CameraItem from './CameraItem'
+import CameraAssignedItem from './CameraAssignedItem'
 import { useGetSubVideosQuery } from './videosApiSlice'
-import VideoPlayerModel from '../modals/VideoPlayerModel'
 
 const createCameraItemComps = (data) => {
   return data.map((e) => {
-    return <CameraItem 
+    return <CameraAssignedItem 
       camera={e}
     />
   })
@@ -38,8 +37,6 @@ const CameraList = () => {
 
   return (
     <section className='camera-assigned'>
-      <VideoPlayerModel/>
-
       <h1 className='camera-assigned__h1'>Cameras assigned</h1>
 
       <button onClick={refetch} disabled={isFetching}>

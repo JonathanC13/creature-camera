@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     userInfo: {
+        // id, name, email
         persistentLogin: localStorage.getItem('persistentLogin') || false,
     },
     token: null,
@@ -13,10 +14,10 @@ export const authSlice = createSlice({
     initialState,
     reducers: {
         userInfoSet: (state, action) => {
-            const { persistentLogin } = action.payload.persistentLogin ?? false
+            const { persistentLogin } = action.payload.persistentLogin ?? state.persistentLogin
             localStorage.setItem('persistentLogin', persistentLogin)
 
-            state.userInfo = {...action.payload.userInfo}
+            state.userInfo = { ...state.userInfo, ...action.payload.user}
             state.token = action.payload.token ?? null
         },
         persistenLoginSet: (state, action) => {

@@ -11,8 +11,8 @@ const CameraPage = () => {
 
     const { data, isLoading, isError, refetch } = useGetCameraQuery(id)
 
-    const [updateCamera, {isLoadingUpdate}] = useUpdateCameraMutation()
-    const [deleteCamera, {isLoadingDelete}] = useDeleteCameraMutation()
+    const [updateCamera, {isLoading: isLoadingUpdate}] = useUpdateCameraMutation()
+    const [deleteCamera, {isLoading: isLoadingDelete}] = useDeleteCameraMutation()
 
     const modifyLoading = isLoadingUpdate || isLoadingDelete
 

@@ -18,18 +18,20 @@ const ListItem = ({ item, onSelect }) => (
 )
 
 const AssignCamerasModal = (
-    id,
-    subscriptions
+    id
 ) => {
 
   const msgRef = useRef()
   const [msg, setMsg] = useState()
 
-  const [ updateUser, { isLoadingUpdate, isErrorUpdate }] = useUpdateUserMutation()
-  const { data, isLoading, refetch, isFetching, isError } = useGetAllCamerasQuery()
+  const [ updateUser, { isLoading: isLoadingUpdate, isError: isErrorUpdate }] = useUpdateUserMutation()
+  const { data: userData, isLoading: isLoadingUser, isError: isErrorUser, refetch: retechUser } = useGetUserQuery(id)
+  const { data, isLoading: isLoadingCameras, refetch, isFetching, isError: isErrorCameras } = useGetAllCamerasQuery()
   // const cameraLookup = useSelector(selectCameraEntities)
+  const isLoading = isLoadingUser || isLoadingCameras
+  const isError = isErrorUser || isErrorCameras
 
-  const [assignedCameras, setAssignedCameras] = useState(subscriptions)  // ids
+  const [assignedCameras, setAssignedCameras] = useState(userData?.subscriptions)  // ids
 
   // current selected in each box.
   const [activeAvailable, setActiveAvailable] = useState([])
@@ -149,7 +151,7 @@ const AssignCamerasModal = (
     content = 
       <>
         {dualListbox}
-        <button onClick={updateUserOnClick}>Finalize</button>
+        <button onClick={updateUserOnClick} disabled={isLoadingUpdate}>Finalize</button>
       </>
   }
     

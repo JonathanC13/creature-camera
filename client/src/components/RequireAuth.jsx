@@ -4,7 +4,7 @@ import { useLogoutMutation } from '../features/auth/authApiSlice'
 import { ROLES } from '../constants/roles'
 
 const RequireAuth = () => {
-    const location = useLocation()
+    // const location = useLocation()
     // get from store the auth info.
     const auth = useSelector(state => state.auth)
 
@@ -18,7 +18,7 @@ const RequireAuth = () => {
                 })
         } catch (err) {
         } finally {
-            <Navigate to='/login' state={{from: location}} replace></Navigate>
+            <Navigate to='/login' replace></Navigate>
         }
     }
 
@@ -27,13 +27,11 @@ const RequireAuth = () => {
             logOutHandler()
         }
     }, [])
-    
-    
     // show the children if user exists, else go to login page.
     return (
-        !auth?.token ? <Navigate to='/login' state={{from: location}} replace></Navigate>
+        !auth?.token || auth.user?.temp_password ? <Navigate to='/login' replace></Navigate>
             : ROLES.hasOwn(auth.userInfo.roleName) ? <Navigate to={auth.userInfo.roleName === "admin" ? "/admin" : "/user"} replace />
-                : <Navigate to='/login' state={{from: location}} replace></Navigate>
+                    : <Navigate to='/login' replace></Navigate>
              
             
     )

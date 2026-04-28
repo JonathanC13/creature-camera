@@ -22,7 +22,7 @@ const getUser = async(req, res, next) => {
         id
     } = req.params
 
-    const response = await UserModel.findById(id).exec()
+    const response = await UserModel.findById(id).select('-password').exec()
 
     if (!response) {
         throw new NotFoundError(`User with id: ${id} does not exist`)

@@ -7,6 +7,7 @@ import FormInput from '../../components/FormInput'
 import ShowPasswordBtn from '../../components/ShowPasswordBtn'
 import { useLoginMutation, useLogoutMutation } from './authApiSlice'
 import { userInfoSet, tokenSet, authMessageSet } from './authSlice'
+import UpdateTempPassword from './UpdateTempPassword'
 
 const login = () => {
     const dispatch = useDispatch()
@@ -19,6 +20,7 @@ const login = () => {
     const [password, setPassword] = useState('')
     const [msg, setMsg] = useState('')
     const [showPassword, setShowPassword] = useState(false)
+    const [isTemp, setIsTemp] = useState(false)
 
     const emailRef = useRef()
     const msgRef = useRef()
@@ -27,8 +29,8 @@ const login = () => {
     const { userInfo, token } = useSelector(state => state.auth)
 
     // api
-    const [logIn, { data, error, isLoading }] = useLoginMutation();
-    const [logOut, {isLoadingLogOut}] = useLogoutMutation()
+    const [logIn, { data, isError, isLoading }] = useLoginMutation();
+    const [logOut, {isLoading: isLoadingLogOut}] = useLogoutMutation()
 
     const resetControlledInputs = () => {
         setEmail('')
@@ -75,10 +77,14 @@ const login = () => {
                     dispatch(userInfoSet(res.user))
                     dispatch(tokenSet(res.token))
 
-                    // clear form
-                    resetControlledInputs()
-                    // navigate to dashboard
-                    navigate(from, { replace: true })
+                    const temp = res.user.temp_password
+                    if (!temp) {
+                        resetControlledInputs()
+                        // navigate to origin
+                        navigate(from, { replace: true })
+                    } else {
+                        setIsTemp(temp)
+                    }
                 })
                 .catch((error) => {
                     // console.log(error)
@@ -98,45 +104,60 @@ const login = () => {
         }
     }
 
+    let content = ''
+    
+    if (isTemp && password !== '') {
+        content = 
+            <UpdateTempPassword 
+                otp={password}
+                forgot={false}
+            />
+    } else {
+        content = 
+            <section className='login'>
+                <form className='login__form' action='javascript:void(0)' onSubmit={loginFormSubmitHandler}>
+                    <h1>Login</h1>
+                    <FormInput
+                        ref = {emailRef}
+                        required = {true}
+                        text = 'email'
+                        inputType = 'text'
+                        value = {email}
+                        onChangeCB = {setEmail}
+                        disabled = {isLoading ? true : false}
+                    >
+                    </FormInput>
+                    <div className="login__form__password">
+                        <FormInput
+                            ref = {null}
+                            required = {true}
+                            text = 'password'
+                            inputType = {showPassword ? "text" : "password"}
+                            value = {password}
+                            onChangeCB = {setPassword}
+                            disabled = {isLoading ? true : false}
+                        >
+                        </FormInput>
+                        <ShowPasswordBtn
+                            showPassword={showPassword}
+                            setShowPasswordCB={setShowPassword}
+                        ></ShowPasswordBtn>
+                    </div>
+                    <button type='submit' disabled={isLoading}>log in</button>
+                    <p ref={msgRef}>{msg}</p>
+                    <div className={isLoading ? "loading__div" : "offscreen"}>
+                        {
+                            isLoading ? 
+                            <div className="loader"></div> :
+                            <></>
+                        }
+                    </div>
+                </form>
+            </section>
+    }
+
   return (
-    <section className='login'>
-        <form className='login__form' action='javascript:void(0)' onSubmit={loginFormSubmitHandler}>
-            <h1>Login</h1>
-            <FormInput
-                ref = {emailRef}
-                required = {true}
-                text = 'email'
-                inputType = 'text'
-                value = {email}
-                onChangeCB = {setEmail}
-            >
-            </FormInput>
-            <div className="login__form__password">
-                <FormInput
-                    ref = {null}
-                    required = {true}
-                    text = 'password'
-                    inputType = 'password'
-                    value = {password}
-                    onChangeCB = {setPassword}
-                >
-                </FormInput>
-                <ShowPasswordBtn
-                    showPassword={showPassword}
-                    setShowPasswordCB={setShowPassword}
-                ></ShowPasswordBtn>
-            </div>
-            <button type='submit' disabled={isLoading}>log in</button>
-            <p ref={msgRef}>{msg}</p>
-            <div className={isLoading ? "loading__div" : "offscreen"}>
-                {
-                    isLoading ? 
-                    <div className="loader"></div> :
-                    <></>
-                }
-            </div>
-        </form>
-    </section>
+    {content}
   )
 }
 

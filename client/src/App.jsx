@@ -1,16 +1,18 @@
 import './App.css'
 import store from './app/store'
 import { BrowserRouter, Routes, Route } from "react-router";
-import RequireAuth from './components/RequireAuth';
 import { ROLES } from './constants/roles'
 import ModalManager from './features/modals/ModalManager';
+import RequireAuth from './components/RequireAuth';
+import Login from './features/auth/Login'
+import AccountSettings from './features/auth/AccountSettings';
 /*
 todo elements
 Layout ** OK
 AuthLayout **OK
 RequireAuth ** OK, check if has token and a roleName, based on role go to /adminHome or /userHome
 RoleProtected ** OK, protects nexted routes with role based access control
-Login ** OK
+Login ** if temp_password === true, load updateTempPassword, else go to '/' where it will redirect to dashboard
 Register ** OK
 Error
 Missing
@@ -49,9 +51,12 @@ registerCamera  ** OK
     cameraRow ** + button for redirect to cameraPage  ** OK
 camerasPage * for edit, delete  ** OK
 
-accountSettings * to edit and toggle settings ** Todo
+accountSettings * to edit and toggle settings ** OK
+  userInfo ** OK
+  updatePassword ** OK
 
-forgot password process ** TODO
+forgot password process ** OK
+
 
 */
 
@@ -66,7 +71,7 @@ function App() {
             <Route element={<PersistentLogin></PersistentLogin>}>
               {/* protected routes valid logged in users. */}
               <Route index element={<RequireAuth />}>
-                
+
                 <Route path='/' element={<Layout/>}>
 
                   <Route path="/admin" element={<RoleProtected allowedRoles={[ROLES.ADMIN]} />}>
@@ -83,12 +88,13 @@ function App() {
                     <Route index element={<UserHome></UserHome>}></Route>
                   </Route>
 
+                  <Route path="/settings" element={<AccountSettings></AccountSettings>}/>
+
                 </Route>
               </Route>
 
-              <Route element={<AuthLayout />}>
-                <Route path="login" element={<Login />} />
-              </Route>
+              <Route path="/login" element={<Login />} />
+              <Route path="/forgotPassword" element={<ForgotPassword />} />
             
             </Route>
 

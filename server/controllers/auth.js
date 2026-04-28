@@ -213,7 +213,7 @@ const updatePassword = async(req, res, next) => {
 
     try {
         await userDocument.save()
-        res.status(StatusCodes.OK).json()
+        res.status(StatusCodes.OK).json({temp_password: userDocument.temp_password})
     } catch(e) {
         logger.error('updatePassword: ' + e.message)
         throw new InternalServerError('Update password failed.')
