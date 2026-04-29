@@ -12,12 +12,12 @@ Layout ** OK
 AuthLayout **OK
 RequireAuth ** OK, check if has token and a roleName, based on role go to /adminHome or /userHome
 RoleProtected ** OK, protects nexted routes with role based access control
-Login ** if temp_password === true, load updateTempPassword, else go to '/' where it will redirect to dashboard
+Login ** if temp_password === true, load updateTempPassword, else go to '/' where it will redirect to dashboard ** OK
 Register ** OK
-Error
-Missing
-features/navbars/Navbar ** with ROLES based what appears
-PersistentLogin
+Error ** OK
+Missing ** OK
+features/navbars/Navbar ** with ROLES based what appears ** OK
+PersistentLogin ** OK
 components/formInput ** OK
 
 adminHome ** OK

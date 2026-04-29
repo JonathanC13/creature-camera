@@ -2,12 +2,14 @@ import { configureStore } from '@reduxjs/toolkit'
 // reducers
 import authReducer from '../features/auth/authSlice'
 import modalReducer from '../features/modals/modalSlice'
+import errorReducer from '../features/error/errorSlice'
 import { apiSlice } from './apiSlice'
 
 export default store = configureStore({
     reducer: {
         auth: authReducer,
         modal: modalReducer,
+        error: errorReducer,
         // api
         [apiSlice.reducerPath]: apiSlice.reducer,
         //[authApiSlice.reducerPath]: authApiSlice.reducer,
