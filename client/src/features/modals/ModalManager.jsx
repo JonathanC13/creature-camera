@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import VideoPlayerModal from './VideoPlayerModel'
-import RegisterUserModal from '../users/RegisterUserModal';
+import RegisterUserModal from './RegisterUserModal';
 import AssignCamerasModal from './AssignCamerasModal';
 
 const ModalManager = () => {

@@ -28,7 +28,7 @@ export const authSlice = createSlice({
         tokenSet: (state, action) => {
             state.token = action.payload.token ?? null
         },
-        authMsgSet: (state, action) => {
+        authMessageSet: (state, action) => {
             state.authMessage = action.payload
         },
         loggedOut: state => {
@@ -39,6 +39,6 @@ export const authSlice = createSlice({
     }
 })
 
-export const { userInfoSet, persistenLoginSet, tokenSet, authMsgSet, loggedOut} = authSlice.actions
+export const { userInfoSet, persistenLoginSet, tokenSet, authMessageSet, loggedOut} = authSlice.actions
 
 export default authSlice.reducer

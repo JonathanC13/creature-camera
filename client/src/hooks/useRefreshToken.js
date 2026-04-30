@@ -1,4 +1,4 @@
-import { useLazyUserRefreshTokenQuery } from "../features/auth/authApiSlice"
+import { useLazyRefreshTokenQuery } from "../features/auth/authApiSlice"
 import { userInfoSet, tokenSet } from '../features/auth/authSlice'
 import { useSelector, useDispatch } from "react-redux"
 import { useState, useEffect } from 'react'
@@ -15,7 +15,7 @@ const useRefreshToken = () => {
           isSuccess,
           isError,
           error
-        }] = useLazyUserRefreshTokenQuery()
+        }] = useLazyRefreshTokenQuery()
 
     // useEffect(() => {
     //     if (isFetching) {

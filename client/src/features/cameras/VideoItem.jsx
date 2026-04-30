@@ -9,10 +9,10 @@ const descriptionItem = (tag, info) => {
   </li>
 }
 
-const VideoItem = memo((
+const VideoItem = memo(({
   cameraId,
   videoInfo
-) => {
+}) => {
     const {
       filename,
       birthtime,

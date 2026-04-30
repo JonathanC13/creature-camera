@@ -8,6 +8,7 @@ import { useLogoutMutation } from '../auth/authApiSlice'
 const navbarItemComp = (text, link) => {
     return (
         <NavLink
+            className='navbar__nav-link'
             to={link}
             style={({ isActive }) => ({
                 color: isActive ? "orange" : "white",
@@ -34,6 +35,16 @@ const Navbar = () => {
         }
     }
 
+    let content = ''
+    if (!roleName) {
+        content = <></>
+    } else {
+        content =
+            <div className="navbar__right-div">
+                {Object.entries(ROLE_PATHS).map((e) => navbarItemComp(e.text, e.link))}
+                <button className="navbar__logout-btn" onClick={logOutOnClick}>log out</button>
+            </div>
+    }
 
   return (
     <section className='navbar'>
@@ -41,10 +52,7 @@ const Navbar = () => {
             {navbarItemComp('Creature Camera', '/')}
         </div>
         
-        <div className="navbar__right-div">
-            {Object.entries(ROLE_PATHS).map((e) => navbarItemComp(e.text, e.link))}
-            <button className="navbar__logout-btn" onClick={logOutOnClick}>log out</button>
-        </div>
+        {content}
     </section>
   )
 }

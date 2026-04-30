@@ -2,12 +2,12 @@ import React from 'react'
 import { memo } from 'react'
 import { Link } from 'react-router'
 
-const UsersRow = memo((
+const UsersRow = memo(({
     headers,
     user
-) => {
+}) => {
 
-    const link = `/users/${user.id}`
+    const link = `/admin/users/${user.id}`
 
     const cellComps = new Array()
     for (const [k, v] of headers) {

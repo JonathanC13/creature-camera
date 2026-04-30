@@ -5,7 +5,7 @@ import modalReducer from '../features/modals/modalSlice'
 import errorReducer from '../features/error/errorSlice'
 import { apiSlice } from './apiSlice'
 
-export default store = configureStore({
+export default configureStore({
     reducer: {
         auth: authReducer,
         modal: modalReducer,

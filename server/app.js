@@ -45,12 +45,12 @@ app.use(cookieParser())
 
 // extra security packages
 app.use(helmet())
-// app.use(cors(
-//     {
-//         origin: process.env.ACCESS_CONTROL_ALLOW_ORIGIN, // Adjust this to your frontend's URL
-//         credentials: true, // This allows cookies to be included in requests
-//     }
-// ))
+app.use(cors(
+    {
+        origin: process.env.ACCESS_CONTROL_ALLOW_ORIGIN, // Adjust this to your frontend's URL
+        credentials: true, // This allows cookies to be included in requests
+    }
+))
 app.use(xss()) // make sure this comes before any routes
 
 app.set('trust proxy', 1 /* number of proxies between user and server */)

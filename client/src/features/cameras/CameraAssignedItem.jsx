@@ -1,9 +1,9 @@
 import React from 'react'
 import VideoList from './VideoList'
 
-const CameraAssignedItem = (
+const CameraAssignedItem = ({
   camera
-) => {
+}) => {
 
   const { id, cameraName, videos } = camera
 

@@ -58,8 +58,8 @@ DB will hold:
             roleLevel
         * When updating, to ensure no duplicates either check myself or https://www.mongodb.com/docs/manual/reference/operator/update/addToSet/ 
 
-todo:
-    Server ** TO TEST with Postman
+server test:
+    Server ** TEST with Postman
         1. middleware/authCameraMiddleware:  // setup model for Camera list with keys, verify key sent in header with keys in mongodb. ** OK
         2. controllers/uploadVideoSingle      // video bytes transferred to server (this PC), multer saves the video to a directory, mongoDB saves the file path for the video. ** OK
         3. notifications for uploaded video // ** OK
@@ -400,13 +400,13 @@ API:
             Body: 
                 {
                     "name": "bobo",
-                    "email": "bob@mail.com",
-                    "password": "123",
+                    "email": "jonsjonjon113@gmail.com",
                     "role_id": "69d0213294650c3fb85f1e59",
-                    "roleLevel": "2"
+                    "roleLevel": "2",
+                    "roleName": "user"
                 }
             Expected results: 1. status code: 201. 2. response: JSON { response: created user, tempPlain: tempPassword }. 3. User is created and temp password emailed to submitted email.
-            Status: TODO
+            Status: Pass
 
         3. Valid admin account try to register a user with already existing email
             Prerequisites: Logged in as Admin
@@ -585,8 +585,8 @@ API:
             Route params: valid id
             Body: 
                 {  }
-            Expected results: 1. status code: 200. 2. response: JSON { password: plain text }. 3. User emailed OTP and temp_password = true so that client will redirect user to set new password. Log in with temp password.
-            Status: TODO
+            Expected results: 1. status code: 200. 2. response: JSON {  }. 3. User emailed OTP and temp_password = true so that client will redirect user to set new password. Log in with temp password.
+            Status: Pass
 
 3. camera
     1. POST /camera/
@@ -691,7 +691,7 @@ API:
         Expected results: 1. status code: 200. 2. response: JSON { response: [{filename, created, thumbnail: url to public folder}, ...], count: number of cameras }. 3. 
         Status: Pass
 
-    2. GET /video/src TODO
+    2. GET /video/src TODO test
         Test from client request.
         Query parameters:
             ?
@@ -713,7 +713,7 @@ Status:
 
 
 
-Client TODO:
+Client:
 1. auth reducer and apiSlice: should be OK
     - auth reducer saves the logged in user info and token so apiSlice doesn't need a getMe endpoint to keeping retrieving current profile.
     - Just remember to dispatch to reducer after api queries to save info.
@@ -775,5 +775,5 @@ Client TODO:
 
 5. React client
 
-X. Videos apiSlice auto refetch all every x minutes since only GETS, no mutations will trigger a tag invalidation. TODO
+6. Videos apiSlice auto refetch all every 10 minutes since only GETS, no mutations will trigger a tag invalidation. OK
 

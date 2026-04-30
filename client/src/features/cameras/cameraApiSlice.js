@@ -1,4 +1,4 @@
-import { createEntityAdapter, EntityState } from '@reduxjs/toolkit'
+import { createEntityAdapter, createSelector } from '@reduxjs/toolkit'
 import { apiSlice, providesList } from '../../app/apiSlice'
 
 const camerasAdapter = createEntityAdapter()

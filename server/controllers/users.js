@@ -49,8 +49,8 @@ const registerUser = async(req, res, next) => {
     
         res.status(StatusCodes.CREATED).json({response: response.getUserInfo()})
 
-        const body = `This is your temporary password:\n${tempPassword}\n.`
-        sendMail(email, `${config.projectName}, registered`, body)    // send async
+        const body = `This is your temporary password:\n${tempPassword}`
+        sendMail(email, `${config.projectName}, user registered`, body)    // send async
     } catch (e) {
         logger.error('registerUser: ' + e.message)
         throw new InternalServerError('register user failed.')
@@ -154,7 +154,7 @@ const adminResetPassword = async(req, res, next) => {
         await userDocument.save()
         res.status(StatusCodes.OK).json()
 
-        const body = `This is your temporary password:\n${tempPassword}\n.`
+        const body = `This is your temporary password:\n${tempPassword}`
         sendMail(email, `${config.projectName}, admin reset password`, body)    // send async
     } catch(e) {
         logger.error('adminResetPassword: ' + e.message)

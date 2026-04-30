@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router'
 import { useSelector } from 'react-redux'
 
 import { selectRoleById } from '../roles/roleApiSlice'
-import { useRegisterMutation } from './userApiSlice'
+import { useRegisterMutation } from '../users/userApiSlice'
 import FormInput from '../../components/FormInput'
 import RoleDropDown from '../../components/RoleDropDown'
 

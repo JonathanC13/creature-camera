@@ -7,10 +7,10 @@ import ShowPasswordBtn from '../../components/ShowPasswordBtn'
 import { useUpdatePasswordMutation } from './authApiSlice'
 import { loggedOut } from './authSlice'
 
-const UpdateTempPassword = (
+const UpdateTempPassword = ({
     otp,
     forgot = false
-) => {
+}) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 

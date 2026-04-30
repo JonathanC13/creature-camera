@@ -2,10 +2,10 @@ import React from 'react'
 import { useState } from 'react'
 // import { useDispatch } from 'react-redux'
 
-const VideoPlayerModel = (
+const VideoPlayerModel = ({
   filename,
   url
-) => {
+}) => {
   // const dispatch = useDispatch()
 
   const [error, setError] = useState(false);

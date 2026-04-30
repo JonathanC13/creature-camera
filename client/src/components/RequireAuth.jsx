@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useLocation, Navigate, Outlet } from 'react-router'
 import { useSelector } from 'react-redux'
 import { useLogoutMutation } from '../features/auth/authApiSlice'
@@ -27,13 +28,13 @@ const RequireAuth = () => {
             logOutHandler()
         }
     }, [])
+
+
     // show the children if user exists, else go to login page.
     return (
         !auth?.token || auth.user?.temp_password ? <Navigate to='/login' replace></Navigate>
             : ROLES.hasOwn(auth.userInfo.roleName) ? <Navigate to={auth.userInfo.roleName === "admin" ? "/admin" : "/user"} replace />
                     : <Navigate to='/login' replace></Navigate>
-             
-            
     )
 }
 

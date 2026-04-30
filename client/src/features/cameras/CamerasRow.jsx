@@ -2,11 +2,11 @@ import React from 'react'
 import { memo } from 'react'
 import { Link } from 'react-router'
 
-const CamerasRow = memo((
+const CamerasRow = memo(({
     headers,
     camera
-) => {
-    const link = `/cameras/${camera.id}`
+}) => {
+    const link = `/admin/cameras/${camera.id}`
 
     const cellComps = new Array()
     for (const [k, v] of headers) {

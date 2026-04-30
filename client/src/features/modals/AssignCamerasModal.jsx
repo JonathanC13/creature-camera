@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { useGetAllCamerasQuery, selectCameraEntities } from '../cameras/cameraApiSlice'
 import { useUpdateUserMutation } from '../users/userApiSlice'
-import { closeModal } from "../modals"
+import { closeModal } from "../modals/modalSlice"
 
 // Item Component for displaying each list item
 const ListItem = ({ item, onSelect }) => (
@@ -17,9 +17,9 @@ const ListItem = ({ item, onSelect }) => (
   </div>
 )
 
-const AssignCamerasModal = (
+const AssignCamerasModal = ({
     id
-) => {
+}) => {
 
   const msgRef = useRef()
   const [msg, setMsg] = useState()
@@ -63,7 +63,7 @@ const AssignCamerasModal = (
     setActiveSelected([])
   };
   
-  const updateUserOnClick = () => {
+  const updateUserOnClick = async() => {
     setMsg('')
     try {
       // updateUser will invalidate cache for id, so the UserPage data will refetch.

@@ -18,4 +18,4 @@ const RoleProtected = (
     )
 }
 
-export default RequiRoleProtectedreAuth
+export default RoleProtected

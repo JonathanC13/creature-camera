@@ -8,19 +8,24 @@ const FormInput = (
         inputType = 'text',
         value = null,
         onChangeCB = () => {},
-        disabled = false
+        disabled = false,
+        inclineComp
     }
 ) => {
   return (
     <section className='form-input'>
         <label className='form-input__label'>{text}</label>
-        <input className='form-input__input' 
-            type = {inputType}
-            {...(required ? 'required' : '')}
-            value = {value}
-            onChange= { (elem) => { onChangeCB(elem.target.value) } }
-            {...(disabled ? 'disabled' : '')}
-        />
+        <div className="form-input__div">
+            <input className='form-input__div__input' 
+                ref={ref}
+                type = {inputType}
+                {...(required ? required : '')}
+                value = {value}
+                onChange= { (elem) => { onChangeCB(elem.target.value) } }
+                {...(disabled ? disabled : '')}
+            />
+            {inclineComp}
+        </div>
     </section>
   )
 }

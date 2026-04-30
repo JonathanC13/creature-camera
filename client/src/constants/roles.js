@@ -27,7 +27,7 @@ const PATHS = {
   user: [{'settings', '/'}]
 }
 */
-export const ROLE_PATHS = Object.entries(PATHS).reduce(
+const ROLE_PATHS = Object.entries(PATHS).reduce(
     (acc, [pathName, { text, link, roles }]) => {
         roles.forEach((role) => {
             if (!acc[role]) {
