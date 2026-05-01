@@ -44,17 +44,17 @@ export const apiSliceWithAuth = apiSlice.injectEndpoints({
         })
     }),
     updatePassword: builder.mutation({
-        query: (userInfo) => ({
+        query: (user) => ({
             method: 'PATCH',
-            url: `/auth/updatePassword/${getState().auth.userInfo.id}`,
-            body: {...userInfo}
+            url: `/auth/updatePassword/${user.id}`,
+            body: {...user.userInfo}
         })
     }),
     updateUserInfo: builder.mutation({
-        query: (userInfo) => ({
+        query: (user) => ({
             method: 'PATCH',
-            url: `/auth/updateUserInfo/${getState().auth.userInfo.id}`,
-            body: {...userInfo}
+            url: `/auth/updateUserInfo/${user.id}`,
+            body: {...user.userInfo}
         })
     }),
     refreshToken: builder.query({

@@ -21,4 +21,12 @@ RoleSchema.methods.getId = function() {
     return this._id.toString()
 }
 
+RoleSchema.methods.getRoleInfo = function() {
+    return  {
+        id: this._id.toString(),
+        roleName: this.roleName,
+        roldeLevel: this.roleLevel
+    }
+}
+
 module.exports = mongoose.model('roles', RoleSchema)

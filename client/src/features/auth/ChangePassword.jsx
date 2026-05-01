@@ -21,6 +21,16 @@ const ChangePassword = () => {
 
     const [updatePassword, { data, isError, isLoading }] = useUpdatePasswordMutation();
 
+    const changeShowCurr = () => {
+        setShowCurr(!showcurr)
+    }
+    const changeShowNew = () => {
+        setShowNew(!showNew)
+    }
+    const changeShowConfirm = () => {
+        setShowConfirm(!showConfirm)
+    }
+
     const resetControlledInputs = () => {
         setCurrPassword('')
         setNewPassword('')
@@ -40,8 +50,11 @@ const ChangePassword = () => {
 
         try {
             const payload = {
-                currentPassword: currPassword,
-                newPassword: newPassword
+                id: id,
+                userInfo: {
+                    currentPassword: currPassword,
+                    newPassword: newPassword
+                }
             }
 
             const response = await updatePassword(payload).unwrap()
@@ -86,7 +99,7 @@ const ChangePassword = () => {
                 ></FormInput>
                 <ShowPasswordBtn
                     showPassword={showCurr}
-                    setShowPasswordCB={setShowCurr}
+                    setShowPasswordCB={changeShowCurr}
                 ></ShowPasswordBtn>
             </div>
             <div className="change-password__form__newPass-div">
@@ -101,7 +114,7 @@ const ChangePassword = () => {
                 ></FormInput>
                 <ShowPasswordBtn
                     showPassword={showNew}
-                    setShowPasswordCB={setShowNew}
+                    setShowPasswordCB={changeShowNew}
                 ></ShowPasswordBtn>
             </div>
             <div className="change-password__form__oldPass-div">
@@ -116,7 +129,7 @@ const ChangePassword = () => {
                 ></FormInput>
                 <ShowPasswordBtn
                     showPassword={showConfirm}
-                    setShowPasswordCB={setShowConfirm}
+                    setShowPasswordCB={changeShowConfirm}
                 ></ShowPasswordBtn>
             </div>
 

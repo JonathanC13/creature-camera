@@ -12,7 +12,7 @@ export const apiSliceWithUsers = apiSlice.injectEndpoints({
                 url: '/user',
             }),
             providesTags: (result, error) => {
-                return providesList(result, 'User')
+                return providesList(result.response, 'User')
             },
             transformResponse: (result, meta, arg) => {
                 // Here to flatten then normalized into an EntityAdapter
@@ -26,7 +26,7 @@ export const apiSliceWithUsers = apiSlice.injectEndpoints({
                 url: `/user/${id}`
             }),
             providesTags: (result, error, id) => {
-                return result
+                return result.response
                 ? [{ type: 'User', id }]
                 : []
             }
@@ -46,7 +46,7 @@ export const apiSliceWithUsers = apiSlice.injectEndpoints({
             query: (userInfo) => ({
                 method: 'PATCH',
                 url: `/user/${userInfo.id}`,
-                body: {...userInfo.updateInfo}
+                body: {...userInfo.userInfo}
             }),
             invalidatesTags: (result, error, userInfo) => {
                 return [{ type: 'User', id: userInfo.id }]

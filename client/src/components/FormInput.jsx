@@ -12,6 +12,7 @@ const FormInput = (
         inclineComp
     }
 ) => {
+
   return (
     <section className='form-input'>
         <label className='form-input__label'>{text}</label>
@@ -19,10 +20,10 @@ const FormInput = (
             <input className='form-input__div__input' 
                 ref={ref}
                 type = {inputType}
-                {...(required ? required : '')}
+                required={required}
                 value = {value}
                 onChange= { (elem) => { onChangeCB(elem.target.value) } }
-                {...(disabled ? disabled : '')}
+                disabled={disabled}
             />
             {inclineComp}
         </div>

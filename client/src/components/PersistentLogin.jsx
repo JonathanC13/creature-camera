@@ -8,19 +8,18 @@ import errorTextConversion from '../functions/errorTextConversion'
 
 const PersistentLogin = () => {
     const dispatch = useDispatch()
-    const { userInfo } = useSelector(state => state.auth)
-    const { trigger, token, isError, error, isFetching } = useRefreshToken()
+    const auth = useSelector(state => state.auth)
+    const { trigger, token, isError, error, isFetching, isLoadingRefresh } = useRefreshToken()
     const { status } = useSelector(state => state.error)
     
     useEffect(() => {
         let isMounted = true
-
+        
         const verifyRefreshToken = () => {
             trigger()
         }
 
-        // console.log(persistentLogin, userInfo)
-        if (userInfo?.persistentLogin && !userInfo?.token) {
+        if (Boolean(auth.userInfo?.persistentLogin) && auth.userInfo?.token === undefined) {
             verifyRefreshToken()
         }
 
@@ -48,10 +47,10 @@ const PersistentLogin = () => {
     // console.log(isLoadingRefresh, ' ', isFetching)
   return (
     <>
-        {isError ?
+        {status === 'Server error' ?
             <Navigate to="/error" replace />
             :
-            userInfo?.persistentLogin && (isFetching) ?
+            Boolean(auth.userInfo?.persistentLogin) && (isLoadingRefresh || isFetching) ?
                 <div className='persistent-login-loading__div'>
                     <section className='persistent-login-loading__section'>
                         <h1 className='persistent-login-loading__h1'>Is loading...</h1>

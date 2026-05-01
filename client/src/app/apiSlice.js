@@ -7,7 +7,7 @@ const baseQuery = retry(fetchBaseQuery({
     baseUrl: url,
     credentials: 'include',
     prepareHeaders: (headers, { getState }) => {
-      const token = getState().auth.token
+      const token = getState().auth.userInfo.token
   
       // If we have a token set in state, let's assume that we should be passing it.
       if (token) {

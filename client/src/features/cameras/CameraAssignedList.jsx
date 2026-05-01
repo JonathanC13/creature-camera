@@ -4,7 +4,7 @@ import { useGetSubVideosQuery } from './videosApiSlice'
 
 const createCameraItemComps = (data) => {
   return data.map((e) => {
-    return <CameraAssignedItem 
+    <CameraAssignedItem 
       camera={e}
     />
   })
@@ -15,7 +15,7 @@ const CameraList = () => {
     const {data, refetch, isFetching, isLoading, isError} = useGetSubVideosQuery(undefined, {
       pollingInterval: 600000,  // 10 minutes
     })
-
+    
     let content = ''
     if (isError) {
       content = <p>Error</p>
@@ -31,7 +31,9 @@ const CameraList = () => {
     } else {
       content =
         <ul className='camera-assigned__ul'>
-          {createCameraItemComps(data)}
+          {data.response.length === 0 
+            ? <p className='camera-assigned__p'>No assigned cameras, request assignment with an admin.</p>
+            : createCameraItemComps(data.response)}
         </ul>
     }
 
@@ -39,7 +41,7 @@ const CameraList = () => {
     <section className='camera-assigned'>
       <h1 className='camera-assigned__h1'>Cameras assigned</h1>
 
-      <button onClick={refetch} disabled={isFetching}>
+      <button className='refetch-btn cursor_pointer' onClick={refetch} disabled={isFetching}>
         {isFetching ? 'Refreshing...' : 'Refresh Data'}
       </button>
 

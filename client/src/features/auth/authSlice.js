@@ -1,11 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const persist = localStorage.getItem('persistentLogin')
+
 const initialState = {
     userInfo: {
         // id, name, email
-        persistentLogin: localStorage.getItem('persistentLogin') || false,
+        persistentLogin: persist === undefined ? persist : true,
     },
-    token: null,
     authMessage: ''
 }
 
@@ -14,31 +15,28 @@ export const authSlice = createSlice({
     initialState,
     reducers: {
         userInfoSet: (state, action) => {
-            const { persistentLogin } = action.payload.persistentLogin ?? state.persistentLogin
+            const { persistentLogin } = action.payload.persistentLogin ?? state.userInfo.persistentLogin
             localStorage.setItem('persistentLogin', persistentLogin)
-
-            state.userInfo = { ...state.userInfo, ...action.payload.user}
-            state.token = action.payload.token ?? null
+            state.userInfo = { ...state.userInfo, ...action.payload}
         },
-        persistenLoginSet: (state, action) => {
-            const { persistentLogin } = action.payload.persistentLogin ?? false
+        persistentLoginSet: (state, action) => {
+            const { persistentLogin } = action.payload ?? false
             state.userInfo.persistentLogin = persistentLogin
             localStorage.setItem('persistentLogin', persistentLogin)
         },
         tokenSet: (state, action) => {
-            state.token = action.payload.token ?? null
+            state.userInfo.token = action.payload
         },
         authMessageSet: (state, action) => {
             state.authMessage = action.payload
         },
         loggedOut: state => {
             state.userInfo = {}
-            state.token = null
             localStorage.setItem('persistentLogin', false)
         },
     }
 })
 
-export const { userInfoSet, persistenLoginSet, tokenSet, authMessageSet, loggedOut} = authSlice.actions
+export const { userInfoSet, persistentLoginSet, authMessageSet, loggedOut, tokenSet} = authSlice.actions
 
 export default authSlice.reducer

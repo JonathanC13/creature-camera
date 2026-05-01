@@ -56,7 +56,7 @@ const RegisterCameraModal = () => {
 
   return (
     <section className="register-camera-modal">
-        <form action="javascript:void(0)" onSubmit={registerCameraOnClick}>
+        <form onSubmit={registerCameraOnClick}>
             <h1 className="register-camera-modal__h1">register camera</h1>
             <FormInput
                 ref = {null}

@@ -5,16 +5,19 @@ const ROLES = {
 
 const PATHS = {
     MANAGE_USERS: {
+        id: 1,
         text: 'users',
-        link: '/users',
+        link: '/users',  // relative
         roles: [ROLES.ADMIN]
     },
     MANAGE_CAMERAS: {
+        id: 2,
         text: 'cameras',
         link: '/cameras',
         roles: [ROLES.ADMIN]
     },
     SETTINGS: {
+        id: 3,
         text: 'settings',
         link: '/settings',
         roles: [ROLES.ADMIN, ROLES.USER]
@@ -28,12 +31,12 @@ const PATHS = {
 }
 */
 const ROLE_PATHS = Object.entries(PATHS).reduce(
-    (acc, [pathName, { text, link, roles }]) => {
+    (acc, [pathName, { id, text, link, roles }]) => {
         roles.forEach((role) => {
             if (!acc[role]) {
                 acc[role] = []
             }
-            acc[role].push({ text, link })
+            acc[role].push({ id, text, link })
         });
         return acc
     },

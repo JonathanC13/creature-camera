@@ -12,11 +12,11 @@ const apiSliceWithRoles = apiSlice.injectEndpoints({
                 url: '/role',
             }),
             providesTags: (result, error) => {
-                return providesList(result, 'Role')
+                return providesList(result.response, 'Role')
             },
             transformResponse: (result, meta, arg) => {
                 // Here to flatten then normalized into an EntityAdapter
-                return rolesAdapter.setAll(initialState, result)
+                return rolesAdapter.setAll(initialState, result.response)
             }
         }),
         getRole: builder.query({

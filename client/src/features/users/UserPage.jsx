@@ -1,32 +1,62 @@
 import React from 'react'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { useLogoutMutation } from '../auth/authApiSlice'
+import { loggedOut } from '../auth/authSlice'
 import { useGetUserQuery, useUpdateUserMutation, useDeleteUserMutation } from './userApiSlice'
-import { selectRoleById } from '../roles/roleApiSlice'
+import { userInfoSet } from '../auth/authSlice'
+import { useGetRolesQuery, selectRoleById } from '../roles/roleApiSlice'
 import { useNavigate, NavLink, useParams } from "react-router"
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import FormInput from '../../components/FormInput'
 import RoleDropDown from '../../components/RoleDropDown'
 import { openModal } from '../modals/modalSlice'
+import { ROLES } from '../../constants/roles'
 
 const UserPage = () => {
     const { id } = useParams(); // id will be '123' if the URL is /user/123
 
+    const dispatch = useDispatch()
+
     const navigate = useNavigate()
 
+    const auth = useSelector(state => state.auth)
     const { data, isLoading, isError, refetch } = useGetUserQuery(id)
     const { data: dataRoles } = useGetRolesQuery()
     const [updateUser, {isLoading: isLoadingUpdate}] = useUpdateUserMutation()
     const [deleteUser, {isLoading: isLoadingDelete}] = useDeleteUserMutation()
-
+    const [logOut, {}] = useLogoutMutation()
+    
     const modifyLoading = isLoadingUpdate || isLoadingDelete
 
-    const [name, setName] = useState(data.name ?? '')
-    const [email, setEmail] = useState(data.email ?? '')
-    const [roleId, setRoleId] = useState(data.roleId ?? '')
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [roleId, setRoleId] = useState('')
+    const [role, setRole] = useState('')
     const [editing, setEditing] = useState(false)
     const [msg, setMsg] = useState('')
 
     const msgRef = useRef()
+
+    const self = auth.userInfo.id === id
+    const otherAdmin = (id !== auth.userInfo.id && role.roleName === ROLES.ADMIN)
+
+    useEffect(() => {
+      resetInfo()
+    }, [data])
+
+    useEffect(() => {
+      if (roleId !== '') {
+        setRole(useSelector((state) => selectRoleById(state, roleId)))
+      }
+    }, [roleId])
+
+    const resetInfo = () => {
+        if (data?.response) {
+          setName(data?.response.name)
+          setEmail(data?.response.email)
+          setRoleId(data?.response.role_id)
+        }
+    }
 
     const editOnClick = () => {
       setEditing(true)
@@ -34,7 +64,7 @@ const UserPage = () => {
 
     const cancelEditOnClick = () => {
       setEditing(false)
-      refetch()
+      resetInfo()
     }
 
     const updateOnClick = async(e) => {
@@ -43,7 +73,6 @@ const UserPage = () => {
       setMsg('')
 
       try {
-        const role = useSelector((state) => selectRoleById(state, roleId))
         const payload = {
           name,
           email,
@@ -54,20 +83,23 @@ const UserPage = () => {
 
         const response = await updateUser(payload).unwrap()
           .then((res) => {
-              setMsg('user updated.')
+            if (id === auth.userInfo.id) {
+              dispatch(userInfoSet(res.response))
+            }
+            setMsg('user updated.')
           })
           .catch((error) => {
-              // console.log(error)
-              if (!error.data) {
-                  setMsg('no server response.')
-              } else if (error?.data?.message) {
-                  const message = error?.data?.message ?? 'error.'
-                  setMsg(message)
-              } else {
-                  setMsg('update failed.')
-              }
-              msgRef.current.focus()
-            })
+            // console.log(error)
+            if (!error.data) {
+                setMsg('no server response.')
+            } else if (error?.data?.message) {
+                const message = error?.data?.message ?? 'error.'
+                setMsg(message)
+            } else {
+                setMsg('update failed.')
+            }
+            msgRef.current.focus()
+          })
       } catch (e) {
         setMsg('update failed.')
         msgRef.current.focus()
@@ -82,7 +114,17 @@ const UserPage = () => {
 
     const userDeleteOnClick = async(e) => {
       await deleteUser(id)
-      navigate("/users", { replace: true }) // { replace: true } so cannot go back to this page.
+      if (self) {
+        await logOut()
+        dispatch(loggedOut())
+        navigate("/", { replace: true })
+      } else {
+        navigate("/users", { replace: true }) // { replace: true } so cannot go back to this page.
+      }
+    }
+
+    const onSubmitHandler = (e) => {
+      e.preventDefault()
     }
 
     let content = ''
@@ -99,7 +141,7 @@ const UserPage = () => {
         </div>
     } else {
       content =
-        <form className='user-page__form' action='javascript:void(0)'>
+        <form className='user-page__form' onSubmit={onSubmitHandler}>
           <FormInput
             ref = {null}
             required = {true}
@@ -107,7 +149,7 @@ const UserPage = () => {
             inputType = 'text'
             value = {name}
             onChangeCB = {setName}
-            disabled = {!editing}
+            disabled = {!editing || otherAdmin}
           ></FormInput>
           <FormInput
             ref = {null}
@@ -116,28 +158,28 @@ const UserPage = () => {
             inputType = 'text'
             value = {email}
             onChangeCB = {setEmail}
-            disabled = {!editing}
+            disabled = {!editing || otherAdmin}
           ></FormInput>
 
           <RoleDropDown 
             roleId = {roleId}
             setRoleIdCB = {setRoleId}
-            disabled = {!editing}
+            disabled = {!editing || self || role === ROLES.ADMIN}
           ></RoleDropDown>
 
           <div className="user-page__form__editing-div">
           {editing ? 
             <>
-              <button className="user-page__form__editing-div__cancel-btn" onClick={cancelEditOnClick}>cancel</button>
-              <button className="user-page__form__editing-div__update-btn" onClick={updateOnClick}>update</button>
+              <button className="user-page__form__editing-div__cancel-btn cursor_pointer" onClick={cancelEditOnClick}>cancel</button>
+              <button className="user-page__form__editing-div__update-btn cursor_pointer" onClick={updateOnClick}>update</button>
             </>
-            : <button className="user-page__form__editing-div__edit-btn" onClick={editOnClick}>edit</button>
+            : <button className="user-page__form__editing-div__edit-btn cursor_pointer" onClick={editOnClick}>edit</button>
           }
           </div>
 
-          <button className='user-page__form__assign-cameras-btn' onClick={openAssignCamerasModal}>assign cameras</button>
+          <button className='user-page__form__assign-cameras-btn cursor_pointer' onClick={openAssignCamerasModal}>assign cameras</button>
 
-          <button className='user-page__form__del-btn' onClick={userDeleteOnClick}>delete</button>
+          {(!otherAdmin) ? <button className='user-page__form__del-btn cursor_pointer' onClick={userDeleteOnClick}>delete</button> : <></>}
 
           <p ref={msgRef}>{msg}</p>
 

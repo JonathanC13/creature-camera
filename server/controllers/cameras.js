@@ -55,8 +55,11 @@ const createCamera = async(req, res, next) => {
         const response = await CameraModel.create({...req.body})
         res.status(StatusCodes.CREATED).json({response})
     } catch (e) {
-        logger.error('adminResetPassword: ' + e.message)
-        throw new InternalServerError('Create camera failed.')
+        logger.error('createCamera: ' + e.message)
+        const err = new Error()
+        err.code = e?.code
+        err.keyValue = e?.keyValue
+        throw err
     }
 }
 

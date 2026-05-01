@@ -1,11 +1,12 @@
 import { useLazyRefreshTokenQuery } from "../features/auth/authApiSlice"
-import { userInfoSet, tokenSet } from '../features/auth/authSlice'
+import { userInfoSet } from '../features/auth/authSlice'
 import { useSelector, useDispatch } from "react-redux"
 import { useState, useEffect } from 'react'
 
 const useRefreshToken = () => {
     const auth = useSelector(state => state.auth)
     const dispatch = useDispatch()
+    const [isLoadingRefresh, setIsLoadingRefresh] = useState(true)
 
     const [trigger, {
           data,
@@ -17,22 +18,19 @@ const useRefreshToken = () => {
           error
         }] = useLazyRefreshTokenQuery()
 
-    // useEffect(() => {
-    //     if (isFetching) {
-    //         console.log('fetcjing')
-    //         setIsLoadingRefresh(true)
-    //     }
-    // }, [isFetching])
-
     useEffect(() => {
-        if (isSuccess) {
-            dispatch(userInfoSet({...data.user}))
-            dispatch(tokenSet(data?.token))
-            // console.log('new token: ', data?.token)
+        setIsLoadingRefresh(true)
+        if (!isFetching && isSuccess) {
+            // Using JWT cookie, refetch user info
+            const payload = {...data.user, token: data.token}
+            dispatch(userInfoSet(payload))
         }
-    }, [isSuccess])
+        if (!isFetching) {
+            setIsLoadingRefresh(false)
+        }
+    }, [isFetching, setIsLoadingRefresh])
 
-    return {trigger, token: data?.token, isError, error, isFetching, refetch} 
+    return {trigger, token: data?.token, isError, error, isFetching, refetch, isLoadingRefresh} 
 }
 
 export default useRefreshToken

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router'
 import FormInput from '../../components/FormInput'
 import ShowPasswordBtn from '../../components/ShowPasswordBtn'
 import { useUpdatePasswordMutation } from './authApiSlice'
-import { loggedOut } from './authSlice'
+import { userInfoSet, loggedOut } from './authSlice'
 
 const UpdateTempPassword = ({
     otp,
@@ -14,6 +14,7 @@ const UpdateTempPassword = ({
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
+    const auth = useSelector((state) => state.auth)
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
     const [confirmPassword, setConfirmPassword] = useState('')
@@ -23,6 +24,13 @@ const UpdateTempPassword = ({
     const msgRef = useRef()
 
     const [updatePassword, { isLoading }] = useUpdatePasswordMutation()
+
+    const changeShowPassword = () => {
+        setShowPassword(!showPassword)
+    }
+    const changeShowConfirmPassword = () => {
+        setShowConfirm(!showConfirm)
+    }
 
     const updatePasswordOnClick = async(e) => {
         e.preventDefault()
@@ -37,12 +45,17 @@ const UpdateTempPassword = ({
 
         try {
             const payload = {
-                currentPassword: otp,
-                newPassword: password
+                id: auth.userInfo.id,
+                userInfo: {
+                    currentPassword: otp,
+                    newPassword: password
+                }
             }
+            
             // state.auth has info for request; userInfo {id, temp_password}, token
             const resp = await updatePassword(payload).unwrap()
                 .then((res) => {
+                    dispatch(userInfoSet({'temp_password':false}))
                     if (forgot) {
                         // from forgot password, make user log in with new password.
                         dispatch(loggedOut())
@@ -82,12 +95,12 @@ const UpdateTempPassword = ({
                 value = {password}
                 onChangeCB = {setPassword}
                 disabled = {isLoading ? true : false}
+                inclineComp={<ShowPasswordBtn
+                    showPassword={showPassword}
+                    setShowPasswordCB={changeShowPassword}
+                ></ShowPasswordBtn>}
             >
             </FormInput>
-            <ShowPasswordBtn
-                showPassword={showPassword}
-                setShowPasswordCB={setShowPassword}
-            ></ShowPasswordBtn>
         </div>
         <div className="update-temp-pass__OTP-form__div">
             <FormInput
@@ -98,16 +111,16 @@ const UpdateTempPassword = ({
                 value = {confirmPassword}
                 onChangeCB = {setConfirmPassword}
                 disabled = {isLoading ? true : false}
+                inclineComp={<ShowPasswordBtn
+                    showPassword={showConfirm}
+                    setShowPasswordCB={changeShowConfirmPassword}
+                ></ShowPasswordBtn>}
             >
             </FormInput>
-            <ShowPasswordBtn
-                showPassword={showConfirm}
-                setShowPasswordCB={setShowConfirm}
-            ></ShowPasswordBtn>
         </div>
 
-        <button type='submit'>update password</button>
-        <p ref={msgRef}>{msg}</p>
+        <button className='update-temp-password__submit-btn cursor_pointer' type='submit'>update password</button>
+        <p className='update-temp-password__msg-p' ref={msgRef}>{msg}</p>
         <div className={isLoading ? "loading__div" : "offscreen"}>
             {
                 isLoading ? 

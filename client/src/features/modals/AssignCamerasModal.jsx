@@ -66,8 +66,14 @@ const AssignCamerasModal = ({
   const updateUserOnClick = async() => {
     setMsg('')
     try {
+      const payload = {
+        id: id,
+        userInfo: {
+            subscriptions: assignedCameras
+        }
+      }
       // updateUser will invalidate cache for id, so the UserPage data will refetch.
-      const response = await updateUser({id: id, subscriptions: assignedCameras}).unwrap()
+      const response = await updateUser(payload).unwrap()
         .then((res) => {
           closeModal()
         })

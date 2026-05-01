@@ -6,8 +6,9 @@ import { Link, useNavigate, useLocation } from 'react-router'
 import FormInput from '../../components/FormInput'
 import ShowPasswordBtn from '../../components/ShowPasswordBtn'
 import { useLoginMutation, useLogoutMutation } from './authApiSlice'
-import { userInfoSet, tokenSet, authMessageSet } from './authSlice'
+import { userInfoSet, authMessageSet } from './authSlice'
 import UpdateTempPassword from './UpdateTempPassword'
+import { errorStatusCleared } from '../error/errorSlice'
 
 const login = () => {
     const dispatch = useDispatch()
@@ -78,8 +79,10 @@ const login = () => {
 
             const response = await logIn(payload).unwrap()
                 .then((res) => {
-                    dispatch(userInfoSet(res.user))
-                    dispatch(tokenSet(res.token))
+                    dispatch(errorStatusCleared())
+                    const payload = {...res.user, token: res.token}
+                    dispatch(userInfoSet(payload))
+                    // dispatch(tokenSet({token: res.token}))
 
                     const temp = res.user.temp_password
                     if (!temp) {
@@ -148,7 +151,7 @@ const login = () => {
                     </FormInput>
                 </div>
                 <button className='login__btn cursor_pointer' type='submit' disabled={isLoading}>log in</button>
-                <p ref={msgRef}>{msg}</p>
+                <p className='login__msg-p' ref={msgRef}>{msg}</p>
                 <div className={isLoading ? "loading__div" : "offscreen"}>
                     {
                         isLoading ? 

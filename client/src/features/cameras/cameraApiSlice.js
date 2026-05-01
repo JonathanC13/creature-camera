@@ -12,7 +12,7 @@ const apiSliceWithCameras = apiSlice.injectEndpoints({
                 url: '/camera',
             }),
             providesTags: (result, error) => {
-                return providesList(result, 'Camera')
+                return providesList(result.response, 'Camera')
             },
             transformResponse: (result, meta, arg) => {
                 // Here to flatten then normalized into an EntityAdapter
@@ -26,7 +26,7 @@ const apiSliceWithCameras = apiSlice.injectEndpoints({
                 url: `/camera/${id}`
             }),
             providesTags: (result, error, id) => {
-                return result
+                return result.response
                     ? [{ type: 'Camera', id }]
                     : []
             }

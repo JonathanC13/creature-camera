@@ -2,18 +2,14 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { NavLink, useNavigate } from 'react-router'
 import { ROLE_PATHS } from '../../constants/roles'
-import { loggedOut } from '../auth/authSlice'
-import { useLogoutMutation } from '../auth/authApiSlice'
+import LogoutBtn from '../auth/LogoutBtn'
 
-const navbarItemComp = (text, link) => {
+const navbarItemComp = (id, text, link) => {
     return (
         <NavLink
+            key={id}
             className='navbar__nav-link'
             to={link}
-            style={({ isActive }) => ({
-                color: isActive ? "orange" : "white",
-                textDecoration: "none",
-            })}
         >{text}</NavLink>
     )
 }
@@ -22,18 +18,7 @@ const Navbar = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    const roleName = useSelector((state) => state.auth.user?.roleName)
-    const [logout, {}] = useLogoutMutation()
-
-    const logOutOnClick = async() => {
-        try {
-            const resp = await logout()
-        } catch(e) {
-        } finally {
-            dispatch(loggedOut())
-            navigate("/login", { replace: true });
-        }
-    }
+    const roleName = useSelector((state) => state.auth.userInfo?.roleName)
 
     let content = ''
     if (!roleName) {
@@ -41,15 +26,19 @@ const Navbar = () => {
     } else {
         content =
             <div className="navbar__right-div">
-                {Object.entries(ROLE_PATHS).map((e) => navbarItemComp(e.text, e.link))}
-                <button className="navbar__logout-btn" onClick={logOutOnClick}>log out</button>
+                {Object.entries(ROLE_PATHS[roleName]).map((e) => navbarItemComp(e[1].id, e[1].text, e[1].link))}
+                {<LogoutBtn></LogoutBtn>}
             </div>
     }
 
   return (
     <section className='navbar'>
         <div className="navbar__left-div">
-            {navbarItemComp('Creature Camera', '/')}
+            <NavLink
+                key={0}
+                className='navbar__nav-link navbar-home'
+                to={'/'}
+            >Creature Camera</NavLink>
         </div>
         
         {content}

@@ -52,8 +52,11 @@ const registerUser = async(req, res, next) => {
         const body = `This is your temporary password:\n${tempPassword}`
         sendMail(email, `${config.projectName}, user registered`, body)    // send async
     } catch (e) {
-        logger.error('registerUser: ' + e.message)
-        throw new InternalServerError('register user failed.')
+        logger.error('registerUser: ' + e.code + ": " + e.message)
+        const err = new Error()
+        err.code = e?.code
+        err.keyValue = e?.keyValue
+        throw err
     }
 }
 
@@ -110,6 +113,12 @@ const updateUser = async(req, res, next) => {
     if (userDocument.roleLevel === 1 && adminId !== userDocument.getId()) {
         // if admin account and not self, cannot modify.
         throw new ForbiddenError("Cannot modify another admin.")
+    }
+    // restrict chaning own Role
+    if (adminId === userDocument.getId()) {
+        delete req.body.role_id
+        delete req.body.roleLevel
+        delete req.body.roleName
     }
 
     const restricted = new Set(['emailLowercase', 'password', 'lastNotifySent', 'lastLoggedIn', 'temp_password', 'expiration_timestamp_OTP', 'OTP_retries', 'refreshToken'])

@@ -26,14 +26,17 @@ const ChangeInfo = () => {
 
         try {
             const payload = {
-                name,
-                email,
-                settingNotifyAlways: notifyAlways
+                id: id,
+                userInfo: {
+                    name,
+                    email,
+                    settingNotifyAlways: notifyAlways
+                }
             }
 
             const response = await updateUser(payload).unwrap()
                 .then((res) => {
-                    dispatch(userInfoSet({ user: res.user } ));
+                    dispatch(userInfoSet(res.response));
                     const successMsg = `user info updated.`
                     setMsg(successMsg)
                     msgRef.current.focus()

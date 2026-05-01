@@ -1,10 +1,12 @@
 import React from 'react'
 import { useMemo } from 'react'
-import { useGetRolesQuery } from '../features/roles/roleApiSlice'
+import { useGetRolesQuery, selectAllRoles } from '../features/roles/roleApiSlice'
+import { useSelector } from 'react-redux'
 
 const createOptionComponents = (rolesData) => {
     const comps = rolesData.map((role) => {
         return <option
+            key={role.id}
             value={role.id}
         >
             {role.roleName}
@@ -14,38 +16,38 @@ const createOptionComponents = (rolesData) => {
   return comps
 }
 
-const RoleDropDown = (
-    roleId = null,
+const RoleDropDown = ({
+    roleId = -1,
     setRoleIdCB,
     disabled = false
-) => {
+}) => {
 
     const {
         data,
         isError,
     } = useGetRolesQuery()
-
+    
+    // const rolesInfo = useSelector(selectAllRoles)
     const sortedRoles = useMemo(() => {
         const sortedRoles = []
-        for (let [key, val] of Object.entries(data.entities)) {
+        for (let [key, val] of Object.entries(data?.entities)) {
             sortedRoles.push(val)
         } 
         
         sortedRoles.sort((a, b) => b.roleLevel - a.roleLevel)
 
-        setRoleIdCB(sortedRoles[0]['id'])
         return sortedRoles
     }, [data])  // memo the original data
-
+    
   return (
     <section className="role-drop-down">
-        <label for="roles">roles</label>
-        {isError || sortedRoles.length === 0 ? 
+        <label className='role-drop-down__label' htmlFor="roles">role: </label>
+        {isError || (sortedRoles !== undefined && sortedRoles.length === 0) ? 
             <p>Error</p> :
-            <select name="roles" id="roles"
+            <select className='role-drop-down__select' name="roles" id="roles"
                 value={roleId}
                 onChange={(e) => (setRoleIdCB(e.target.value))}
-                {...(disabled ? 'disabled' : '')}
+                disabled={disabled}
             >
                 {createOptionComponents(sortedRoles)}
             </select>

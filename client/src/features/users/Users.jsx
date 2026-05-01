@@ -14,8 +14,8 @@ const Users = () => {
   return (
     <section className='users'>
 
-        <h1 className="users__h1">Users</h1>
-        <button className="users__register-btn" onClick={openRegisterModel}>register</button>
+        <h1 className="users__h1">Manage users</h1>
+        <button className="users__register-btn cursor_pointer" onClick={openRegisterModel}>register new user</button>
 
         <UsersTable></UsersTable>
     </section>
