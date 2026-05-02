@@ -6,12 +6,12 @@ export default function Modal({ children }) {
   const dispatch = useDispatch();
 
   return createPortal(
-    <div className="overlay" onClick={() => dispatch(closeModal())}>
+    <div className="modal-overlay" onClick={() => dispatch(closeModal())}>
       <div
-        className="modal"
+        className="modal-content"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={() => dispatch(closeModal())}>
+        <button className='modal__close-btn cursor_pointer' onClick={() => dispatch(closeModal())}>
           Close
         </button>
         {children}

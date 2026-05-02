@@ -23,7 +23,7 @@ const UpdateTempPassword = ({
 
     const msgRef = useRef()
 
-    const [updatePassword, { isLoading }] = useUpdatePasswordMutation()
+    const [updatePassword, { isLoading, isError }] = useUpdatePasswordMutation()
 
     const changeShowPassword = () => {
         setShowPassword(!showPassword)
@@ -120,7 +120,7 @@ const UpdateTempPassword = ({
         </div>
 
         <button className='update-temp-password__submit-btn cursor_pointer' type='submit'>update password</button>
-        <p className='update-temp-password__msg-p' ref={msgRef}>{msg}</p>
+        <p className={ isError ? 'update-temp-password__msg-p-error' : 'update-temp-password__msg-p-succ'} ref={msgRef}>{msg}</p>
         <div className={isLoading ? "loading__div" : "offscreen"}>
             {
                 isLoading ? 

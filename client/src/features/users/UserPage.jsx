@@ -22,38 +22,37 @@ const UserPage = () => {
     const auth = useSelector(state => state.auth)
     const { data, isLoading, isError, refetch } = useGetUserQuery(id)
     const { data: dataRoles } = useGetRolesQuery()
-    const [updateUser, {isLoading: isLoadingUpdate}] = useUpdateUserMutation()
-    const [deleteUser, {isLoading: isLoadingDelete}] = useDeleteUserMutation()
+    const [updateUser, {isLoading: isLoadingUpdate, isError: isErrorUpdate}] = useUpdateUserMutation()
+    const [deleteUser, {isLoading: isLoadingDelete, isError: isErrorDelete}] = useDeleteUserMutation()
     const [logOut, {}] = useLogoutMutation()
     
+    const isErrorGen = isErrorUpdate || isErrorDelete
     const modifyLoading = isLoadingUpdate || isLoadingDelete
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
+    const [roleIdOrg, setRoleIdOrg] = useState('')
     const [roleId, setRoleId] = useState('')
     const [role, setRole] = useState('')
     const [editing, setEditing] = useState(false)
     const [msg, setMsg] = useState('')
-
+    const roleOrgInfo = useSelector((state) => selectRoleById(state, roleIdOrg))
+    const roleInfo = useSelector((state) => selectRoleById(state, roleId))
+    
     const msgRef = useRef()
 
     const self = auth.userInfo.id === id
-    const otherAdmin = (id !== auth.userInfo.id && role.roleName === ROLES.ADMIN)
+    const otherAdmin = (id !== auth.userInfo.id && roleOrgInfo?.roleName === ROLES.ADMIN)
 
     useEffect(() => {
       resetInfo()
     }, [data])
 
-    useEffect(() => {
-      if (roleId !== '') {
-        setRole(useSelector((state) => selectRoleById(state, roleId)))
-      }
-    }, [roleId])
-
     const resetInfo = () => {
         if (data?.response) {
           setName(data?.response.name)
           setEmail(data?.response.email)
+          setRoleIdOrg(data?.response.role_id)
           setRoleId(data?.response.role_id)
         }
     }
@@ -74,11 +73,14 @@ const UserPage = () => {
 
       try {
         const payload = {
-          name,
-          email,
-          roleId,
-          roleLevel: role.roleLevel,
-          roleName: role.roleName
+          id: id,
+          userInfo: {
+            name,
+            email,
+            role_id: roleId,
+            roleLevel: roleInfo.roleLevel,
+            roleName: roleInfo.roleName
+          }
         }
 
         const response = await updateUser(payload).unwrap()
@@ -127,6 +129,24 @@ const UserPage = () => {
       e.preventDefault()
     }
 
+    const editOptions = 
+      <section className="user-edit-options">
+        <div className="user-edit-options__editing-div">
+        {editing ? 
+            <>
+              <button className="user-edit-options__editing-div__cancel-btn cursor_pointer" onClick={cancelEditOnClick}>cancel</button>
+              <button className="user-edit-options__editing-div__update-btn cursor_pointer" onClick={updateOnClick}>update</button>
+            </>
+            : <button className="user-edit-options__editing-div__edit-btn cursor_pointer" onClick={editOnClick}>edit</button>
+          
+        }
+        </div>
+
+        <button className='user-edit-options__assign-cameras-btn cursor_pointer' onClick={openAssignCamerasModal}>assign cameras</button>
+
+        <button className='user-edit-options__del-btn cursor_pointer' onClick={userDeleteOnClick}>delete</button>
+      </section>
+
     let content = ''
     if (isError) {
       content = <p>Error</p>
@@ -149,7 +169,7 @@ const UserPage = () => {
             inputType = 'text'
             value = {name}
             onChangeCB = {setName}
-            disabled = {!editing || otherAdmin}
+            disabled = {!editing}
           ></FormInput>
           <FormInput
             ref = {null}
@@ -158,30 +178,22 @@ const UserPage = () => {
             inputType = 'text'
             value = {email}
             onChangeCB = {setEmail}
-            disabled = {!editing || otherAdmin}
+            disabled = {!editing}
           ></FormInput>
 
           <RoleDropDown 
             roleId = {roleId}
             setRoleIdCB = {setRoleId}
-            disabled = {!editing || self || role === ROLES.ADMIN}
+            disabled = {!editing || self}
           ></RoleDropDown>
+          {self ? <p>Changing self role restricted.</p> : <></>}
 
-          <div className="user-page__form__editing-div">
-          {editing ? 
-            <>
-              <button className="user-page__form__editing-div__cancel-btn cursor_pointer" onClick={cancelEditOnClick}>cancel</button>
-              <button className="user-page__form__editing-div__update-btn cursor_pointer" onClick={updateOnClick}>update</button>
-            </>
-            : <button className="user-page__form__editing-div__edit-btn cursor_pointer" onClick={editOnClick}>edit</button>
+          {otherAdmin 
+            ? <p className="user-page__form__editing-restricted-p">Editing other Admin is restricted.</p> 
+            : editOptions
           }
-          </div>
 
-          <button className='user-page__form__assign-cameras-btn cursor_pointer' onClick={openAssignCamerasModal}>assign cameras</button>
-
-          {(!otherAdmin) ? <button className='user-page__form__del-btn cursor_pointer' onClick={userDeleteOnClick}>delete</button> : <></>}
-
-          <p ref={msgRef}>{msg}</p>
+          <p className={isErrorGen ? 'update-user__p-error' : 'update-user__p-succ'} ref={msgRef}>{msg}</p>
 
           {(modifyLoading) && 
             <div className={(modifyLoading) ? "loading__div" : "offscreen"}>

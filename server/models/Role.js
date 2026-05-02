@@ -25,7 +25,7 @@ RoleSchema.methods.getRoleInfo = function() {
     return  {
         id: this._id.toString(),
         roleName: this.roleName,
-        roldeLevel: this.roleLevel
+        roleLevel: this.roleLevel
     }
 }
 

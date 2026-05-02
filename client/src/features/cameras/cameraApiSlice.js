@@ -17,7 +17,7 @@ const apiSliceWithCameras = apiSlice.injectEndpoints({
             transformResponse: (result, meta, arg) => {
                 // Here to flatten then normalized into an EntityAdapter
                 // response: { reponse, count}
-                return camerasAdapter.setAll(initialState, result.response)
+                return camerasAdapter.setAll(initialState, result?.response)
             }
         }),
         getCamera: builder.query({
@@ -26,7 +26,7 @@ const apiSliceWithCameras = apiSlice.injectEndpoints({
                 url: `/camera/${id}`
             }),
             providesTags: (result, error, id) => {
-                return result.response
+                return result?.response
                     ? [{ type: 'Camera', id }]
                     : []
             }

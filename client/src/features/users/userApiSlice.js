@@ -17,7 +17,7 @@ export const apiSliceWithUsers = apiSlice.injectEndpoints({
             transformResponse: (result, meta, arg) => {
                 // Here to flatten then normalized into an EntityAdapter
                 // response: { reponse, count}
-                return usersAdapter.setAll(initialState, result.response)
+                return usersAdapter.setAll(initialState, result?.response)
             }
         }),
         getUser: builder.query({
@@ -26,7 +26,7 @@ export const apiSliceWithUsers = apiSlice.injectEndpoints({
                 url: `/user/${id}`
             }),
             providesTags: (result, error, id) => {
-                return result.response
+                return result?.response
                 ? [{ type: 'User', id }]
                 : []
             }
@@ -34,7 +34,7 @@ export const apiSliceWithUsers = apiSlice.injectEndpoints({
         register: builder.mutation({
             query: (userInfo) => ({
                 method: 'POST',
-                url: '/user',
+                url: '/user/register',
                 body: {...userInfo}
             }),
             invalidatesTags: (result, error, id) => {

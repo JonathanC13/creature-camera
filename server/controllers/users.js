@@ -53,7 +53,7 @@ const registerUser = async(req, res, next) => {
         sendMail(email, `${config.projectName}, user registered`, body)    // send async
     } catch (e) {
         logger.error('registerUser: ' + e.code + ": " + e.message)
-        const err = new Error()
+        const err = new Error(e.message)
         err.code = e?.code
         err.keyValue = e?.keyValue
         throw err
@@ -73,7 +73,7 @@ const deleteUser = async(req, res, next) => {
 
     const {
         id: adminId
-    } = req.user.id
+    } = req.user
 
     const userDocument = await UserModel.findById(id).exec()
     if (userDocument.roleLevel === 1 && adminId !== userDocument.getId()) {
@@ -90,10 +90,10 @@ const updateUser = async(req, res, next) => {
     const {
         id
     } = req.params
-
+    
     const {
         id: adminId
-    } = req.user.id
+    } = req.user
 
     const {
         subscriptions
@@ -111,6 +111,7 @@ const updateUser = async(req, res, next) => {
         throw new NotFoundError()
     }
     if (userDocument.roleLevel === 1 && adminId !== userDocument.getId()) {
+        console.log(adminId, userDocument.getId())
         // if admin account and not self, cannot modify.
         throw new ForbiddenError("Cannot modify another admin.")
     }
@@ -139,7 +140,7 @@ const updateUser = async(req, res, next) => {
         res.status(StatusCodes.OK).json({response: response.getUserInfo()})
     } catch (e) {
         logger.error('updateUser: ' + e.message)
-        throw new InternalServerError('update user failed.')
+        throw new InternalServerError('update user failed: ' + e.message)
     }
 }
 

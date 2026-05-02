@@ -1,12 +1,14 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
+import Modal from './Modal'
 import VideoPlayerModal from './VideoPlayerModel'
 import RegisterUserModal from './RegisterUserModal';
 import AssignCamerasModal from './AssignCamerasModal';
+import RegisterCameraModal from './RegisterCameraModal'
 
 const ModalManager = () => {
     const { type, props } = useSelector((state) => state.modal);
-
+    
     if (!type) return null;
 
     let content;

@@ -25,11 +25,11 @@ import HomeRedirect from './components/HomeRedirect'
 import DashboardRedirect from './components/DashboardRedirect';
 
 function App() {
+
   return (
     <>
       <Provider store={store}>
         <BrowserRouter>
-          <ModalManager />
           <Routes>
             {/* Public */}
             <Route path="/" element={<HomeRedirect />} />
@@ -77,6 +77,9 @@ function App() {
             {/* catach all */}
             <Route path='*' element={<Missing/>}></Route>
           </Routes>
+
+          <ModalManager />
+
         </BrowserRouter>
       </Provider>
     </>

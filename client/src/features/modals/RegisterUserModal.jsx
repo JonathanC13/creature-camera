@@ -3,7 +3,7 @@ import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router'
 import { useSelector } from 'react-redux'
 
-import { selectRoleById } from '../roles/roleApiSlice'
+import { useGetRolesQuery, selectRoleById } from '../roles/roleApiSlice'
 import { useRegisterMutation } from '../users/userApiSlice'
 import FormInput from '../../components/FormInput'
 import RoleDropDown from '../../components/RoleDropDown'
@@ -16,13 +16,14 @@ const RegisterUserModal = ({ isOpen, onClose, defaultOpen = false }) => {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [roleId, setRoleId] = useState('')
-    const [msg, setMsg] = useStat('')
-
+    const [msg, setMsg] = useState('')
+    const roleInfo = useSelector((state) => selectRoleById(state, roleId));
+    
     const emailRef = useRef()
     const msgRef = useRef()
 
     const { data: roleData, } = useGetRolesQuery()
-    const [register, {data, error, isLoading}] = useRegisterMutation()
+    const [register, {data, error, isError, isLoading}] = useRegisterMutation()
 
     const close = () => {
         if (isControlled) onClose?.();
@@ -42,7 +43,6 @@ const RegisterUserModal = ({ isOpen, onClose, defaultOpen = false }) => {
         setMsg('')
 
         try {
-            const roleInfo = useSelector((state) => selectRoleById(state, roleId));
             if (!roleInfo) {
                 setMsg('Role error')
                 return
@@ -51,12 +51,12 @@ const RegisterUserModal = ({ isOpen, onClose, defaultOpen = false }) => {
             const payload = {
                 name,
                 email,
-                roleId: roleInfo.id,
+                role_id: roleInfo.id,
                 roleLevel: roleInfo.roleLevel,
                 roleName: roleInfo.roleName
             }
 
-            const response = await useRegisterMutation(payload).unwrap()
+            const response = await register(payload).unwrap()
                 .then((res) => {
                     const successMsg = `Registerd. Notify user that an email to ${email} was sent with first time password.`
                     // clear form
@@ -85,7 +85,7 @@ const RegisterUserModal = ({ isOpen, onClose, defaultOpen = false }) => {
   return open ? (
     <section className="register">
         <form onSubmit={registerFormSubmitHandler} className="regiser__form">
-            <h1>Register user</h1>
+            <h1 className='register__form__h1'>Register user</h1>
             <FormInput
                 ref = {null}
                 required = {true}
@@ -103,11 +103,13 @@ const RegisterUserModal = ({ isOpen, onClose, defaultOpen = false }) => {
                 onChangeCB = {setEmail}>
             </FormInput>
             <RoleDropDown
-                value={roleId}
+                roleId={roleId}
                 setRoleIdCB={setRoleId}
             ></RoleDropDown>
-            <button type='submit' disabled={isLoading}>register</button>
-            <p ref={msgRef}>{msg}</p>
+            <div className="register__form__div-btns">
+                <button className='register__form__submit-btn cursor_pointer' type='submit' disabled={isLoading}>register</button>
+            </div>
+            <p className={isError ? 'register__form__p-error' : 'register__form__p-succ'} ref={msgRef}>{msg}</p>
             <div className={isLoading ? "loading__div" : "offscreen"}>
                 {
                     isLoading ? 

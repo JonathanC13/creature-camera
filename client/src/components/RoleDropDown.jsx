@@ -17,11 +17,10 @@ const createOptionComponents = (rolesData) => {
 }
 
 const RoleDropDown = ({
-    roleId = -1,
+    roleId = '',
     setRoleIdCB,
     disabled = false
 }) => {
-
     const {
         data,
         isError,
@@ -30,15 +29,17 @@ const RoleDropDown = ({
     // const rolesInfo = useSelector(selectAllRoles)
     const sortedRoles = useMemo(() => {
         const sortedRoles = []
-        for (let [key, val] of Object.entries(data?.entities)) {
-            sortedRoles.push(val)
-        } 
+        if (data?.entities) {
+            for (let [key, val] of Object.entries(data?.entities)) {
+                sortedRoles.push(val)
+            } 
+            
+            sortedRoles.sort((a, b) => b.roleLevel - a.roleLevel)
+        }
         
-        sortedRoles.sort((a, b) => b.roleLevel - a.roleLevel)
-
         return sortedRoles
     }, [data])  // memo the original data
-    
+
   return (
     <section className="role-drop-down">
         <label className='role-drop-down__label' htmlFor="roles">role: </label>
@@ -49,6 +50,7 @@ const RoleDropDown = ({
                 onChange={(e) => (setRoleIdCB(e.target.value))}
                 disabled={disabled}
             >
+                <option value="" disabled hidden>Choose an option</option>
                 {createOptionComponents(sortedRoles)}
             </select>
         }

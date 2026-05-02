@@ -14,7 +14,7 @@ const login = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const location = useLocation()
-    const from = location.state?.from.pathname ?? '/'
+    // const from = location.state?.from.pathname ?? '/'
 
     // controlled inputs
     const [email, setEmail] = useState('')
@@ -88,7 +88,8 @@ const login = () => {
                     if (!temp) {
                         resetControlledInputs()
                         // navigate to origin
-                        navigate(from, { replace: true })
+                        // navigate(from, { replace: true })
+                        navigate('/', { replace: true })
                     } else {
                         setIsTemp(temp)
                     }
@@ -151,7 +152,7 @@ const login = () => {
                     </FormInput>
                 </div>
                 <button className='login__btn cursor_pointer' type='submit' disabled={isLoading}>log in</button>
-                <p className='login__msg-p' ref={msgRef}>{msg}</p>
+                <p className={isError ? 'login__msg-p-error' : 'login_msg-p-succ'} ref={msgRef}>{msg}</p>
                 <div className={isLoading ? "loading__div" : "offscreen"}>
                     {
                         isLoading ? 

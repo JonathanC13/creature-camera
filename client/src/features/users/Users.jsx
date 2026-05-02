@@ -8,7 +8,7 @@ const Users = () => {
     const dispatch = useDispatch()
 
     const openRegisterModel = () => {
-      dispatch(openModal({ type: "registerUser", }))
+      dispatch(openModal({ type: "registerUser", props: {isOpen: true}}))
     }
 
   return (
