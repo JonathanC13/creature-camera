@@ -17,6 +17,7 @@ const UsersTable = () => {
 
     const {data, refetch, isFetching, isLoading, isError} = useGetAllUsersQuery(undefined, {
         pollingInterval: 600000,  // 10 minutes
+        refetchOnMountOrArgChange: true // to refetch if user was updated on different page.
     })
     
     let content = ''

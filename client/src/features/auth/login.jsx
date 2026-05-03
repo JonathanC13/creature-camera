@@ -132,6 +132,7 @@ const login = () => {
                     value = {email}
                     onChangeCB = {setEmail}
                     disabled = {isLoading ? true : false}
+                    inputId = 'login-email'
                 >
                 </FormInput>
                 <div className="login__form__password">
@@ -148,6 +149,7 @@ const login = () => {
                                 setShowPasswordCB={changeShowPassword}
                             ></ShowPasswordBtn>
                         }
+                        inputId = 'login-password'
                     >
                     </FormInput>
                 </div>

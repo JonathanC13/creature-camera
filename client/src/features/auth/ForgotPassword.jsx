@@ -122,6 +122,7 @@ const ForgotPassword = () => {
                     value = {otp}
                     onChangeCB = {setOtp}
                     disabled = {isLoadingOTP ? true : false}
+                    inputId = 'forgot-password-otp'
                 >
                 </FormInput>
                 <button type='submit'>send otp</button>
@@ -149,6 +150,7 @@ const ForgotPassword = () => {
                     value = {email}
                     onChangeCB = {setEmail}
                     disabled = {isLoadingEmail ? true : false}
+                    inputId = 'forgot-password-email'
                 >
                 </FormInput>
                 <ShowPasswordBtn

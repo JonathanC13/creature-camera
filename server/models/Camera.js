@@ -29,7 +29,8 @@ CameraSchema.methods.getName = function() {
 CameraSchema.methods.getCameraInfo = function() {
     return {
         id: this._id.toString(),
-        name: this.cameraName
+        cameraName: this.cameraName,
+        cameraToken: this.cameraToken
     }
 }
 

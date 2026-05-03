@@ -54,12 +54,14 @@ img {
   --NARVAR-TEXT-COLOR-HOVER: #6D3B47;
   --NARVAR-TEXT-COLOR-ACTIVE: #8A6F78;
   --LIGHT-H1-FONT-COLOR: #fff;
+  --LIGHT-H2-FONT-COLOR: #f4f1f1;
   --LIGHT-TEXT-FONT-COLOR: #f4f1f1;
   --LIGHT-TEXT-BTN-COLOR: #f4f1f1;
   --BG-COLOR: #282F44;
   --CONTAINER-COLOR: #453A49;
   --CONFIRM-BTN-COLOR: #62d75f;
   --CONFIRM-BTN-COLOR-HOVER: #34c230;
+  --SUBMIT-BTN-TEXT-COLOR: black;
   --SUBMIT-TEXT-ERR-COLOR: red;
   --SUBMIT-TEXT-SUCC-COLOR: green;
   --NAVLINK-BG-COLOR: #8A6F78;
@@ -270,7 +272,7 @@ body {
   border-radius: var(--BORDER-BUTTON-RAD);
   padding: var(--PADDING-BTN-GEN);
   background-color: var(--CONFIRM-BTN-COLOR);
-  color: var(--LIGHT-TEXT-BTN-COLOR);
+  color: var(--SUBMIT-BTN-TEXT-COLOR);
 }
 
 .login__btn:hover{
@@ -320,7 +322,7 @@ body {
   border-radius: var(--BORDER-RAD);
   padding: var(--PADDING-BTN-GEN);
   background-color: var(--CONFIRM-BTN-COLOR);
-  color: var(--LIGHT-TEXT-BTN-COLOR);
+  color: var(--SUBMIT-BTN-TEXT-COLOR);
 }
 
 .update-temp-password__submit-btn:hover{
@@ -398,6 +400,7 @@ body {
 
 .users__register-btn {
   background-color: var(--CONFIRM-BTN-COLOR);
+  color: var(--SUBMIT-BTN-TEXT-COLOR);
   border: var(--BORDER-BTN-GEN);
   border-radius: var(--BORDER-BUTTON-RAD);
   padding: var(--PADDING-BTN-GEN);
@@ -493,7 +496,27 @@ body {
   align-items: center;
   gap: var(--FLEX-GAP);
   padding: var(--PADDING-GEN);
+}
 
+.user-page-cameras__div {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--LABEL-INPUT-GAP);
+}
+
+.user-page-cameras__title {
+  color: var(--LIGHT-TEXT-FONT-COLOR);
+}
+
+.user-page-cameras__p {
+  word-wrap: normal;
+  padding: var(--PADDING-FORM-INPUT);
+  background-color: var(--INPUT-BG-COLOR-DISABLED);
+}
+
+.restricted__p {
+  color: var(--RESTRICTED-COLOR);
 }
 
 .user-edit-options {
@@ -526,6 +549,7 @@ body {
   border: var(--BORDER-BTN-GEN);
   border-radius: var(--BORDER-BUTTON-RAD);
   background-color: var(--CONFIRM-BTN-COLOR);
+  color: var(--SUBMIT-BTN-TEXT-COLOR);
 }
 
 .user-edit-options__editing-div__update-btn:hover {
@@ -635,6 +659,7 @@ body {
   border-radius: var(--BORDER-BUTTON-RAD);
   padding: var(--PADDING-BTN-GEN);
   background-color: var(--CONFIRM-BTN-COLOR);
+  color: var(--SUBMIT-BTN-TEXT-COLOR);
 }
 
 .register__form__submit-btn:hover {
@@ -649,6 +674,89 @@ body {
   color: var(--SUBMIT-TEXT-SUCC-COLOR);
 }
 /* /register modal form */
+
+/* assign-cameras-modal */
+.assign-cameras-modal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--FLEX-GAP);
+}
+
+.assign-cameras-modal__h1 {
+  font-size: var(--H1-SIZE);
+  color: var(--LIGHT-H1-FONT-COLOR);
+}
+
+.assign-cameras-modal__refetch-btn {
+  border: var(--BORDER-BTN-GEN);
+  border-radius: var(--BORDER-BUTTON-RAD);
+  width: fit-content;
+  padding: var(--PADDING-BTN-GEN);
+}
+
+.dual-listbox-container {
+  display: flex;
+  align-items: center;
+  gap: var(--FLEX-GAP);
+}
+
+.assign-cameras-grid-wrapper {
+  display: grid;
+  grid-template-columns: 3fr 1fr 3fr;
+  border: var(--BORDER-GEN);
+  border-radius: var(--BORDER-RAD);
+}
+
+.assign-cameras-grid-wrapper__div {
+  padding: var(--PADDING-GEN);
+  display: flex;
+  flex-direction: column;
+}
+
+.dual-listbox-container__move-div {
+  padding: var(--PADDING-GEN);
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.dual-listbox-container__div__h2 {
+  color: var(--LIGHT-H2-FONT-COLOR);
+}
+
+.dual-listbox-container__avail-select, .dual-listbox-container__assigned-select {
+  padding: var(--PADDING-FORM-INPUT);
+  width: 100%;
+  height: 100%;
+}
+
+.dual-listbox-container__div__add-btn, .dual-listbox-container__div__remove-btn, .dual-listbox-container__div__deselect-curr {
+  padding: var(--PADDING-BTN-GEN);
+  /* font-weight: 700; */
+}
+
+.dual-listbox__update-btn {
+  border: none;
+  border-radius: var(--BORDER-RAD);
+  padding: var(--PADDING-BTN-GEN);
+  background-color: var(--CONFIRM-BTN-COLOR);
+  color: var(--SUBMIT-BTN-TEXT-COLOR);
+}
+
+.dual-listbox__update-btn:hover{
+  background-color: var(--CONFIRM-BTN-COLOR-HOVER);
+}
+
+.assign-cameras-modal__p-error {
+  color: var(--SUBMIT-TEXT-ERR-COLOR);
+}
+
+.assign-cameras-modal__p-succ {
+  color: var(--SUBMIT-TEXT-SUCC-COLOR);
+}
+/* /assign-cameras-modal */
 
 /* LOADER */
 .loading__div {

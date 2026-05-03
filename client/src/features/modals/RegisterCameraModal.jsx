@@ -65,6 +65,7 @@ const RegisterCameraModal = () => {
                 inputType = 'text'
                 value = {cameraName}
                 onChangeCB = {setCameraName}
+                inputId = 'register-camera-name'
             ></FormInput>
             <FormInput
                 ref = {null}
@@ -73,6 +74,7 @@ const RegisterCameraModal = () => {
                 inputType = 'text'
                 value = {cameraToken}
                 onChangeCB = {setCameraToken}
+                inputId = 'register-camera-token'
             ></FormInput>
 
             <button className='register-camera-modal__form__submit-btn' type='submit'>register</button>

@@ -99,6 +99,7 @@ const UpdateTempPassword = ({
                     showPassword={showPassword}
                     setShowPasswordCB={changeShowPassword}
                 ></ShowPasswordBtn>}
+                inputId = 'update-temp-pass-password'
             >
             </FormInput>
         </div>
@@ -115,6 +116,7 @@ const UpdateTempPassword = ({
                     showPassword={showConfirm}
                     setShowPasswordCB={changeShowConfirmPassword}
                 ></ShowPasswordBtn>}
+                inputId = 'update-temp-pass-confirm'
             >
             </FormInput>
         </div>

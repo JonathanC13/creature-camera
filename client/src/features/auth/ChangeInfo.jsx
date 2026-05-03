@@ -82,6 +82,7 @@ const ChangeInfo = () => {
                 value = {name}
                 onChangeCB = {setName}
                 disabled = {isLoadingUpdate ? true : false}
+                inputId = 'change-info-name'
             ></FormInput>
             <FormInput
                 ref = {null}
@@ -91,6 +92,7 @@ const ChangeInfo = () => {
                 value = {email}
                 onChangeCB = {setEmail}
                 disabled = {isLoadingUpdate ? true : false}
+                inputId = 'change-info-email'
             ></FormInput>
             <div className="change-info__form__notify-div">
                 <label for="notifyAlways">Notify for every upload (else one email for first upload until next log in.)</label>

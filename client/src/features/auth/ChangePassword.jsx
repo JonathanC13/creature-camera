@@ -96,6 +96,7 @@ const ChangePassword = () => {
                     value = {currPassword}
                     onChangeCB = {setCurrPassword}
                     disabled = {isLoading ? true : false}
+                    inputId = 'change-password-curr'
                 ></FormInput>
                 <ShowPasswordBtn
                     showPassword={showCurr}
@@ -111,6 +112,7 @@ const ChangePassword = () => {
                     value = {newPassword}
                     onChangeCB = {setNewPassword}
                     disabled = {isLoading ? true : false}
+                    inputId = 'change-password-new'
                 ></FormInput>
                 <ShowPasswordBtn
                     showPassword={showNew}
@@ -126,6 +128,7 @@ const ChangePassword = () => {
                     value = {confirmPassword}
                     onChangeCB = {setConfirmPassword}
                     disabled = {isLoading ? true : false}
+                    inputId = 'change-password-confirm'
                 ></FormInput>
                 <ShowPasswordBtn
                     showPassword={showConfirm}

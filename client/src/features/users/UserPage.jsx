@@ -1,10 +1,10 @@
 import React from 'react'
 import { useState, useRef, useEffect } from 'react'
 import { useLogoutMutation } from '../auth/authApiSlice'
-import { loggedOut } from '../auth/authSlice'
+import { loggedOut, userInfoSet } from '../auth/authSlice'
 import { useGetUserQuery, useUpdateUserMutation, useDeleteUserMutation } from './userApiSlice'
-import { userInfoSet } from '../auth/authSlice'
 import { useGetRolesQuery, selectRoleById } from '../roles/roleApiSlice'
+import { useGetAllCamerasQuery, selectCameraEntities } from '../cameras/cameraApiSlice'
 import { useNavigate, NavLink, useParams } from "react-router"
 import { useSelector, useDispatch } from 'react-redux'
 import FormInput from '../../components/FormInput'
@@ -22,6 +22,7 @@ const UserPage = () => {
     const auth = useSelector(state => state.auth)
     const { data, isLoading, isError, refetch } = useGetUserQuery(id)
     const { data: dataRoles } = useGetRolesQuery()
+    const { data: dataCameras } = useGetAllCamerasQuery()
     const [updateUser, {isLoading: isLoadingUpdate, isError: isErrorUpdate}] = useUpdateUserMutation()
     const [deleteUser, {isLoading: isLoadingDelete, isError: isErrorDelete}] = useDeleteUserMutation()
     const [logOut, {}] = useLogoutMutation()
@@ -38,6 +39,9 @@ const UserPage = () => {
     const [msg, setMsg] = useState('')
     const roleOrgInfo = useSelector((state) => selectRoleById(state, roleIdOrg))
     const roleInfo = useSelector((state) => selectRoleById(state, roleId))
+    let camerasAssigned = new Array()
+    const [cameraNames, setCameraNames] = useState('')
+    const cameraEntities = useSelector(selectCameraEntities)
     
     const msgRef = useRef()
 
@@ -54,6 +58,9 @@ const UserPage = () => {
           setEmail(data?.response.email)
           setRoleIdOrg(data?.response.role_id)
           setRoleId(data?.response.role_id)
+          
+          camerasAssigned = (cameraEntities && data?.response?.subscriptions) ? Object.entries(cameraEntities).filter(item => data.response.subscriptions.includes(item[0])) : []
+          setCameraNames(camerasAssigned.map((e) => e[1].cameraName).join(', '))
         }
     }
 
@@ -110,7 +117,7 @@ const UserPage = () => {
 
     const openAssignCamerasModal = () => {
       dispatch(openModal({ type: "assignCameras", props: {
-        id: data.id
+        id: data?.response.id
       }}))
     }
 
@@ -186,7 +193,13 @@ const UserPage = () => {
             setRoleIdCB = {setRoleId}
             disabled = {!editing || self}
           ></RoleDropDown>
-          {self ? <p>Changing self role restricted.</p> : <></>}
+
+          <div className="user-page-cameras__div">
+            <p className="user-page-cameras__title">Cameras assigned:</p>
+            <p className='user-page-cameras__p'>{cameraNames}</p>
+          </div>
+
+          {self ? <p className='restricted__p'>Changing self role restricted.</p> : <></>}
 
           {otherAdmin 
             ? <p className="user-page__form__editing-restricted-p">Editing other Admin is restricted.</p> 

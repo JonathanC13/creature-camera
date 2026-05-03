@@ -9,15 +9,17 @@ const FormInput = (
         value = null,
         onChangeCB = () => {},
         disabled = false,
-        inclineComp
+        inclineComp,
+        inputId
     }
 ) => {
 
   return (
     <section className='form-input'>
-        <label className='form-input__label'>{text}</label>
+        <label className='form-input__label' htmlFor={inputId}>{text}</label>
         <div className="form-input__div">
             <input className='form-input__div__input' 
+                id={inputId}
                 ref={ref}
                 type = {inputType}
                 required={required}

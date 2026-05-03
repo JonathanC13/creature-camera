@@ -1,14 +1,18 @@
 import React from 'react'
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { useGetRolesQuery, selectRoleById } from '../roles/roleApiSlice'
 import { useRegisterMutation } from '../users/userApiSlice'
 import FormInput from '../../components/FormInput'
 import RoleDropDown from '../../components/RoleDropDown'
 
+import { closeModal } from "./modalSlice";
+
 const RegisterUserModal = ({ isOpen, onClose, defaultOpen = false }) => {
+    const dispatch = useDispatch()
+
     const [internalOpen, setInternalOpen] = useState(defaultOpen)
     const isControlled = isOpen !== undefined
     const open = isControlled ? isOpen : internalOpen
@@ -63,6 +67,7 @@ const RegisterUserModal = ({ isOpen, onClose, defaultOpen = false }) => {
                     resetControlledInputs()
                     setMsg(successMsg)
                     msgRef.current.focus()
+                    dispatch(closeModal())
                 })
                 .catch((error) => {
                     // console.log(error)
@@ -92,7 +97,9 @@ const RegisterUserModal = ({ isOpen, onClose, defaultOpen = false }) => {
                 text = 'name'
                 inputType = 'text'
                 value = {name}
-                onChangeCB = {setName}>
+                onChangeCB = {setName}
+                inputId = 'register-user-name'
+                >
             </FormInput>
             <FormInput
                 ref = {emailRef}
@@ -100,7 +107,9 @@ const RegisterUserModal = ({ isOpen, onClose, defaultOpen = false }) => {
                 text = 'email'
                 inputType = 'text'
                 value = {email}
-                onChangeCB = {setEmail}>
+                onChangeCB = {setEmail}
+                inputId = 'register-user-email'
+                >
             </FormInput>
             <RoleDropDown
                 roleId={roleId}

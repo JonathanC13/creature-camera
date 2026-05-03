@@ -2,7 +2,7 @@ import React from 'react'
 import { memo } from 'react'
 import { Link } from 'react-router'
 
-const UsersRow = memo(({
+const UsersRow = ({
     headers,
     user
 }) => {
@@ -24,6 +24,6 @@ const UsersRow = memo(({
         {cellComps}
     </tr>
   )
-})
+}
 
 export default UsersRow

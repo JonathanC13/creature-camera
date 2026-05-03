@@ -1,8 +1,8 @@
 import React from 'react'
 import { useState, useEffect, useRef } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useGetAllCamerasQuery, selectCameraEntities } from '../cameras/cameraApiSlice'
-import { useUpdateUserMutation } from '../users/userApiSlice'
+import { useGetUserQuery, useUpdateUserMutation } from '../users/userApiSlice'
 import { closeModal } from "../modals/modalSlice"
 
 // Item Component for displaying each list item
@@ -20,6 +20,7 @@ const ListItem = ({ item, onSelect }) => (
 const AssignCamerasModal = ({
     id
 }) => {
+  const dispatch = useDispatch()
 
   const msgRef = useRef()
   const [msg, setMsg] = useState()
@@ -27,19 +28,22 @@ const AssignCamerasModal = ({
   const [ updateUser, { isLoading: isLoadingUpdate, isError: isErrorUpdate }] = useUpdateUserMutation()
   const { data: userData, isLoading: isLoadingUser, isError: isErrorUser, refetch: retechUser } = useGetUserQuery(id)
   const { data, isLoading: isLoadingCameras, refetch, isFetching, isError: isErrorCameras } = useGetAllCamerasQuery()
+
+  const camerasInfo = data?.entities ? Object.entries(data.entities).map((e) => e[1]) : []
+  
   // const cameraLookup = useSelector(selectCameraEntities)
   const isLoading = isLoadingUser || isLoadingCameras
   const isError = isErrorUser || isErrorCameras
 
-  const [assignedCameras, setAssignedCameras] = useState(userData?.subscriptions)  // ids
+  const [assignedCameras, setAssignedCameras] = useState(userData?.response.subscriptions)  // ids
 
   // current selected in each box.
   const [activeAvailable, setActiveAvailable] = useState([])
   const [activeSelected, setActiveSelected] = useState([])
 
   // derive seperate lists
-  const availableItems = data.filter(item => !assignedCameras.includes(item.id));
-  const selectedItems = data.filter(item => assignedCameras.includes(item.id));
+  const availableItems = assignedCameras ? camerasInfo.filter(item => !assignedCameras.includes(item.id)) : []
+  const selectedItems = assignedCameras ? camerasInfo.filter(item => assignedCameras.includes(item.id)) : []
 
   // useEffect(() => {
   // }, [data])
@@ -62,6 +66,11 @@ const AssignCamerasModal = ({
 
     setActiveSelected([])
   };
+
+  const deselectAll = () => {
+    setActiveAvailable([])
+    setActiveSelected([])
+  }
   
   const updateUserOnClick = async() => {
     setMsg('')
@@ -75,7 +84,8 @@ const AssignCamerasModal = ({
       // updateUser will invalidate cache for id, so the UserPage data will refetch.
       const response = await updateUser(payload).unwrap()
         .then((res) => {
-          closeModal()
+          setMsg('Successfully assigned.')
+          dispatch(closeModal())
         })
         .catch((error) => {
             // console.log(error)
@@ -96,50 +106,65 @@ const AssignCamerasModal = ({
   }
 
   const dualListbox =
-    <div className="dual-listbox-container">
-      <div className="dual-listbox-container__div">
-        <h2 className="dual-listbox-container__div__h2">Available</h2>
-        <select
-          multiple
-          value={activeAvailable}
-          onChange={e =>
-            setActiveAvailable(
-              Array.from(e.target.selectedOptions, opt => opt.value)
-            )
-          }
-        >
-          {availableItems.map(item => (
-            <option key={item.id} value={item.id}>
-              {item.cameraName}
-            </option>
-          ))}
-        </select>
-      </div>
+    <>
+      <div className="dual-listbox-container">
+        <div className="assign-cameras-grid-wrapper">
+          <div className="assign-cameras-grid-wrapper__div">
+            <h2 className="dual-listbox-container__div__h2">Available</h2>
+          </div>
+          <div className="assign-cameras-grid-wrapper__div"></div>
+          <div className="assign-cameras-grid-wrapper__div">
+            <h2 className="dual-listbox-container__div__h2">Assigned</h2>
+          </div>
 
-      <div className="dual-listbox-container__div">
-        <button className="dual-listbox-container__div__add-btn" onClick={moveToSelected}>{'>>'}</button>
-        <button className="dual-listbox-container__div__remove-btn" onClick={moveToAvailable}>{'<<'}</button>
-      </div>
 
-      <div className="dual-listbox-container__div">
-        <h2 className="dual-listbox-container__div__h2">Assigned</h2>
-        <select
-          multiple
-          value={activeSelected}
-          onChange={e =>
-            setActiveSelected(
-              Array.from(e.target.selectedOptions, opt => opt.value)
-            )
-          }
-        >
-          {selectedItems.map(item => (
-            <option key={item.id} value={item.id}>
-              {item.cameraName}
-            </option>
-          ))}
-        </select>
+          <div className="assign-cameras-grid-wrapper__div">
+            <select
+              className='dual-listbox-container__avail-select'
+              multiple
+              value={activeAvailable}
+              onChange={e =>
+                setActiveAvailable(
+                  Array.from(e.target.selectedOptions, opt => opt.value)
+                )
+              }
+            >
+              {availableItems.map(item => (
+                <option key={item.id} value={item.id}>
+                  {item.cameraName}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="dual-listbox-container__move-div">
+            <button className="dual-listbox-container__div__add-btn cursor_pointer" onClick={moveToSelected}>{'>>'}</button>
+            <button className="dual-listbox-container__div__remove-btn cursor_pointer" onClick={moveToAvailable}>{'<<'}</button>
+            <button className="dual-listbox-container__div__deselect-curr cursor_pointer" onClick={deselectAll}>{'de-select'}</button>
+          </div>
+
+          <div className="assign-cameras-grid-wrapper__div">
+            <select
+              className='dual-listbox-container__avail-select'
+              multiple
+              value={activeSelected}
+              onChange={e =>
+                setActiveSelected(
+                  Array.from(e.target.selectedOptions, opt => opt.value)
+                )
+              }
+            >
+              {selectedItems.map(item => (
+                <option key={item.id} value={item.id}>
+                  {item.cameraName}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
-    </div>
+      <button className='dual-listbox__update-btn cursor_pointer' onClick={updateUserOnClick} disabled={isLoadingUpdate}>Finalize</button>
+    </>
 
   let content = ''
   if (isError) {
@@ -157,14 +182,13 @@ const AssignCamerasModal = ({
     content = 
       <>
         {dualListbox}
-        <button onClick={updateUserOnClick} disabled={isLoadingUpdate}>Finalize</button>
       </>
   }
     
   return (
     <section className='assign-cameras-modal'>
       <h1 className="assign-cameras-modal__h1">Assign cameras</h1>
-      <button onClick={refetch} disabled={isFetching}>
+      <button className='assign-cameras-modal__refetch-btn cursor_pointer' onClick={refetch} disabled={isFetching}>
         {isFetching ? 'Refreshing...' : 'Refresh Data'}
       </button>
 
@@ -177,7 +201,7 @@ const AssignCamerasModal = ({
             <></>
         }
       </div>
-      <p className='assign-cameras-modal__p' ref={msgRef}>{msg}</p>
+      <p className={isErrorUpdate ? 'assign-cameras-modal__p-error' : 'assign-cameras-modal__p-succ'} ref={msgRef}>{msg}</p>
       
     </section>
   )

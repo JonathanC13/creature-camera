@@ -13,7 +13,7 @@ const logger = require('../logging/logger')
 const getAllCameras = async(req, res, next) => {
     const response = await CameraModel.find({}).exec()
 
-    res.status(StatusCodes.OK).json({response, count: response.length})
+    res.status(StatusCodes.OK).json({response: response.map((e) => e.getCameraInfo()), count: response.length})
 }
 
 /**
@@ -32,7 +32,7 @@ const getCamera = async(req, res, next) => {
         throw new NotFoundError(`Camera with id: ${cameraId} does not exist`)
     }
 
-    res.status(StatusCodes.OK).json({response})
+    res.status(StatusCodes.OK).json({response: response.getCameraInfo()})
 }
 
 /**
@@ -53,7 +53,7 @@ const createCamera = async(req, res, next) => {
 
     try {
         const response = await CameraModel.create({...req.body})
-        res.status(StatusCodes.CREATED).json({response})
+        res.status(StatusCodes.CREATED).json({response: response.getCameraInfo()})
     } catch (e) {
         logger.error('createCamera: ' + e.message)
         const err = new Error()
@@ -87,7 +87,7 @@ const updateCamera = async(req, res, next) => {
             throw new NotFoundError(`Camera with id: ${cameraId} does not exist`)
         }
 
-        res.status(StatusCodes.OK).json({response})
+        res.status(StatusCodes.OK).json({response: response.getCameraInfo()})
     } catch (e) {
         logger.error('updateCamera: ' + e.message)
         throw new InternalServerError('Update camera failed.')
