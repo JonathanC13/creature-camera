@@ -48,13 +48,17 @@ const getSubVideos = async(req, res, next) => {
                     videoInfo['filename'] = file
                     videoInfo['birthtime'] = stats.birthtime
                     videoInfo['size'] = stats.size
-                    ffmpeg.ffprobe(filePath, (err, metadata) => {
-                        if (err) {
-                            videoInfo['length_s'] = 0
-                            return;
-                        }
-                        videoInfo['length_s'] = metadata.format.duration
-                    });
+                    
+                    
+                    videoInfo['length_s'] = await getVideoDurationInSeconds(filePath)
+                    // await ffmpeg.ffprobe(filePath, (err, metadata) => {
+                    //     if (err) {
+                    //         videoInfo['length_s'] = 0
+                    //         return;
+                    //     }
+                        
+                    //     videoInfo['length_s'] = metadata.format.duration
+                    // });
 
                     // get thumbnail
                     const name = file.split('.')[0]

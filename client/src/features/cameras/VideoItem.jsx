@@ -37,12 +37,12 @@ const VideoItem = memo(({
 
   return (
     <li className='video-item'>
-      <section className="video-item__section">
+      <section className="video-item__section cursor_pointer" onclick={thumbnailOnClickHandler}>
         <h3 className='video-item__section__h2'>{filename}</h3>
-        <img src={baseURL + thumbnail} alt={filename} className="video-item__section__img" onclick={thumbnailOnClickHandler}/>
+        <img src={baseURL + thumbnail} alt={filename} className="video-item__section__img"/>
         <ul className='video-item__ul'>
           {descriptionItem('upload time', birthtime)}
-          {descriptionItem('length (seconds)', length_s)}
+          {descriptionItem('length (seconds)', length_s === 0 ? 'Could not retrieve length' : length_s)}
           {descriptionItem('size', size)}
         </ul>
       </section>
