@@ -16,6 +16,7 @@ Server
     readline-sync
     npm install @ffmpeg-installer/ffmpeg @ffprobe-installer/ffprobe
     fluent-ffmpeg
+    get-video-duration
 
     * Setup in .env
         ACCESS_CONTROL_ALLOW_ORIGIN = "https://www.jonRPI.com"

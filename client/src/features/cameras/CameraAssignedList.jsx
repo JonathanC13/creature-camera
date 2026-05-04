@@ -3,11 +3,12 @@ import CameraAssignedItem from './CameraAssignedItem'
 import { useGetSubVideosQuery } from './videosApiSlice'
 
 const createCameraItemComps = (data) => {
-  return data.map((e) => {
+  return data.map((e) => 
     <CameraAssignedItem 
+      key={e.id}
       camera={e}
     />
-  })
+  )
 }
 
 const CameraList = () => {
@@ -15,6 +16,7 @@ const CameraList = () => {
     const {data, refetch, isFetching, isLoading, isError} = useGetSubVideosQuery(undefined, {
       pollingInterval: 600000,  // 10 minutes
     })
+    const dataResp = data?.response ? data.response : []
     
     let content = ''
     if (isError) {
@@ -31,9 +33,9 @@ const CameraList = () => {
     } else {
       content =
         <ul className='camera-assigned__ul'>
-          {data.response.length === 0 
+          {dataResp.length === 0 
             ? <p className='camera-assigned__p'>No assigned cameras, request assignment with an admin.</p>
-            : createCameraItemComps(data.response)}
+            : createCameraItemComps(dataResp)}
         </ul>
     }
 

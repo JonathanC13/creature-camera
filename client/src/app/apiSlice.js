@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react'
 import { tokenSet, loggedOut } from '../features/auth/authSlice'
 
-const url = import.meta.env.VITE_BACKEND_URL //'http://localhost:5000/api/v1/' // import.meta.env.REACT_APP_BE_URL + '/auth' || 
+const url = import.meta.env.VITE_BACKEND_API_URL //'http://localhost:5000/api/v1/' // import.meta.env.REACT_APP_BE_URL + '/auth' || 
 
 const baseQuery = retry(fetchBaseQuery({
     baseUrl: url,

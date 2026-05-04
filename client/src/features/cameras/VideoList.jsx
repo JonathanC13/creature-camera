@@ -2,17 +2,17 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import VideoItem from './VideoItem'
 
-const VideoList = (
+const VideoList = ({
     cameraId,
-    videosProp = []
-) => {
+    videosArr = []
+}) => {
     // const sortCategory = localStorage.getItem(cameraId + '__cate')
     if (!localStorage.getItem(cameraId + '__sortDesc')) {
         localStorage.setItem(cameraId + '__sortDesc', true)
     }
     const sortDesc = localStorage.getItem(cameraId + '__sortDesc')
 
-    const [videos, setVideos] = useState(videosProp)
+    const [videos, setVideos] = useState(videosArr)
     const [descUploadTime, setDescUploadTime] = useState(sortDesc ?? true)
 
     const toggleDescUploadTime = () => {

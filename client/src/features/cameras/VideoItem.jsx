@@ -17,17 +17,20 @@ const VideoItem = memo(({
       filename,
       birthtime,
       size,
-      length,
+      length_s,
       thumbnail
     } = videoInfo
-
+    
     const dispatch = useDispatch()
+
+    const baseURL = import.meta.env.VITE_BACKEND_BASE_URL
+    const apiURL = import.meta.env.VITE_BACKEND_API_URL
 
     const thumbnailOnClickHandler = (e) => {
       dispatch(openModal({ type: "videoPlayer", 
         props: { 
           filename: filename,
-          url: import.meta.env.VITE_BACKEND_URL + 'video/src/' + `?id=${cameraId}&filename=${filename}`
+          url: apiURL + 'video/src/' + `?id=${cameraId}&filename=${filename}`
         }})
       )
     }
@@ -36,10 +39,10 @@ const VideoItem = memo(({
     <li className='video-item'>
       <section className="video-item__section">
         <h3 className='video-item__section__h2'>{filename}</h3>
-        <img src={thumbnail} alt={filename} className="video-item__section__img" onclick={thumbnailOnClickHandler}/>
+        <img src={baseURL + thumbnail} alt={filename} className="video-item__section__img" onclick={thumbnailOnClickHandler}/>
         <ul className='video-item__ul'>
           {descriptionItem('upload time', birthtime)}
-          {descriptionItem('length', length)}
+          {descriptionItem('length (seconds)', length_s)}
           {descriptionItem('size', size)}
         </ul>
       </section>

@@ -600,7 +600,60 @@ body {
 .camera-assigned__p {
   color: var(--LIGHT-TEXT-FONT-COLOR);
 }
+
+.camera-assigned__ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--FLEX-GAP);
+}
+
+.camera-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--FLEX-GAP);
+  border: var(--BORDER-GEN);
+  border-radius: var(--BORDER-RAD);
+  padding: var(--PADDING-GEN);
+}
+
+.camera-item__h2 {
+  color: var(--LIGHT-TEXT-FONT-COLOR);
+}
 /* /camera-assigned */
+
+/* video list */
+
+.video-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--FLEX-GAP);
+}
+
+.video-list__ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--FLEX-GAP);
+  width: 100%;
+  max-height: 400px; /* Set your maximum height limit */
+  overflow-y: auto;  /* Adds vertical scrollbar only when content overflows */
+  border: 1px solid #ccc; /* Optional: adds a visual border */
+  padding: var(--PADDING-GEN);
+  list-style-type: none;
+}
+
+.video-item__section {
+  border: var(--BORDER-GEN);
+  padding: var(--PADDING-GEN);
+  display: flex;
+  flex-direction: column;
+  gap: var(--FLEX-GAP);
+}
+
+.video-item__section__img {
+  width: 25%;
+  height: auto;
+}
+/* /video list */
 
 /* Modal */
 .modal-overlay {

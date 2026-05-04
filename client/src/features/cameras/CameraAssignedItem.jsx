@@ -11,8 +11,8 @@ const CameraAssignedItem = ({
     <section className='camera-item'>
       <h2 className="camera-item__h2">{cameraName}</h2>
       <VideoList
-        id
-        videos
+        cameraId={id}
+        videosArr={videos}
       />
     </section>
   )

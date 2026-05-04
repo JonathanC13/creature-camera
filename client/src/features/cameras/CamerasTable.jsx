@@ -1,5 +1,6 @@
 import React from 'react'
-import { useGetAllCamerasQuery } from './cameraApiSlice'
+import { useSelector } from 'react-redux'
+import { authSlice } from '../auth/authSlice'
 
 const CamerasTable = () => {
     const headers = new Map[
@@ -15,6 +16,8 @@ const CamerasTable = () => {
     const {data, refetch, isFetching, isLoading, isError} = useGetAllCamerasQuery(undefined, {
         pollingInterval: 600000,  // 10 minutes
     })
+    
+    const camerasInfoArr = data?.entities ? Object.entries(data.entities).map((e) => e[1]) : []
 
     let content = ''
     if (isError) {
@@ -32,8 +35,8 @@ const CamerasTable = () => {
         content =
             <table className='cameras-table'>
                 <tr className='cameras-table__header-tr'>{headerComps}</tr>
-                {data.map(camera => (
-                    <CamerasRow key={user.id} headers={headers} camera={camera} />
+                {camerasInfoArr.map(camera => (
+                    <CamerasRow key={camera.id} headers={headers} camera={camera} />
                 ))}
             </table>
     }
