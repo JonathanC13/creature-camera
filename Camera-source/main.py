@@ -33,7 +33,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         logger.critical(f"ERR: Could not open video stream with URL, check .env")
         return
     
-    maskDebug = True
+    maskDebug = False
     CompareImagesObj = CompareImages((CameraControlObj.width, CameraControlObj.height), maskDebug=maskDebug)
     
     uploadVideoThreadsQueue = deque()
@@ -114,9 +114,9 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
                 
                 # once recording is finised upload to server create thread to upload to server
                 #print(recordFilename)
-                #threadUploadVideo = threading.Thread(target=req_uploadVideo, args=(recordFilename,))
-                #threadUploadVideo.start()
-                #uploadVideoThreadsQueue.append(threadUploadVideo)
+                threadUploadVideo = threading.Thread(target=req_uploadVideo, args=(recordFilename,))
+                threadUploadVideo.start()
+                uploadVideoThreadsQueue.append(threadUploadVideo)
                 
                 recordFilename = ""
                 
@@ -137,7 +137,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
             recordExtended = 0
             startRecordIntervalTime = time.time()
             startRecordTime = time.time()
-            recordFilename = f"recorded_{timeStamp}.avi"
+            recordFilename = f"recorded_{timeStamp}.mp4"
             CameraControlObj.setRecord(True, recordFolder + f"/{recordFilename}")
         
         if (CameraControlObj.getRecord() == True and processedFrame is not None):
@@ -157,6 +157,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         logger.info('Joined.')
             
     print('\n**Current camera session completed.**\n')
+    print('Enter a settings selection for the next session.')
     logger.info('===/ Camera Thread ===')
     return
         

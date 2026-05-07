@@ -57,7 +57,7 @@ class CameraControl:
         return self.record
         
     def setRecordProperties(self):
-        self.fourcc = cv2.VideoWriter_fourcc(*'XVID')  # Or 'MJPG', 'H264', etc.
+        self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # mp4 files so client browser can load into <source>
         self.fps = self.capture.get(cv2.CAP_PROP_FPS)
         self.width = int(self.capture.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.height = int(self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))

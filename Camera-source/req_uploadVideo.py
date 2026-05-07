@@ -39,8 +39,8 @@ def req_uploadVideo(recordFilename):
             
             # POST request
             # (fieldname: (recordFilename, file_object, content_type, headers))
-            file = {'file': (f"{recordFilename}", openedFile, 'video/avi')}
-            data = {"cameraName": config['SETTINGS']["camera_name"]}
+            file = {'file': (f"{recordFilename}", openedFile, 'video/mp4')}
+            data = {}
             response = requests.post(api_uploadVideoURL, files=file, data=data, headers=headers)
             logger.info(f'req_uploadVideo: Upload sending to {api_uploadVideoURL}...')
         

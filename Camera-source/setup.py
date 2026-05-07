@@ -177,7 +177,6 @@ def checkConfigFileExists():
         
     configSettings = {
             "comment" : "If application has erros related to this config file, either manually configure or delete this file then re-run.",
-            "camera_name" : "this camera",
             "recorded_path" : currPath + "/recorded",
             "max_recording_length_in_seconds" : "60"
             #"api_uploadVideoURL" : "http://192.168.1.2:5000/api/v1/uploadVideo"
