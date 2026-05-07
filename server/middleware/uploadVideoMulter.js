@@ -25,11 +25,20 @@ const uploadVideoMulter = async(req, res, next) => {
             callback(null, dest);
         },
         filename: function (req, file, callback) {
-            callback(null, file.originalname);
+            // const extArray = file.mimetype.split('/')
+            // const ext = extArray[extArray.length - 1]
+            // console.log(extArray, ext)
+            callback(null, Math.round(Math.random() * 1e9) + '-' + file.originalname);
         }
     });
 
-    const upload = multer({ storage: storage, fileFilter: videoFileFilter }).single('file');    // That upload object has several methods (single, array, fields, none, etc.), and each method returns a middleware function that Express can use.
+    const upload = multer({ 
+        storage: storage, 
+        fileFilter: videoFileFilter, 
+        limits: {
+            fileSize: 1024 * 1024 * 500 // 500MB
+        }
+    }).single('file');    // That upload object has several methods (single, array, fields, none, etc.), and each method returns a middleware function that Express can use.
 
     upload(req, res, (err) => {
         if (err instanceof multer.MulterError) {

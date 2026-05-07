@@ -8,7 +8,7 @@ const path = require('path')
 const logger = require('../logging/logger')
 const config = require('../config')
 
-function createThumbnail(src, subFolder, filenamePrefix) {
+async function createThumbnail(src, subFolder, filenamePrefix) {
     const filename = `${filenamePrefix}-tb.png`
     const dir = path.join(config.thumbnailFolder, subFolder)
     ffmpeg(src)

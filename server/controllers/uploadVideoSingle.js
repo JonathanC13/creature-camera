@@ -37,7 +37,7 @@ const uploadVideoSingle = async(req, res, next) => {
             const thumbnailDir = path.join(config.base, 'public', config.thumbnailFolder, id)
             if ((await directoryExistsOrCreate(thumbnailDir))) {
                 // file created, create one time thumbnail
-                createThumbnail(filePath, id, filename.split('.')[0])
+                await createThumbnail(filePath, id, filename.split('.')[0]) // must await so that multer finishes uploaded the video before attempting to access the file.
             }
             // //else throw new NotFoundError('Thumbnail directory not found.')
             

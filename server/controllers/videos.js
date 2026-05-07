@@ -67,7 +67,7 @@ const getSubVideos = async(req, res, next) => {
                     
                     if (!await fileExists(thumbnailFilepath)) {
                         // Since writing only if not exists. No race condition from 'check-then-act'.
-                        const [dir, filename] = createThumbnail(filePath, folderName, name)
+                        const [dir, filename] = await createThumbnail(filePath, folderName, name)
                         thumbnailPublic = path.join(dir, filename)
                     }
                     videoInfo['thumbnail'] = thumbnailPublic
@@ -87,12 +87,12 @@ const getVideoFromCamera = async(req, res, next) => {
     const { id, filename } = req.query;
     
     const videoPath = path.join(uploadPath, id, filename);
-    
+    console.log(videoPath)
     try {
         const stats = await stat(videoPath);
         const fileSize = stats.size;
         const range = req.headers.range;    //  React <video> tag automatically provides: Range: bytes=0-999999.
-
+        console.log(range)
         if (range) {
             const [start, end] = range.replace(/bytes=/, "").split("-");
             const startNum = parseInt(start, 10);   // convert to Integer
