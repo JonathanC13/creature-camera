@@ -69,11 +69,11 @@ app.get('/', (req, res) => {
     res.send('hello, world!')
 })
 
-// Put before app.use(express.json()), potential body is consumed before multer processes it?
-app.use('/api/v1/uploadVideo', authCameraMiddleware, uploadVideoSingleRouter)
+// ensure /uploadVideo is not on route of '/api'. Express pipeline is consuming/modifying the request body before multer reads it
+app.use('/uploadVideo', authCameraMiddleware, uploadVideoSingleRouter)
 
 // Middleware to parse JSON bodies
-app.use(express.json());
+app.use('/api', express.json());
 
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/camera', authorizationMiddleware, validAdminMiddleware, cameraRouter)

@@ -5,6 +5,9 @@ const { BadRequestError, NotFoundError } = require('../errors')
 const config = require('../config')
 const { directoryExistsOrCreate } = require('../functions/fileSystem');
 
+const fs = require('fs');
+const crypto = require('crypto');
+
 const uploadVideoMulter = async(req, res, next) => {
     const {
         base
@@ -28,7 +31,8 @@ const uploadVideoMulter = async(req, res, next) => {
             // const extArray = file.mimetype.split('/')
             // const ext = extArray[extArray.length - 1]
             // console.log(extArray, ext)
-            callback(null, Math.round(Math.random() * 1e9) + '-' + file.originalname);
+            // Math.round(Math.random() * 1e9) + '-' + 
+            callback(null, file.originalname);
         }
     });
 
@@ -41,6 +45,16 @@ const uploadVideoMulter = async(req, res, next) => {
     }).single('file');    // That upload object has several methods (single, array, fields, none, etc.), and each method returns a middleware function that Express can use.
 
     upload(req, res, (err) => {
+        // console.log('Uploaded file:', req.file)
+        // console.log(req.headers['content-type']);
+        // const data = fs.readFileSync(req.file.path);
+
+        // console.log(
+        //     crypto.createHash('md5')
+        //         .update(data)
+        //         .digest('hex')
+        //     );
+
         if (err instanceof multer.MulterError) {
             // A Multer error occurred (e.g., file too large)
             throw new BadRequestError(err.message)

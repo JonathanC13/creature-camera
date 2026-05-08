@@ -39,7 +39,7 @@ const uploadVideoSingle = async(req, res, next) => {
                 // file created, create one time thumbnail
                 await createThumbnail(filePath, id, filename.split('.')[0]) // must await so that multer finishes uploaded the video before attempting to access the file.
             }
-            // //else throw new NotFoundError('Thumbnail directory not found.')
+            //else throw new NotFoundError('Thumbnail directory not found.')
             
             logger.info(`uploadVideoSingle: ${StatusCodes.CREATED} - Video uploaded successfully to ${filePath}`)
             // send response
@@ -48,7 +48,7 @@ const uploadVideoSingle = async(req, res, next) => {
             })
 
             // let run async
-            sendNotifications(id, name, filename)
+            // sendNotifications(id, name, filename)
         } else {
             throw new Error('No file.')
         }
