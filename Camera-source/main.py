@@ -137,7 +137,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
             recordExtended = 0
             startRecordIntervalTime = time.time()
             startRecordTime = time.time()
-            recordFilename = f"recorded_{timeStamp}.mp4"
+            recordFilename = f"recorded_{timeStamp}.avi"    
             CameraControlObj.setRecord(True, recordFolder + f"/{recordFilename}")
         
         if (CameraControlObj.getRecord() == True and processedFrame is not None):
@@ -151,9 +151,10 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
     
     logger.info(f'uploadVideoThreads to join: {len(uploadVideoThreadsQueue)}')
     while (len(uploadVideoThreadsQueue) > 0):
-        if (uploadVideoThreadsQueue.popleft().is_alive() == True):
+        t = uploadVideoThreadsQueue.popleft()
+        if (t.is_alive() == True):
             # wait for join
-            thread.join()
+            t.join()
         logger.info('Joined.')
             
     print('\n**Current camera session completed.**\n')
