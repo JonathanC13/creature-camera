@@ -46,18 +46,20 @@ class CameraControl:
             #print(f"CameraControl: **Trying to record to {path}")
             self.logger.info(f"CameraControl: setRecord: **Trying to record to {path}")
             self.recordPath = path
-            self.out = cv2.VideoWriter(path, self.fourcc, self.fps, (self.width, self.height), True)
+            self.out = cv2.VideoWriter(path, self.fourcc, self.fps, (self.width, self.height), True)    # For each video, need new VideoWriter
         else:
             #print("CameraControl: **Recording end.")
             self.logger.info("CameraControl: setRecord: **Recording end.")
-            #if (self.out is not None):
-            #    self.out.release()
+            if (self.out is not None):
+                # must release after each video complete.
+                self.out.release()
+                self.out = None
             
     def getRecord(self):
         return self.record
         
     def setRecordProperties(self):
-        self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # mp4 files so client browser can load into <source>
+        self.fourcc = cv2.VideoWriter_fourcc(*'XVID')  # format files so client browser can load into <source>
         self.fps = self.capture.get(cv2.CAP_PROP_FPS)
         self.width = int(self.capture.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.height = int(self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
