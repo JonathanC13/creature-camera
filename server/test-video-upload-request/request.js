@@ -5,7 +5,7 @@ const fetch = require('node-fetch');    // node-fetch@2 for form-data compatibil
 
 const testVideoPOST = async(token, filename) => {
     const videoPath = path.join(__dirname, '/videos', filename);
-
+    // console.log(videoPath)
     //console.log('Exists:', fs.existsSync(videoPath));
     // const stats = fs.statSync(videoPath);
     // console.log('Size:', stats.size, 'bytes');
@@ -25,18 +25,18 @@ const testVideoPOST = async(token, filename) => {
 
     try {
         // console.log(requestHeaders)
-        const response = await fetch('http://127.0.0.1:5000/api/v1/uploadVideo', 
+        const response = await fetch('http://127.0.0.1:5000/uploadVideo', 
             {
                 method: 'POST',
                 headers: requestHeaders,
                 body: formData
             },
         )
-        
-        console.log(await response.json())
+        console.log(await response)
+        // console.log(await response.json())
     } catch (e) {
         console.error('Error', e)
     }
 }
 
-testVideoPOST('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjYW1lcmFfbnVtYmVyIjoiMSIsImNhbWVyYV9uYW1lIjoiRmlyc3QgY2FtZXJhIn0.Af5bzfUQGgYVvR9yl42F3ovi47RuMbuJ4iJEj68nOm8', 'recorded_2026221_15h56m49s.avi')
+testVideoPOST('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjYW1lcmFfbnVtYmVyIjoiMSIsImNhbWVyYV9uYW1lIjoiRmlyc3QgY2FtZXJhIn0.Af5bzfUQGgYVvR9yl42F3ovi47RuMbuJ4iJEj68nOm8', 'recorded_202658_14h32m51s.mp4')

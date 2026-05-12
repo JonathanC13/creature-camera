@@ -38,7 +38,7 @@ const getSubVideos = async(req, res, next) => {
         // go into the uploads folder and list the files
         for (let camera of camerasArr) {
             const folderName = camera.id
-            const cameraUploads = path.join(uploadPath, folderName)
+            const cameraUploads = path.join(uploadPath, folderName, 'processed')
             if (await directoryExists(cameraUploads)) {
                 const files = await readdir(cameraUploads);
                 for (let file of files) {
@@ -84,9 +84,10 @@ const getSubVideos = async(req, res, next) => {
     }
 }
 
+// video needs to be codec H.264 (AVC) for browser, /uploadVideoSingle will force convert
 const getVideoFromCamera = async(req, res, next) => {
     const { id, filename } = req.query;
-    const videoPath = path.join(uploadPath, id, filename);
+    const videoPath = path.join(uploadPath, id, 'processed', filename);
     try {
         const contentType = mime.lookup(filename) || "video/mp4";
         const stats = await stat(videoPath);

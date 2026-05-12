@@ -74,7 +74,7 @@ app.get('/', (req, res) => {
     res.send('hello, world!')
 })
 
-app.use("/video", express.static('D:\\Important\\VS code\\pyStuff\\full_stack_road_map\\Full-stack-projs\\creature-camera\\creature-camera\\server\\uploads\\69e123f5521067c3cf7a6083'));
+// app.use("/video", express.static(uploadFolder));
 
 
 // ensure /uploadVideo is not on route of '/api'. Express pipeline is consuming/modifying the request body before multer reads it

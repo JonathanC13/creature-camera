@@ -22,6 +22,10 @@ const uploadVideoMulter = async(req, res, next) => {
     if (!(await directoryExistsOrCreate(dest))) {
         throw new NotFoundError('Upload directory not found.')
     }
+    const processedDest = path.join(dest, 'processed')
+    if (!(await directoryExistsOrCreate(processedDest))) {
+        throw new NotFoundError('Upload directory not found.')
+    }
     
     const storage = multer.diskStorage({
         destination: function (req, file, callback) {

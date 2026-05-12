@@ -4,6 +4,7 @@ const { sendNotifications } = require('../notifications/sendNotifications')
 const { UploadError } = require('../errors')
 const { directoryExistsOrCreate } = require('../functions/fileSystem')
 const createThumbnail = require('../functions/createThumbnail')
+const convertToH264 = require('../functions/convertToH264')
 // const config = require('../config')
 const logger = require('../logging/logger')
 const config = require('../config')
@@ -33,11 +34,28 @@ const uploadVideoSingle = async(req, res, next) => {
                 filename: filename
             } = req.file
 
+            const {
+                base
+            } = config
+            const { uploadFolder } = config.folders
+            const uploadPath = path.join(base, uploadFolder)
+            const outputFileName = filename + "-h264.mp4"
+            const outputPath = path.join(uploadPath, id, 'processed', outputFileName);
+            // force to H.264 in case it is not
+            try {
+
+                await convertToH264(filePath, outputPath);
+
+            } catch (err) {
+                console.error(err);
+                res.status(500).send("Conversion failed");
+            }
+
             // create thumbnail folder
             const thumbnailDir = path.join(config.base, 'public', config.thumbnailFolder, id)
             if ((await directoryExistsOrCreate(thumbnailDir))) {
                 // file created, create one time thumbnail
-                await createThumbnail(filePath, id, filename.split('.')[0]) // must await so that multer finishes uploaded the video before attempting to access the file.
+                await createThumbnail(outputPath, id, outputFileName.split('.')[0]) // must await so that multer finishes uploaded the video before attempting to access the file.
             }
             //else throw new NotFoundError('Thumbnail directory not found.')
             
