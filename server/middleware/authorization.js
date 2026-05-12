@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 const { UnauthenticatedError } = require('../errors')
 
 const authorization = async(req, res, next) => {
+    
     // request has the token in the header:
     // authentication: Bearer token
     const authHeader = req.headers.authorization || req.headers.Authorization

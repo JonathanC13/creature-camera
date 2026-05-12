@@ -22,6 +22,7 @@ const uploadVideoSingleRouter = require("./routes/uploadVideoSingle")
 const cameraRouter = require('./routes/cameras')
 const userRouter = require('./routes/users')
 const videoRouter = require('./routes/videos')
+const videoSrcRouter = require('./routes/videoSrc')
 const roleRouter = require('./routes/roles')
 
 // middleware
@@ -45,7 +46,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 
 // extra security packages
-app.use(helmet())
+app.use(helmet({
+    crossOriginResourcePolicy: {
+      policy: "cross-origin"
+    }
+}))
 app.use(cors(
     {
         origin: process.env.ACCESS_CONTROL_ALLOW_ORIGIN, // Adjust this to your frontend's URL
@@ -69,6 +74,9 @@ app.get('/', (req, res) => {
     res.send('hello, world!')
 })
 
+app.use("/video", express.static('D:\\Important\\VS code\\pyStuff\\full_stack_road_map\\Full-stack-projs\\creature-camera\\creature-camera\\server\\uploads\\69e123f5521067c3cf7a6083'));
+
+
 // ensure /uploadVideo is not on route of '/api'. Express pipeline is consuming/modifying the request body before multer reads it
 app.use('/uploadVideo', authCameraMiddleware, uploadVideoSingleRouter)
 
@@ -79,6 +87,7 @@ app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/camera', authorizationMiddleware, validAdminMiddleware, cameraRouter)
 app.use('/api/v1/user', authorizationMiddleware, validAdminMiddleware, userRouter)
 app.use('/api/v1/video', authorizationMiddleware, videoRouter)
+app.use('/api/v1/videoSrc', videoSrcRouter)
 app.use('/api/v1/role', authorizationMiddleware, roleRouter)
 // /routes
 

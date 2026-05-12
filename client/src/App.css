@@ -629,6 +629,10 @@ body {
   gap: var(--FLEX-GAP);
 }
 
+.video-list__count-p {
+  color: var(--LIGHT-TEXT-FONT-COLOR);
+}
+
 .video-list__ul {
   display: flex;
   flex-direction: column;

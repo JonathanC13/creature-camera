@@ -20,14 +20,14 @@ const VideoList = ({
     }
 
     useEffect(() => {
-
+        // console.log(videosArr)
         // sort videos in original Array -> spread into new Array() so that setVideos state reference changed to new array, but the object reference within are the same as original which is one part to not re-render the item component.
         setVideos(prevVideos =>
             [...prevVideos].sort((a, b) => {
                 if(descUploadTime) {
-                    return b.birthtime - a.birthtime
+                    return new Date(b.birthtime) - new Date(a.birthtime)
                 } else {
-                    return -1
+                    return new Date(a.birthtime) - new Date(b.birthtime)
                 }
             })
         );
@@ -55,9 +55,9 @@ const VideoList = ({
     <section className='video-list'>
         <div className="video-list__sort-opt-div">
             <p className="video-list__sort-opt-div__p">Sort</p>
-            <button className="video-list__sort-opt-div__upload-btn">upload time {descUploadTime ? 'desc' : 'asc'}</button>
+            <button className="video-list__sort-opt-div__upload-btn" onClick={toggleDescUploadTime}>upload time {descUploadTime ? 'desc' : 'asc'}</button>
         </div>
-        
+        <p className="video-list__count-p">Number of videos: {videosArr.length}</p>
         <ul className='video-list__ul'>
             {videoComps}
         </ul>

@@ -9,6 +9,7 @@ const config = require('../config')
 const { InternalServerError, NotFoundError } = require('../errors')
 const { StatusCodes } = require('http-status-codes')
 const { getVideoDurationInSeconds } = require('get-video-duration');
+const mime = require('mime-types');
 
 const ffmpeg = require('fluent-ffmpeg')
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
@@ -85,29 +86,44 @@ const getSubVideos = async(req, res, next) => {
 
 const getVideoFromCamera = async(req, res, next) => {
     const { id, filename } = req.query;
-    
     const videoPath = path.join(uploadPath, id, filename);
-    console.log(videoPath)
     try {
+        const contentType = mime.lookup(filename) || "video/mp4";
         const stats = await stat(videoPath);
         const fileSize = stats.size;
         const range = req.headers.range;    //  React <video> tag automatically provides: Range: bytes=0-999999.
-        console.log(range)
+        
+        const origin = process.env.ACCESS_CONTROL_ALLOW_ORIGIN
         if (range) {
-            const [start, end] = range.replace(/bytes=/, "").split("-");
-            const startNum = parseInt(start, 10);   // convert to Integer
-            const endNum = end ? parseInt(end, 10) : fileSize - 1;
+            const match = range.match(/bytes=(\d*)-(\d*)/);
+            if (!match) {
+                return res.status(StatusCodes.REQUESTED_RANGE_NOT_SATISFIABLE).send("Invalid Range");
+            }
+
+            const startNum = match[1] ? parseInt(match[1]) : 0;
+            const endNum = match[2] ? parseInt(match[2]) : fileSize - 1;
+            const chunkSize = endNum - startNum + 1;
 
             res.writeHead(StatusCodes.PARTIAL_CONTENT, {
-                'Content-Range': `bytes ${startNum}-${endNum}/${fileSize}`,
-                'Accept-Ranges': 'bytes',
-                'Content-Length': (endNum - startNum) + 1,
-                'Content-Type': `video/${filename.split('.')[1]}`,
+                "Content-Range": `bytes ${startNum}-${endNum}/${fileSize}`,
+                "Accept-Ranges": "bytes",
+                "Content-Length": chunkSize,
+                "Content-Type": `${contentType}`,
+                "Cross-Origin-Resource-Policy": "cross-origin",
+                "Access-Control-Allow-Origin": origin,
             });
-
+            
             createReadStream(videoPath, { start: startNum, end: endNum }).pipe(res);
         } else {
-            res.sendFile(videoPath, { root: __dirname });
+            res.writeHead(StatusCodes.OK, {
+                "Content-Length": fileSize,
+                "Accept-Ranges": "bytes",
+                "Content-Type": `${contentType}`,
+                "Cross-Origin-Resource-Policy": "cross-origin",
+                "Access-Control-Allow-Origin": origin,
+            });
+
+            createReadStream(videoPath).pipe(res);
         }
     } catch (e) {
         throw new NotFoundError('Video not found.')
