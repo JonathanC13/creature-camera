@@ -13,7 +13,7 @@ const Cameras = () => {
   return (
     <section className='cameras'>
         <h1 className="cameras__h1">Cameras</h1>
-        <button className="cameras__register-btn" onClick={openRegisterModel}>register</button>
+        <button className="cameras__register-btn cursor_pointer" onClick={openRegisterModel}>register</button>
 
         <CamerasTable></CamerasTable>
     </section>

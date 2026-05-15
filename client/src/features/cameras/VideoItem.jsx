@@ -5,7 +5,8 @@ import { openModal } from "../modals/modalSlice"
 
 const descriptionItem = (tag, info) => {
   return <li className="video-item__li">
-    {tag}: {info}
+    <p className='video-item__li__label-p'>{tag}:</p>
+    <p className='video-item__li__info-p'>{info}</p>
   </li>
 }
 

@@ -1,12 +1,12 @@
 import React from 'react'
-import { useState, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router'
+import { useState, useRef, useEffect } from 'react'
+import { useParams, useNavigate, NavLink } from 'react-router'
 import { useGetCameraQuery, useUpdateCameraMutation, useDeleteCameraMutation } from './cameraApiSlice'
 import FormInput from '../../components/FormInput'
  
 const CameraPage = () => {
     const { id } = useParams(); // id will be '123' if the URL is /user/123
-
+  
     const navigate = useNavigate()
 
     const { data, isLoading, isError, refetch } = useGetCameraQuery(id)
@@ -15,13 +15,24 @@ const CameraPage = () => {
     const [deleteCamera, {isLoading: isLoadingDelete}] = useDeleteCameraMutation()
 
     const modifyLoading = isLoadingUpdate || isLoadingDelete
-
-    const [cameraName, setCameraName] = useState(data.cameraName ?? '')
-    const [cameraToken, setCameraToken] = useState(data.cameraToken ?? '')
+    
+    const [cameraName, setCameraName] = useState('')
+    const [cameraToken, setCameraToken] = useState('')
     const [editing, setEditing] = useState(false)
     const [msg, setMsg] = useState('')
 
     const msgRef = useRef()
+
+    useEffect(() => {
+      resetInfo()
+    }, [data])
+
+    const resetInfo = () => {
+        if (data?.response) {
+          setCameraName(data?.response.name)
+          setCameraToken(data?.response.email)
+        }
+    }
 
     const editOnClick = () => {
         setEditing(true)

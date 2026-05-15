@@ -41,7 +41,7 @@ const VideoPlayerModel = ({
 
   return (
     <section className='video-module'>
-      <h1>{filename}</h1>
+      <h1 className='video-module__h1'>{filename}</h1>
 
       {error && <p className='video-module__error'>Video not available</p>}
       {/* <video controls onError={handleError} src='http://localhost:5000/video/recorded_202658_14h32m51s.mp4' /> */}
@@ -50,7 +50,7 @@ const VideoPlayerModel = ({
         controls
         onError={handleError}
         className='video-module__video'
-        width="640"
+        // width="640"
       >
         <source src={url} type="video/mp4"/>
       </video>

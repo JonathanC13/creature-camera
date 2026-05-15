@@ -54,8 +54,8 @@ const VideoList = ({
   return (
     <section className='video-list'>
         <div className="video-list__sort-opt-div">
-            <p className="video-list__sort-opt-div__p">Sort</p>
-            <button className="video-list__sort-opt-div__upload-btn" onClick={toggleDescUploadTime}>upload time {descUploadTime ? 'desc' : 'asc'}</button>
+            {/* <p className="video-list__sort-opt-div__p">Sort</p> */}
+            <button className="video-list__sort-upl-btn cursor_pointer" onClick={toggleDescUploadTime}>Sorted by upload time {descUploadTime ? 'desc' : 'asc'}</button>
         </div>
         <p className="video-list__count-p">Number of videos: {videosArr.length}</p>
         <ul className='video-list__ul'>
