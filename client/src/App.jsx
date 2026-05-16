@@ -31,51 +31,55 @@ function App() {
       <Provider store={store}>
         <BrowserRouter>
           <Routes>
-            {/* Public */}
-            <Route path="/" element={<HomeRedirect />} />
-            <Route element={<Landing></Landing>}>
+            <Route element={<Layout></Layout>}>
+
+              {/* Public */}
+              <Route path="/" element={<HomeRedirect />} />
+              {/* <Route element={<Landing></Landing>}> */}
               <Route path="/login" element={<Login />} />
               <Route path="/forgotPassword" element={<ForgotPassword />} />
               <Route path="/unauthorized" element={<Unauthorized />} />
-            </Route>
+              {/* </Route> */}
 
-            <Route element={<PersistentLogin></PersistentLogin>}>
-              
-              {/* protected routes valid logged in users. */}
-              <Route element={<RequireAuth />}>
-                <Route element={<Layout></Layout>}>
-                  <Route path='/dashboard' element={<DashboardRedirect />}></Route>
+              <Route element={<PersistentLogin></PersistentLogin>}>
+                
+                {/* protected routes valid logged in users. */}
+                <Route element={<RequireAuth />}>
+                  {/* <Route element={<Layout></Layout>}> */}
+                    <Route path='/dashboard' element={<DashboardRedirect />}></Route>
 
-                  <Route path="/admin" element={<RoleProtected allowedRoles={[ROLES.ADMIN]} />}>
-                    <Route index element={<AdminHome />}></Route>
-                  </Route>
-
-                  <Route element={<RoleProtected allowedRoles={[ROLES.ADMIN]} />}>
-                    <Route path='/users'>
-                      <Route index element={<Users />}></Route>
-                      <Route path=":id" element={<UserPage />}></Route>
+                    <Route path="/admin" element={<RoleProtected allowedRoles={[ROLES.ADMIN]} />}>
+                      <Route index element={<AdminHome />}></Route>
                     </Route>
-                    <Route path='/cameras'>
-                      <Route index element={<Cameras />}></Route>
-                      <Route path=":id" element={<CameraPage />}></Route>
+
+                    <Route element={<RoleProtected allowedRoles={[ROLES.ADMIN]} />}>
+                      <Route path='/users'>
+                        <Route index element={<Users />}></Route>
+                        <Route path=":id" element={<UserPage />}></Route>
+                      </Route>
+                      <Route path='/cameras'>
+                        <Route index element={<Cameras />}></Route>
+                        <Route path=":id" element={<CameraPage />}></Route>
+                      </Route>
+                      
                     </Route>
-                    
-                  </Route>
-                    
-                  <Route path="/user" element={<RoleProtected allowedRoles={[ROLES.USER]} />}>
-                    <Route index element={<UserHome></UserHome>}></Route>
-                  </Route>
+                      
+                    <Route path="/user" element={<RoleProtected allowedRoles={[ROLES.USER]} />}>
+                      <Route index element={<UserHome></UserHome>}></Route>
+                    </Route>
+                  {/* </Route> */}
                 </Route>
+                  
+                <Route path="/settings" element={<AccountSettings></AccountSettings>}/>
+                  
               </Route>
-                
-              <Route path="/settings" element={<AccountSettings></AccountSettings>}/>
-                
+
+              <Route path='/error' element={<Error/>}></Route>
+
+              {/* catach all */}
+              <Route path='*' element={<Missing/>}></Route>
+
             </Route>
-
-            <Route path='/error' element={<Error/>}></Route>
-
-            {/* catach all */}
-            <Route path='*' element={<Missing/>}></Route>
           </Routes>
 
           <ModalManager />

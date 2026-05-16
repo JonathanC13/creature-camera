@@ -18,7 +18,8 @@ const FormInput = (
     <section className='form-input'>
         <label className='form-input__label' htmlFor={inputId}>{text}</label>
         <div className="form-input__div">
-            <input className='form-input__div__input' 
+            <textarea className='form-input__div__input' 
+                rows='1'
                 id={inputId}
                 ref={ref}
                 type = {inputType}

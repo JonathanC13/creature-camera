@@ -56,8 +56,8 @@ const RegisterCameraModal = () => {
 
   return (
     <section className="register-camera-modal">
-        <form onSubmit={registerCameraOnClick}>
-            <h1 className="register-camera-modal__h1">register camera</h1>
+        <form onSubmit={registerCameraOnClick} className='register__form'>
+            <h1 className="register__form__h1">register camera</h1>
             <FormInput
                 ref = {null}
                 required = {true}
@@ -77,8 +77,10 @@ const RegisterCameraModal = () => {
                 inputId = 'register-camera-token'
             ></FormInput>
 
-            <button className='register-camera-modal__form__submit-btn' type='submit'>register</button>
-            <p ref={msgRef}>{msg}</p>
+            <div className="register__form__div-btns">
+                <button className='register__form__submit-btn cursor_pointer' type='submit'>register</button>
+            </div>
+            <p className={isError ? 'register__form__p-error' : 'register__form__p-succ'} ref={msgRef}>{msg}</p>
             <div className={isLoading ? "loading__div" : "offscreen"}>
                 {
                     isLoading ? 

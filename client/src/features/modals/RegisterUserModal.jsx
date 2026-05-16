@@ -89,7 +89,7 @@ const RegisterUserModal = ({ isOpen, onClose, defaultOpen = false }) => {
 
   return open ? (
     <section className="register">
-        <form onSubmit={registerFormSubmitHandler} className="regiser__form">
+        <form onSubmit={registerFormSubmitHandler} className="register__form">
             <h1 className='register__form__h1'>Register user</h1>
             <FormInput
                 ref = {null}

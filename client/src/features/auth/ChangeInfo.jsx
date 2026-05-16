@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import FormInput from '../../components/FormInput'
 import { useGetUserQuery, useUpdateUserMutation } from '../users/userApiSlice'
 import { userInfoSet } from './authSlice'
@@ -12,12 +12,28 @@ const ChangeInfo = () => {
     const { data, isLoading, isError } = useGetUserQuery(id)
     const [updateUser, { isLoading: isLoadingUpdate, isError: isErrorUpdate }] = useUpdateUserMutation()
 
-    const [name, setName] = useState(data.name)
-    const [email, setEmail] = useState(data.email)
-    const [notifyAlways, setNotifyAlways] = useState(data.settingNotifyAlways)
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [notifyAlways, setNotifyAlways] = useState(false)
     const [msg, setMsg] = useState('')
 
     const msgRef = useRef()
+
+    useEffect(() => {
+        resetInfo()
+    }, [data])
+
+    const resetInfo = () => {
+        if (data?.response) {
+            setName(data.response.name)
+            setEmail(data.response.email)
+            setNotifyAlways(data.response.settingNotifyAlways)
+        }
+    }
+
+    const onSubmitHandler = (e) => {
+        e.preventDefault()
+    }
 
     const changeInfoOnClick = async(e) => {
         e.preventDefault()
@@ -95,12 +111,15 @@ const ChangeInfo = () => {
                 inputId = 'change-info-email'
             ></FormInput>
             <div className="change-info__form__notify-div">
-                <label for="notifyAlways">Notify for every upload (else one email for first upload until next log in.)</label>
+                <label htmlFor="notifyAlways">Notify for every upload (else one email for first upload until next log in.)</label>
                 <input type="checkbox" id="notifyId" name="notifyAlways" checked={notifyAlways} onChange={(e) => setNotifyAlways(e.target.checked)}></input>
             </div>
 
-            <button className='change-info__form__update-btn' type='submit' disabled={isLoadingUpdate}>update</button>
-            <p ref={msgRef}>{msg}</p>
+            
+            <button className='change-info__form__reset-btn cursor_pointer' onClick={resetInfo}>reset</button>
+            <button className='change-info__form__update-btn cursor_pointer' type='submit' disabled={isLoadingUpdate}>update</button>
+            
+            <p className={isError ? 'update-camera__p-error' : 'update-camera__p-succ'} ref={msgRef}>{msg}</p>
             <div className={isLoadingUpdate ? "loading__div" : "offscreen"}>
                 {
                     isLoadingUpdate ? 
@@ -113,7 +132,7 @@ const ChangeInfo = () => {
 
   return (
     <section className='change-info'>
-        <form className="change-info__form" action='javascript:void(0)' onSubmit={changeInfoOnClick}>
+        <form className="change-info__form" action={onSubmitHandler} onSubmit={changeInfoOnClick}>
             <h1 className="change-info__form__h1">change info</h1>
             {content}
         </form>

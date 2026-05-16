@@ -12,7 +12,7 @@ const CamerasRow = memo(({
     for (const [k, v] of headers) {
         cellComps.push(<td key={v[0]} className='cameras-row__tr-td'>{camera[k]}</td>)
     }
-    cellComps.push(<td className='cameras-row__tr-td'>
+    cellComps.push(<td key={-1} className='cameras-row__tr-td'>
         <Link to={link} className="cameras-row__view-link">
             view
         </Link>

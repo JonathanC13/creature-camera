@@ -130,7 +130,7 @@ const AssignCamerasModal = ({
               }
             >
               {availableItems.map(item => (
-                <option key={item.id} value={item.id}>
+                <option className='camara-assigned-select__opt' key={item.id} value={item.id}>
                   {item.cameraName}
                 </option>
               ))}
@@ -155,7 +155,7 @@ const AssignCamerasModal = ({
               }
             >
               {selectedItems.map(item => (
-                <option key={item.id} value={item.id}>
+                <option className='camara-assigned-select__opt' key={item.id} value={item.id}>
                   {item.cameraName}
                 </option>
               ))}

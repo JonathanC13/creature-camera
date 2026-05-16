@@ -11,10 +11,11 @@ const CameraPage = () => {
 
     const { data, isLoading, isError, refetch } = useGetCameraQuery(id)
 
-    const [updateCamera, {isLoading: isLoadingUpdate}] = useUpdateCameraMutation()
-    const [deleteCamera, {isLoading: isLoadingDelete}] = useDeleteCameraMutation()
+    const [updateCamera, {isLoading: isLoadingUpdate, isError: isErrorUpdate}] = useUpdateCameraMutation()
+    const [deleteCamera, {isLoading: isLoadingDelete, isError: isErrorDelete}] = useDeleteCameraMutation()
 
     const modifyLoading = isLoadingUpdate || isLoadingDelete
+    const isErrorGen = isErrorUpdate || isErrorDelete
     
     const [cameraName, setCameraName] = useState('')
     const [cameraToken, setCameraToken] = useState('')
@@ -29,9 +30,13 @@ const CameraPage = () => {
 
     const resetInfo = () => {
         if (data?.response) {
-          setCameraName(data?.response.name)
-          setCameraToken(data?.response.email)
+          setCameraName(data?.response.cameraName)
+          setCameraToken(data?.response.cameraToken)
         }
+    }
+
+    const onSubmitHandler = (e) => {
+      e.preventDefault()
     }
 
     const editOnClick = () => {
@@ -40,7 +45,7 @@ const CameraPage = () => {
 
     const cancelEditOnClick = () => {
       setEditing(false)
-      refetch()
+      resetInfo()
     }
 
     const updateOnClick = async(e) => {
@@ -50,8 +55,11 @@ const CameraPage = () => {
 
       try {
         const payload = {
-          cameraName,
-          cameraToken
+          id,
+          updateInfo: {
+            cameraName,
+            cameraToken
+          }
         }
 
         const response = await updateCamera(payload).unwrap()
@@ -81,6 +89,22 @@ const CameraPage = () => {
       navigate("/cameras", { replace: true }) // { replace: true } so cannot go back to this page.
     }
 
+    const editOptions = 
+      <section className="camera-edit-options">
+        <div className="camera-edit-options__editing-div">
+        {editing ? 
+            <>
+              <button className="camera-edit-options__editing-div__cancel-btn cursor_pointer" onClick={cancelEditOnClick}>cancel</button>
+              <button className="camera-edit-options__editing-div__update-btn cursor_pointer" onClick={updateOnClick}>update</button>
+            </>
+            : <button className="camera-edit-options__editing-div__edit-btn cursor_pointer" onClick={editOnClick}>edit</button>
+          
+        }
+        </div>
+
+        <button className='camera-edit-options__del-btn cursor_pointer' onClick={cameraDeleteOnClick}>delete</button>
+      </section>
+
     let content = ''
     if (isError) {
       content = <p>Error</p>
@@ -95,7 +119,7 @@ const CameraPage = () => {
         </div>
     } else {
       content =
-        <form className='camera-page__form' action='javascript:void(0)'>
+        <form className='camera-page__form' onSubmit={onSubmitHandler}>
           <FormInput
             ref = {null}
             required = {true}
@@ -108,26 +132,16 @@ const CameraPage = () => {
           <FormInput
             ref = {null}
             required = {true}
-            text = 'email'
+            text = 'token'
             inputType = 'text'
             value = {cameraToken}
             onChangeCB = {setCameraToken}
             disabled = {!editing}
           ></FormInput>
 
-          <div className="camera-page__form__editing-div">
-          {editing ? 
-            <>
-              <button className="camera-page__form__editing-div__cancel-btn" onClick={cancelEditOnClick}>cancel</button>
-              <button className="camera-page__form__editing-div__update-btn" onClick={updateOnClick}>update</button>
-            </>
-            : <button className="camera-page__form__editing-div__edit-btn" onClick={editOnClick}>edit</button>
-          }
-          </div>
+          {editOptions}
 
-          <button className='camera-page__form__del-btn' onClick={cameraDeleteOnClick}>delete</button>
-
-          <p ref={msgRef}>{msg}</p>
+          <p className={isErrorGen ? 'update-camera__p-error' : 'update-camera__p-succ'} ref={msgRef}>{msg}</p>
 
           {(modifyLoading) && 
             <div className={(modifyLoading) ? "loading__div" : "offscreen"}>

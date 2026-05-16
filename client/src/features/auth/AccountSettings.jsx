@@ -5,8 +5,8 @@ import ChangePassword from './ChangePassword'
 const AccountSettings = () => {
   return (
     <section className='account-settings'>
-        {ChangeInfo}
-        {ChangePassword}
+        <ChangeInfo/>
+        {/* <ChangePassword/> */}
     </section>
   )
 }
