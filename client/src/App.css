@@ -205,6 +205,7 @@ body {
   background-color: var(--INPUT-BG-COLOR);
   width: 100%;
   resize: none;
+  font-family: var(--FONT-FAMILY);
 }
 
 .form-input__div__input:disabled {
@@ -357,6 +358,56 @@ body {
 /* update temp password */
 
 /* account settings */
+.account-settings {
+  border: var(--BORDER-GEN);
+  border-radius: var(--BORDER-RAD);
+  background-color: var(--CONTAINER-COLOR);
+  padding: var(--PADDING-GEN);
+}
+
+.change-info {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: var(--FLEX-GAP);
+}
+
+.change-info__form {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: var(--FLEX-GAP);
+}
+
+.change-info__form__h1 {
+  color: var(--LIGHT-H1-FONT-COLOR);
+  font-size: var(--H1-SIZE);
+}
+
+.change-info__form__notify-div {
+  /* width: 75%; */
+  display: flex;
+  gap: var(--FLEX-LABEL-GAP);
+  /* border-bottom: 1px solid white;
+  padding-bottom: var(--PADDING-GEN); */
+}
+
+.change-info__form__notify-div__lbl {
+  color: var(--LIGHT-TEXT-FONT-COLOR);
+}
+
+.change-info__form__notify-div__input {
+  width: 25px;
+  height: 25px;
+}
+
+.change-info__form__opt-div {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--FLEX-GAP);
+}
 /* /account settings */
 
 /* change info */

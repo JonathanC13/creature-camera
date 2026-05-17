@@ -111,13 +111,14 @@ const ChangeInfo = () => {
                 inputId = 'change-info-email'
             ></FormInput>
             <div className="change-info__form__notify-div">
-                <label htmlFor="notifyAlways">Notify for every upload (else one email for first upload until next log in.)</label>
-                <input type="checkbox" id="notifyId" name="notifyAlways" checked={notifyAlways} onChange={(e) => setNotifyAlways(e.target.checked)}></input>
+                <label className='change-info__form__notify-div__lbl' htmlFor="notifyAlways">Notify for every upload (else one email for first upload until next log in.): </label>
+                <input className='change-info__form__notify-div__input cursor_pointer' type="checkbox" id="notifyId" name="notifyAlways" checked={notifyAlways} onChange={(e) => setNotifyAlways(e.target.checked)}></input>
             </div>
 
-            
-            <button className='change-info__form__reset-btn cursor_pointer' onClick={resetInfo}>reset</button>
-            <button className='change-info__form__update-btn cursor_pointer' type='submit' disabled={isLoadingUpdate}>update</button>
+            <div className="change-info__form__opt-div">
+                <button className='change-info__form__reset-btn cursor_pointer' onClick={resetInfo}>reset</button>
+                <button className='change-info__form__update-btn cursor_pointer' onClick={changeInfoOnClick} disabled={isLoadingUpdate}>update</button>
+            </div>
             
             <p className={isError ? 'update-camera__p-error' : 'update-camera__p-succ'} ref={msgRef}>{msg}</p>
             <div className={isLoadingUpdate ? "loading__div" : "offscreen"}>
@@ -129,10 +130,10 @@ const ChangeInfo = () => {
             </div>
         </>
     }
-
+    
   return (
     <section className='change-info'>
-        <form className="change-info__form" action={onSubmitHandler} onSubmit={changeInfoOnClick}>
+        <form className="change-info__form" onSubmit={onSubmitHandler}>
             <h1 className="change-info__form__h1">change info</h1>
             {content}
         </form>
