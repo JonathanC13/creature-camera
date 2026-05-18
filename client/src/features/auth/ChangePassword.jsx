@@ -7,13 +7,14 @@ import ShowPasswordBtn from '../../components/ShowPasswordBtn'
 
 const ChangePassword = () => {
 
-    const [currPassword, setcurrPassword] = useState('')
-    const [showcurr, setShowCurr] = useState(false)
+    const [currPassword, setCurrPassword] = useState('')
+    const [showCurr, setShowCurr] = useState(false)
     const [newPassword, setNewPassword] = useState('')
     const [showNew, setShowNew] = useState(false)
     const [confirmPassword, setConfirmPassword] = useState('')
     const [showConfirm, setShowConfirm] = useState(false)
     const [msg, setMsg] = useState('')
+    const [passError, setPassError] = useState(false)
 
     const msgRef = useRef()
 
@@ -22,7 +23,7 @@ const ChangePassword = () => {
     const [updatePassword, { data, isError, isLoading }] = useUpdatePasswordMutation();
 
     const changeShowCurr = () => {
-        setShowCurr(!showcurr)
+        setShowCurr(!showCurr)
     }
     const changeShowNew = () => {
         setShowNew(!showNew)
@@ -37,13 +38,19 @@ const ChangePassword = () => {
         setConfirmPassword('')
     }
 
+    const onSubmitHandler = (e) => {
+        e.preventDefault()
+    }
+
     const changePasswordOnClick = async(e) => {
         e.preventDefault()
         const form = e.currentTarget
         setMsg('')
+        setPassError(false)
 
         if (newPassword !== confirmPassword) {
             setMsg('new password and confirm password do not match.')
+            setPassError(true)
             msgRef.current.focus()
             return
         }
@@ -85,23 +92,24 @@ const ChangePassword = () => {
 
   return (
     <section className='change-password'>
-        <form className="change-password__form" action='javascript:void(0)' onSubmit={changePasswordOnClick}>
-            <h1 className='change-password__form__h1'>Change password</h1>
+        <form className="change-password__form" onSubmit={changePasswordOnClick}>
+            <h1 className='change-password__form__h1'>change password</h1>
             <div className="change-password__form__oldPass-div">
                 <FormInput
                     ref = {null}
                     required = {true}
                     text = 'current password'
-                    inputType = {currPassword ? "text" : "password"}
+                    inputType = {showCurr ? "text" : "password"}
                     value = {currPassword}
                     onChangeCB = {setCurrPassword}
                     disabled = {isLoading ? true : false}
+                    inclineComp={<ShowPasswordBtn
+                        showPassword={showCurr}
+                        setShowPasswordCB={changeShowCurr}
+                    ></ShowPasswordBtn>}
                     inputId = 'change-password-curr'
+                    isPassword = {true}
                 ></FormInput>
-                <ShowPasswordBtn
-                    showPassword={showCurr}
-                    setShowPasswordCB={changeShowCurr}
-                ></ShowPasswordBtn>
             </div>
             <div className="change-password__form__newPass-div">
                 <FormInput
@@ -112,12 +120,13 @@ const ChangePassword = () => {
                     value = {newPassword}
                     onChangeCB = {setNewPassword}
                     disabled = {isLoading ? true : false}
+                    inclineComp={<ShowPasswordBtn
+                        showPassword={showNew}
+                        setShowPasswordCB={changeShowNew}
+                    ></ShowPasswordBtn>}
                     inputId = 'change-password-new'
+                    isPassword = {true}
                 ></FormInput>
-                <ShowPasswordBtn
-                    showPassword={showNew}
-                    setShowPasswordCB={changeShowNew}
-                ></ShowPasswordBtn>
             </div>
             <div className="change-password__form__oldPass-div">
                 <FormInput
@@ -128,22 +137,28 @@ const ChangePassword = () => {
                     value = {confirmPassword}
                     onChangeCB = {setConfirmPassword}
                     disabled = {isLoading ? true : false}
+                    inclineComp={<ShowPasswordBtn
+                        showPassword={showConfirm}
+                        setShowPasswordCB={changeShowConfirm}
+                    ></ShowPasswordBtn>}
                     inputId = 'change-password-confirm'
+                    isPassword = {true}
                 ></FormInput>
-                <ShowPasswordBtn
-                    showPassword={showConfirm}
-                    setShowPasswordCB={changeShowConfirm}
-                ></ShowPasswordBtn>
             </div>
 
-            <button className='change-password__form__update-btn' type='submit' disabled={isLoading}>update</button>
-            <p ref={msgRef}>{msg}</p>
-            <div className={isLoading ? "loading__div" : "offscreen"}>
-                {
-                    isLoading ? 
-                    <div className="loader"></div> :
-                    <></>
-                }
+            <div className="change-password__form__opt-div">
+                <button className='change-password__form__update-btn cursor_pointer' type='submit' disabled={isLoading}>update password</button>
+            </div>
+
+            <div className="change-pass__form__status-div">
+                <p className={isError || passError ? 'update-msg__p-error' : 'update-msg__p-succ'} ref={msgRef}>{msg}</p>
+                <div className={isLoading ? "loading__div" : "offscreen"}>
+                    {
+                        isLoading ? 
+                        <div className="loader"></div> :
+                        <></>
+                    }
+                </div>
             </div>
         </form>
     </section>

@@ -6,7 +6,7 @@ const AccountSettings = () => {
   return (
     <section className='account-settings'>
         <ChangeInfo/>
-        {/* <ChangePassword/> */}
+        <ChangePassword/>
     </section>
   )
 }

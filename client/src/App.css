@@ -370,6 +370,8 @@ body {
   flex-direction: column;
   align-items: start;
   gap: var(--FLEX-GAP);
+  padding-bottom: 1rem;
+  border-bottom: 1px solid black;
 }
 
 .change-info__form {
@@ -408,9 +410,24 @@ body {
   align-items: center;
   gap: var(--FLEX-GAP);
 }
+
+.change-info__form__status-div {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--FLEX-GAP);
+}
 /* /account settings */
 
 /* change info */
+.update-msg__p-error {
+  color: var(--SUBMIT-TEXT-ERR-COLOR);
+}
+
+.update-msg__p-succ {
+  color: var(--SUBMIT-TEXT-SUCC-COLOR);
+}
 
 .change-info__form__reset-btn {
   padding: var(--PADDING-BTN-GEN);
@@ -440,6 +457,52 @@ body {
   color: var(--SUBMIT-TEXT-SUCC-COLOR);
 }
 /* change info */
+
+/* Change password */
+.change-password__form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: var(--FLEX-GAP);
+}
+
+.change-password__form__h1 {
+  font-size: var(--H1-SIZE);
+  color: var(--LIGHT-H1-FONT-COLOR);
+}
+
+.change-password__form__oldPass-div, .change-password__form__newPass-div{
+  width: 100%;
+}
+
+.change-password__form__opt-div {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.change-password__form__update-btn {
+  padding: var(--PADDING-BTN-GEN);
+  border: var(--BORDER-BTN-GEN);
+  border-radius: var(--BORDER-BUTTON-RAD);
+  background-color: var(--CONFIRM-BTN-COLOR);
+  color: var(--SUBMIT-BTN-TEXT-COLOR);
+  width: fit-content;
+}
+
+.change-password__form__update-btn:hover {
+  background-color: var(--CONFIRM-BTN-COLOR-HOVER);
+}
+
+.change-pass__form__status-div {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--FLEX-GAP);
+}
+/* /Change password */
 
 /* USER HOME */
 .user-home {

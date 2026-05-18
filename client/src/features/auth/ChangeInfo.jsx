@@ -9,7 +9,7 @@ const ChangeInfo = () => {
     const dispatch = useDispatch()
 
     const { id } = useSelector((state) => state.auth.userInfo)
-    const { data, isLoading, isError } = useGetUserQuery(id)
+    const { data, isLoading, isError } = useGetUserQuery(id, { skip: !id })
     const [updateUser, { isLoading: isLoadingUpdate, isError: isErrorUpdate }] = useUpdateUserMutation()
 
     const [name, setName] = useState('')
@@ -20,10 +20,15 @@ const ChangeInfo = () => {
     const msgRef = useRef()
 
     useEffect(() => {
-        resetInfo()
+        if (data?.response) {
+            setName(data.response.name)
+            setEmail(data.response.email)
+            setNotifyAlways(data.response.settingNotifyAlways)
+        }
     }, [data])
 
     const resetInfo = () => {
+        setMsg('')
         if (data?.response) {
             setName(data.response.name)
             setEmail(data.response.email)
@@ -116,24 +121,26 @@ const ChangeInfo = () => {
             </div>
 
             <div className="change-info__form__opt-div">
-                <button className='change-info__form__reset-btn cursor_pointer' onClick={resetInfo}>reset</button>
-                <button className='change-info__form__update-btn cursor_pointer' onClick={changeInfoOnClick} disabled={isLoadingUpdate}>update</button>
+                <button className='change-info__form__reset-btn cursor_pointer' type='button' onClick={resetInfo}>reset to current</button>
+                <button className='change-info__form__update-btn cursor_pointer' type='submit' disabled={isLoadingUpdate}>update info</button>
             </div>
             
-            <p className={isError ? 'update-camera__p-error' : 'update-camera__p-succ'} ref={msgRef}>{msg}</p>
-            <div className={isLoadingUpdate ? "loading__div" : "offscreen"}>
-                {
-                    isLoadingUpdate ? 
-                    <div className="loader"></div> :
-                    <></>
-                }
+            <div className="change-info__form__status-div">
+                <p className={isError ? 'update-msg__p-error' : 'update-msg__p-succ'} ref={msgRef}>{msg}</p>
+                <div className={isLoadingUpdate ? "loading__div" : "offscreen"}>
+                    {
+                        isLoadingUpdate ? 
+                        <div className="loader"></div> :
+                        <></>
+                    }
+                </div>
             </div>
         </>
     }
     
   return (
     <section className='change-info'>
-        <form className="change-info__form" onSubmit={onSubmitHandler}>
+        <form className="change-info__form" onSubmit={changeInfoOnClick}>
             <h1 className="change-info__form__h1">change info</h1>
             {content}
         </form>

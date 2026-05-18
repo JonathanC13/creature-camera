@@ -17,6 +17,7 @@ const CamerasTable = () => {
 
     const {data, refetch, isFetching, isLoading, isError} = useGetAllCamerasQuery(undefined, {
         pollingInterval: 600000,  // 10 minutes
+        refetchOnMountOrArgChange: true
     })
     
     const camerasInfoArr = data?.entities ? Object.entries(data.entities).map((e) => e[1]) : []

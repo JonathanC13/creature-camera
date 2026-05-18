@@ -25,7 +25,7 @@ export const authSlice = createSlice({
             localStorage.setItem('persistentLogin', persistentLogin)
         },
         tokenSet: (state, action) => {
-            state.userInfo.token = action.payload
+            state.userInfo.token = action.payload.token
         },
         authMessageSet: (state, action) => {
             state.authMessage = action.payload

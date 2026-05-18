@@ -22,8 +22,7 @@ const authorization = async(req, res, next) => {
                 expiredAt: 1408621000
                 }
             */
-
-                throw new UnauthenticatedError()
+                throw new UnauthenticatedError('token')
             }
             return decoded
         }

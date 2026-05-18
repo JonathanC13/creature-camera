@@ -84,7 +84,7 @@ const UpdateTempPassword = ({
     }
 
   return (
-    <form action="javascript:void(0)" className="update-temp-pass__OTP-form" onSubmit={updatePasswordOnClick}>
+    <form className="update-temp-pass__OTP-form" onSubmit={updatePasswordOnClick}>
         <h1 className="update-temp-pass__OTP-form__h1">enter new password</h1>
         <div className="update-temp-pass__OTP-form__div">
             <FormInput
@@ -100,6 +100,7 @@ const UpdateTempPassword = ({
                     setShowPasswordCB={changeShowPassword}
                 ></ShowPasswordBtn>}
                 inputId = 'update-temp-pass-password'
+                isPassword = {true}
             >
             </FormInput>
         </div>
@@ -117,6 +118,7 @@ const UpdateTempPassword = ({
                     setShowPasswordCB={changeShowConfirmPassword}
                 ></ShowPasswordBtn>}
                 inputId = 'update-temp-pass-confirm'
+                isPassword = {true}
             >
             </FormInput>
         </div>

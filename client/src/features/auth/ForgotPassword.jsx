@@ -60,9 +60,9 @@ const ForgotPassword = () => {
         }
     }
 
-    const validateOTPOnClick = async(e) => {
-        e.preventDefault()
-        const form = e.currentTarget
+    const validateOTPOnClick = async() => {
+        // e.preventDefault()
+        // const form = e.currentTarget
 
         try {
             const payload = {
@@ -105,13 +105,16 @@ const ForgotPassword = () => {
         }
     }
 
-    const updatePasswordOnClick = async(e) => {
+    const onSubmitHandler = (e) => {
         e.preventDefault()
-        const form = e.currentTarget
+    }
+
+    const updatePasswordOnClick = async() => {
+        // const form = e.currentTarget
     }
     
     const contentOTP = 
-        <form action="javascript:void(0)" className="forgot-password__OTP-form" onSubmit={validateOTPOnClick}>
+        <form className="forgot-password__OTP-form" onSubmit={onSubmitHandler}>
             <h1 className="forgot-password__OTP-form__h1">enter OTP from email</h1>
             <div className="forgot-password__OTP-form__div">
                 <FormInput
@@ -122,12 +125,17 @@ const ForgotPassword = () => {
                     value = {otp}
                     onChangeCB = {setOtp}
                     disabled = {isLoadingOTP ? true : false}
+                    inclineComp={<ShowPasswordBtn
+                        showPassword={showOtp}
+                        setShowPasswordCB={setShowOtp}
+                    ></ShowPasswordBtn>}
                     inputId = 'forgot-password-otp'
+                    isPassword = {true}
                 >
                 </FormInput>
-                <button type='submit'>send otp</button>
+                <button onClick={validateOTPOnClick}>send otp</button>
             </div>
-            <p ref={otpMsgRef}>{otpMsg}</p>
+            <p className={isErrorOTP ? 'update-msg__p-error' : 'update-msg__p-succ'} ref={otpMsgRef}>{otpMsg}</p>
             <div className={isLoadingOTP ? "loading__div" : "offscreen"}>
                 {
                     isLoadingOTP ? 
@@ -139,7 +147,7 @@ const ForgotPassword = () => {
 
   return (
     <section className='forgot-password'>
-        <form action="javascript:void(0)" className="forgot-password__email-form" onSubmit={sendEmailOnClick}>
+        <form className="forgot-password__email-form" onSubmit={onSubmitHandler}>
             <h1 className="forgot-password__email-form__h1">enter account email</h1>
             <div className="forgot-password__email-form__div">
                 <FormInput
@@ -153,11 +161,7 @@ const ForgotPassword = () => {
                     inputId = 'forgot-password-email'
                 >
                 </FormInput>
-                <ShowPasswordBtn
-                    showPassword={showPassword}
-                    setShowPasswordCB={setShowPassword}
-                ></ShowPasswordBtn>
-                <button type='submit'>send otp</button>
+                <button onClick={sendEmailOnClick}>send otp</button>
             </div>
             <p ref={emailMsgRef}>{emailMsg}</p>
             <div className={isLoadingEmail ? "loading__div" : "offscreen"}>

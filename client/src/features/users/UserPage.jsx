@@ -141,17 +141,17 @@ const UserPage = () => {
         <div className="user-edit-options__editing-div">
         {editing ? 
             <>
-              <button className="user-edit-options__editing-div__cancel-btn cursor_pointer" onClick={cancelEditOnClick}>cancel</button>
-              <button className="user-edit-options__editing-div__update-btn cursor_pointer" onClick={updateOnClick}>update</button>
+              <button className="user-edit-options__editing-div__cancel-btn cursor_pointer" type='button' onClick={cancelEditOnClick}>cancel</button>
+              <button className="user-edit-options__editing-div__update-btn cursor_pointer" type='submit' onClick={updateOnClick}>update</button>
             </>
-            : <button className="user-edit-options__editing-div__edit-btn cursor_pointer" onClick={editOnClick}>edit</button>
+            : <button className="user-edit-options__editing-div__edit-btn cursor_pointer" type='button' onClick={editOnClick}>edit</button>
           
         }
         </div>
 
-        <button className='user-edit-options__assign-cameras-btn cursor_pointer' onClick={openAssignCamerasModal}>assign cameras</button>
+        <button className='user-edit-options__assign-cameras-btn cursor_pointer' type='button' onClick={openAssignCamerasModal}>assign cameras</button>
 
-        <button className='user-edit-options__del-btn cursor_pointer' onClick={userDeleteOnClick}>delete</button>
+        <button className='user-edit-options__del-btn cursor_pointer' type='button' onClick={userDeleteOnClick}>delete</button>
       </section>
 
     let content = ''
@@ -168,7 +168,7 @@ const UserPage = () => {
         </div>
     } else {
       content =
-        <form className='user-page__form' onSubmit={onSubmitHandler}>
+        <form className='user-page__form' onSubmit={updateOnClick}>
           <FormInput
             ref = {null}
             required = {true}

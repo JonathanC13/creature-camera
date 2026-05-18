@@ -23,9 +23,8 @@ const baseQuery = retry(fetchBaseQuery({
 // If token expired, attempt to get new token and retry request.
 const baseQueryWithReauth = async (args, api, extraOptions) => {
     let result = await baseQuery(args, api, extraOptions)
-    // console.log('0, ', result)
-    if (result.error && result.error.status === 401) {
-      // console.log('1, ', result.error)
+    
+    if (result.error && result.error.status === 401 && result.error.data.message === 'token') {
       // try to get a new token
       const refreshResult = await baseQuery('/auth/refreshToken', api, extraOptions)
       if (refreshResult.data?.token) {

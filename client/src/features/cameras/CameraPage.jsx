@@ -94,15 +94,15 @@ const CameraPage = () => {
         <div className="camera-edit-options__editing-div">
         {editing ? 
             <>
-              <button className="camera-edit-options__editing-div__cancel-btn cursor_pointer" onClick={cancelEditOnClick}>cancel</button>
-              <button className="camera-edit-options__editing-div__update-btn cursor_pointer" onClick={updateOnClick}>update</button>
+              <button className="camera-edit-options__editing-div__cancel-btn cursor_pointer" type='button' onClick={cancelEditOnClick}>cancel</button>
+              <button className="camera-edit-options__editing-div__update-btn cursor_pointer" type='submit'>update</button>
             </>
-            : <button className="camera-edit-options__editing-div__edit-btn cursor_pointer" onClick={editOnClick}>edit</button>
+            : <button className="camera-edit-options__editing-div__edit-btn cursor_pointer" type='button' onClick={editOnClick}>edit</button>
           
         }
         </div>
 
-        <button className='camera-edit-options__del-btn cursor_pointer' onClick={cameraDeleteOnClick}>delete</button>
+        <button className='camera-edit-options__del-btn cursor_pointer' type='button' onClick={cameraDeleteOnClick}>delete</button>
       </section>
 
     let content = ''
@@ -119,7 +119,7 @@ const CameraPage = () => {
         </div>
     } else {
       content =
-        <form className='camera-page__form' onSubmit={onSubmitHandler}>
+        <form className='camera-page__form' onSubmit={updateOnClick}>
           <FormInput
             ref = {null}
             required = {true}

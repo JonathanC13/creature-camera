@@ -10,7 +10,8 @@ const FormInput = (
         onChangeCB = () => {},
         disabled = false,
         inclineComp,
-        inputId
+        inputId,
+        isPassword = false
     }
 ) => {
 
@@ -18,16 +19,28 @@ const FormInput = (
     <section className='form-input'>
         <label className='form-input__label' htmlFor={inputId}>{text}</label>
         <div className="form-input__div">
-            <textarea className='form-input__div__input' 
-                rows='1'
-                id={inputId}
-                ref={ref}
-                type = {inputType}
-                required={required}
-                value = {value}
-                onChange= { (elem) => { onChangeCB(elem.target.value) } }
-                disabled={disabled}
-            />
+            {isPassword 
+                ? <input className='form-input__div__input' 
+                    id={inputId}
+                    ref={ref}
+                    type = {inputType}
+                    required={required}
+                    value = {value}
+                    onChange= { (elem) => { onChangeCB(elem.target.value) } }
+                    disabled={disabled}
+                />
+                : <textarea className='form-input__div__input' 
+                    rows='2'
+                    id={inputId}
+                    ref={ref}
+                    type = {inputType}
+                    required={required}
+                    value = {value}
+                    onChange= { (elem) => { onChangeCB(elem.target.value) } }
+                    disabled={disabled}
+                />
+            }
+            
             {inclineComp}
         </div>
     </section>
