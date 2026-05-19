@@ -62,6 +62,20 @@ const login = async(req, res, next) => {
     }
 }
 
+const getSelf = async(req, res, next) => {
+    const {
+        id
+    } = req.params
+
+    const response = await UserModel.findById(id).select('-password').exec()
+
+    if (!response) {
+        throw new NotFoundError(`User with id: ${id} does not exist`)
+    }
+
+    res.status(StatusCodes.OK).json({user: response.getUserInfo()})
+}
+
 /**
  * If the request has a valid refresh token, generate a new access token so they have a non-expired token for future requests.
  * @param {*} req 
@@ -293,4 +307,4 @@ const validateOTP = async(req, res, next) => {
     }
 }
 
-module.exports = { login, refreshToken, logout, updateUserInfo, updatePassword, forgotPassword, validateOTP }
+module.exports = { login, getSelf, refreshToken, logout, updateUserInfo, updatePassword, forgotPassword, validateOTP }

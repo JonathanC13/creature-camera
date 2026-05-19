@@ -29,6 +29,18 @@ export const apiSliceWithAuth = apiSlice.injectEndpoints({
             }
         }
     }),
+    getSelf: builder.query({
+        query: (id) => ({
+            method: 'GET',
+            url: `/auth/info/${id}`
+        }),
+        providesTags: (result, error, id) => {
+            // console.log('prov, ', result.user.id)
+            return result?.user
+                ? [{ type: 'Self', id }]
+                : []
+        },
+    }),
     forgotPassword: builder.mutation({
         query: (credentials) => ({
             method: 'POST',
@@ -55,7 +67,11 @@ export const apiSliceWithAuth = apiSlice.injectEndpoints({
             method: 'PATCH',
             url: `/auth/updateUserInfo/${user.id}`,
             body: {...user.userInfo}
-        })
+        }),
+        invalidatesTags: (result, error, user) => {
+            // console.log('upd, ', user.id)
+            return [{ type: 'Self', id: user.id }]
+        }
     }),
     refreshToken: builder.query({
         query: () => ({
@@ -66,4 +82,4 @@ export const apiSliceWithAuth = apiSlice.injectEndpoints({
   })
 })
 
-export const { useLoginMutation, useLogoutMutation, useForgotPasswordMutation, useValidateOTPMutation, useUpdatePasswordMutation, useUpdateUserInfoMutation, useLazyRefreshTokenQuery } = apiSliceWithAuth
+export const { useLoginMutation, useLogoutMutation, useGetSelfQuery, useForgotPasswordMutation, useValidateOTPMutation, useUpdatePasswordMutation, useUpdateUserInfoMutation, useLazyRefreshTokenQuery } = apiSliceWithAuth

@@ -18,10 +18,10 @@ const Navbar = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    const roleName = useSelector((state) => state.auth.userInfo?.roleName)
+    const { id, roleName, temp_password} = useSelector((state) => state.auth.userInfo)
 
     let content = ''
-    if (!roleName) {
+    if (!roleName || temp_password) {
         content = <></>
     } else {
         content =

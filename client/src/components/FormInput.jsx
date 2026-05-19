@@ -29,8 +29,8 @@ const FormInput = (
                     onChange= { (elem) => { onChangeCB(elem.target.value) } }
                     disabled={disabled}
                 />
-                : <textarea className='form-input__div__input' 
-                    rows='2'
+                : <textarea className='form-input__div__ta' 
+                    rows='1'
                     id={inputId}
                     ref={ref}
                     type = {inputType}

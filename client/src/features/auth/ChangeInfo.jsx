@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useRef, useEffect } from 'react'
 import FormInput from '../../components/FormInput'
-import { useGetUserQuery, useUpdateUserMutation } from '../users/userApiSlice'
+import { useGetSelfQuery, useUpdateUserInfoMutation } from '../auth/authApiSlice'
 import { userInfoSet } from './authSlice'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -9,8 +9,8 @@ const ChangeInfo = () => {
     const dispatch = useDispatch()
 
     const { id } = useSelector((state) => state.auth.userInfo)
-    const { data, isLoading, isError } = useGetUserQuery(id, { skip: !id })
-    const [updateUser, { isLoading: isLoadingUpdate, isError: isErrorUpdate }] = useUpdateUserMutation()
+    const { data, refetch, isLoading, isError } = useGetSelfQuery(id, { skip: !id })
+    const [updateUser, { isLoading: isLoadingUpdate, isError: isErrorUpdate }] = useUpdateUserInfoMutation()
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
@@ -20,19 +20,19 @@ const ChangeInfo = () => {
     const msgRef = useRef()
 
     useEffect(() => {
-        if (data?.response) {
-            setName(data.response.name)
-            setEmail(data.response.email)
-            setNotifyAlways(data.response.settingNotifyAlways)
+        if (data?.user) {
+            setName(data.user.name)
+            setEmail(data.user.email)
+            setNotifyAlways(data.user.settingNotifyAlways)
         }
     }, [data])
 
     const resetInfo = () => {
         setMsg('')
-        if (data?.response) {
-            setName(data.response.name)
-            setEmail(data.response.email)
-            setNotifyAlways(data.response.settingNotifyAlways)
+        if (data?.user) {
+            setName(data.user.name)
+            setEmail(data.user.email)
+            setNotifyAlways(data.user.settingNotifyAlways)
         }
     }
 
@@ -57,13 +57,12 @@ const ChangeInfo = () => {
 
             const response = await updateUser(payload).unwrap()
                 .then((res) => {
-                    dispatch(userInfoSet(res.response));
+                    dispatch(userInfoSet(res.user));
                     const successMsg = `user info updated.`
                     setMsg(successMsg)
                     msgRef.current.focus()
                 })
                 .catch((error) => {
-                    // console.log(error)
                     if (!error.data) {
                         setMsg('no server response.')
                     } else if (error?.data?.message) {

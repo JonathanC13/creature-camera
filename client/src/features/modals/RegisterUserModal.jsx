@@ -67,7 +67,7 @@ const RegisterUserModal = ({ isOpen, onClose, defaultOpen = false }) => {
                     resetControlledInputs()
                     setMsg(successMsg)
                     msgRef.current.focus()
-                    dispatch(closeModal())
+                    // dispatch(closeModal())
                 })
                 .catch((error) => {
                     // console.log(error)
