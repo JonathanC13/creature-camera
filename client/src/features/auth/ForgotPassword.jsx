@@ -24,19 +24,23 @@ const ForgotPassword = () => {
     const [forgotPassword, { isLoading: isLoadingEmail, isError: isErrorEmail }] = useForgotPasswordMutation()
     const [validateOTP, { isLoading: isLoadingOTP, isError: isErrorOTP }] = useValidateOTPMutation()
 
+    const changeShowOtp = () => {
+        setShowOtp(!showOtp)
+    }
+
     const sendEmailOnClick = async(e) => {
         e.preventDefault()
         const form = e.currentTarget
 
         // reset process
         dispatch(loggedOut())
-        setShowOTP(false)
+        setShowOtp(false)
         setOtp('')
         setOtpMsg('')
         setShowNewPassForm(false)
 
         try {
-            const resp = await useForgotPasswordMutation( { email } ).unwrap()
+            const resp = await forgotPassword( { email } ).unwrap()
                 .then((res) => {
                     setEmailMsg('if the email address is valid you will have a One Time Password, via email, please type it below.')
                     emailMsgRef.current.focus()
@@ -56,13 +60,14 @@ const ForgotPassword = () => {
                 })
         } catch(e) {
             setEmailMsg('forgot password failed.')
+            console.log(e)
             emailMsgRef.current.focus()
         }
     }
 
-    const validateOTPOnClick = async() => {
-        // e.preventDefault()
-        // const form = e.currentTarget
+    const validateOTPOnClick = async(e) => {
+        e.preventDefault()
+        const form = e.currentTarget
 
         try {
             const payload = {
@@ -70,21 +75,20 @@ const ForgotPassword = () => {
                 password: otp
             }
             
-            const resp = await useValidateOTPMutation( payload ).unwrap()
+            const resp = await validateOTP( payload ).unwrap()
                 .then((res) => {
-                    setOtpMsg('verified, update your password.')
+                    setOtpMsg('verified, update your password below.')
                     otpMsgRef.current.focus()
 
                     // res: {user: {id: userDocument.getId(), temp_password: userDocument.temp_password}, token: oneTimeToken}
                     const obj = {
-                        userInfo: {
-                            id: res.user.id,
-                            temp_password: res.user.temp_password
-                        },
+                        id: res.user.id,
+                        temp_password: res.user.temp_password,
                         token: res.token
                     }
+                    
                     dispatch(userInfoSet(obj))
-
+                    
                     setShowNewPassForm(true)
                 })
                 .catch((error) => {
@@ -108,14 +112,10 @@ const ForgotPassword = () => {
     const onSubmitHandler = (e) => {
         e.preventDefault()
     }
-
-    const updatePasswordOnClick = async() => {
-        // const form = e.currentTarget
-    }
     
     const contentOTP = 
-        <form className="forgot-password__OTP-form" onSubmit={onSubmitHandler}>
-            <h1 className="forgot-password__OTP-form__h1">enter OTP from email</h1>
+        <form className="forgot-password__OTP-form" onSubmit={validateOTPOnClick}>
+            <h2 className="forgot-password__OTP-form__h2">enter OTP from email</h2>
             <div className="forgot-password__OTP-form__div">
                 <FormInput
                     ref = {null}
@@ -127,14 +127,14 @@ const ForgotPassword = () => {
                     disabled = {isLoadingOTP ? true : false}
                     inclineComp={<ShowPasswordBtn
                         showPassword={showOtp}
-                        setShowPasswordCB={setShowOtp}
+                        setShowPasswordCB={changeShowOtp}
                     ></ShowPasswordBtn>}
                     inputId = 'forgot-password-otp'
                     isPassword = {true}
                 >
                 </FormInput>
-                <button onClick={validateOTPOnClick}>send otp</button>
             </div>
+            <button className='forgot-password__verify-otp-btn cursor_pointer' type='submit'>verify otp</button>
             <p className={isErrorOTP ? 'update-msg__p-error' : 'update-msg__p-succ'} ref={otpMsgRef}>{otpMsg}</p>
             <div className={isLoadingOTP ? "loading__div" : "offscreen"}>
                 {
@@ -147,8 +147,9 @@ const ForgotPassword = () => {
 
   return (
     <section className='forgot-password'>
-        <form className="forgot-password__email-form" onSubmit={onSubmitHandler}>
-            <h1 className="forgot-password__email-form__h1">enter account email</h1>
+        <h1 className="forgot-password__h1">forgot password</h1>
+        <form className="forgot-password__email-form" onSubmit={sendEmailOnClick}>
+            <h2 className="forgot-password__email-form__h2">enter account email</h2>
             <div className="forgot-password__email-form__div">
                 <FormInput
                     ref = {null}
@@ -161,9 +162,9 @@ const ForgotPassword = () => {
                     inputId = 'forgot-password-email'
                 >
                 </FormInput>
-                <button onClick={sendEmailOnClick}>send otp</button>
             </div>
-            <p ref={emailMsgRef}>{emailMsg}</p>
+            <button className='forgot-password__email__send-btn cursor_pointer' type='submit'>send one time password</button>
+            <p className={isErrorEmail ? 'update-msg__p-error' : 'update-msg__p-succ'} ref={emailMsgRef}>{emailMsg}</p>
             <div className={isLoadingEmail ? "loading__div" : "offscreen"}>
                 {
                     isLoadingEmail ? 

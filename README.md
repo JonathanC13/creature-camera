@@ -692,7 +692,7 @@ API:
         Expected results: 1. status code: 200. 2. response: JSON { response: [{filename, created, thumbnail: url to public folder}, ...], count: number of cameras }. 3. 
         Status: Pass
 
-    2. GET /video/src TODO test
+    2. GET /videoSrc
         Test from client request.
         Query parameters:
             ?
@@ -703,7 +703,7 @@ API:
         Body: 
             {  }
         Expected results: 1. status code: 206. 2. response: readStream. 3. For <video><source></source></video>
-        Status: 
+        Status: Pass
 
 Prerequisites: 
 Route params: 
@@ -774,7 +774,7 @@ Client:
                 </div>
             )
 
-5. React client
+5. React client OK
 
 6. Videos apiSlice auto refetch all every 10 minutes since only GETS, no mutations will trigger a tag invalidation. OK
 

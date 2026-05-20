@@ -72,6 +72,8 @@ img {
   --SUBMIT-TEXT-SUCC-COLOR: green;
   --NAVLINK-BG-COLOR: #8A6F78;
   --NAVLINK-BG-COLOR-HOVER: #6D3B47;
+  --NAVLINK-PW-COLOR: #8A6F78;
+  --NAVLINK-PW-COLOR-HOVER: #6D3B47;
   --TABLE-HEADER-BG-COLOR: #8A6F78;
   --TABLE-BG-COLOR: #A7A2A9;
   --INPUT-BG-COLOR: #fff;
@@ -312,6 +314,20 @@ body {
   background-color: var(--CONFIRM-BTN-COLOR-HOVER);
 }
 
+.login__forgot-pw-navlink {
+  border: var(--BORDER-BTN-GEN);
+  border-radius: var(--BORDER-BUTTON-RAD);
+  text-decoration: none;
+  padding: var(--PADDING-BTN-GEN);
+  background-color: var(--NAVLINK-PW-COLOR);
+  color: var(--LIGHT-TEXT-BTN-COLOR);
+  text-align: center;
+}
+
+.login__forgot-pw-navlink:hover {
+  background-color: var(--NAVLINK-PW-COLOR-HOVER);
+}
+
 .login__msg-p-error {
   color: var(--SUBMIT-TEXT-ERR-COLOR);
 }
@@ -334,6 +350,79 @@ body {
   justify-content: center;
 }
 /* /Show password */
+
+/* forgot password */
+.forgot-password {
+  border: var(--BORDER-GEN);
+  border-radius: var(--BORDER-RAD);
+  background-color: var(--CONTAINER-COLOR);
+  padding: var(--PADDING-GEN);
+  display: flex;
+  flex-direction: column;
+  gap: var(--FLEX-GAP);
+}
+
+.forgot-password__email-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--FLEX-GAP);
+  padding-bottom: var(--PADDING-GEN);
+  border-bottom: var(--BORDER-GEN);
+}
+
+.forgot-password__h1 {
+  font-size: var(--H1-SIZE);
+  color: var(--LIGHT-H1-FONT-COLOR);
+  padding-bottom: var(--PADDING-GEN);
+  border-bottom: var(--BORDER-GEN);
+}
+
+.forgot-password__email-form__h2 {
+  color: var(--LIGHT-H1-FONT-COLOR);
+}
+
+.forgot-password__email-form__div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--FLEX-GAP);
+}
+
+.forgot-password__email__send-btn {
+  width: 100%;
+  border: var(--BORDER-BTN-GEN);
+  border-radius: var(--BORDER-BUTTON-RAD);
+  padding: var(--PADDING-BTN-GEN);
+  background-color: var(--CONFIRM-BTN-COLOR)
+}
+
+.forgot-password__email__send-btn:hover {
+  background-color: var(--CONFIRM-BTN-COLOR-HOVER);
+}
+
+.forgot-password__OTP-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--FLEX-GAP);
+  padding-bottom: var(--PADDING-GEN);
+  border-bottom: var(--BORDER-GEN);
+}
+
+.forgot-password__OTP-form__h2 {
+  color: var(--LIGHT-H2-FONT-COLOR);
+}
+
+.forgot-password__verify-otp-btn {
+  width: 100%;
+  border: var(--BORDER-BTN-GEN);
+  border-radius: var(--BORDER-BUTTON-RAD);
+  padding: var(--PADDING-BTN-GEN);
+  background-color: var(--CONFIRM-BTN-COLOR)
+}
+
+.forgot-password__verify-otp-btn:hover {
+  background-color: var(--CONFIRM-BTN-COLOR-HOVER);
+}
+/* /forgot password */
 
 /* update temp password */
 .update-temp-pass__OTP-form {

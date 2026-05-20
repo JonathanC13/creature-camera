@@ -15,7 +15,7 @@ export const authSlice = createSlice({
     initialState,
     reducers: {
         userInfoSet: (state, action) => {
-            const { persistentLogin } = action.payload.persistentLogin ?? state.userInfo.persistentLogin
+            const { persistentLogin } = action.payload?.persistentLogin ?? state.userInfo?.persistentLogin ?? false
             localStorage.setItem('persistentLogin', persistentLogin)
             state.userInfo = { ...state.userInfo, ...action.payload}
         },

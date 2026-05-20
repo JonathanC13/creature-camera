@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useRef, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Link, useNavigate, useLocation } from 'react-router'
+import { Link, useNavigate, useLocation, NavLink } from 'react-router'
 
 import FormInput from '../../components/FormInput'
 import ShowPasswordBtn from '../../components/ShowPasswordBtn'
@@ -155,6 +155,7 @@ const login = () => {
                     </FormInput>
                 </div>
                 <button className='login__btn cursor_pointer' type='submit' disabled={isLoading}>log in</button>
+                <NavLink to='/forgotPassword' className='login__forgot-pw-navlink'>forgot password</NavLink>
                 <p className={isError ? 'login__msg-p-error' : 'login_msg-p-succ'} ref={msgRef}>{msg}</p>
                 <div className={isLoading ? "loading__div" : "offscreen"}>
                     {
