@@ -33,13 +33,14 @@ const uploadVideoSingle = async(req, res, next) => {
                 path: filePath,
                 filename: filename
             } = req.file
+            // console.log(req.file)
 
             const {
                 base
             } = config
             const { uploadFolder } = config.folders
             const uploadPath = path.join(base, uploadFolder)
-            const outputFileName = filename + "-h264.mp4"
+            const outputFileName = filename.split('.')[0] + "-h264.mp4"
             const outputPath = path.join(uploadPath, id, 'processed', outputFileName);
             // force to H.264 in case it is not
             try {

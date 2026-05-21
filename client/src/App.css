@@ -1110,7 +1110,7 @@ body {
   flex-direction: column;
   gap: var(--FLEX-GAP);
   width: 100%;
-  max-height: 400px; /* Set your maximum height limit */
+  max-height: 800px; /* Set your maximum height limit */
   overflow-y: auto;  /* Adds vertical scrollbar only when content overflows */
   border: 1px solid #ccc; /* Optional: adds a visual border */
   padding: var(--PADDING-GEN);
@@ -1277,7 +1277,7 @@ body {
 
 .dual-listbox-container__move-div {
   padding: var(--PADDING-GEN);
-  width: fit-content;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;

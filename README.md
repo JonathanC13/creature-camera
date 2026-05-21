@@ -20,6 +20,7 @@ Server
 
     * Setup in .env
         ACCESS_CONTROL_ALLOW_ORIGIN = "https://www.jonRPI.com"
+        process.env.ACCESS_CONTROL_ALLOW_ORIGIN_RPI = "https://192.168.1.18"
         JWT_SECRET
         JWT_LIFETIME = '2h'
 

@@ -51,9 +51,11 @@ app.use(helmet({
       policy: "cross-origin"
     }
 }))
+
+const allowedOrigins = [process.env.ACCESS_CONTROL_ALLOW_ORIGIN]
 app.use(cors(
     {
-        origin: process.env.ACCESS_CONTROL_ALLOW_ORIGIN, // Adjust this to your frontend's URL
+        origin: allowedOrigins, // Adjust this to your frontend's URL
         credentials: true, // This allows cookies to be included in requests
     }
 ))

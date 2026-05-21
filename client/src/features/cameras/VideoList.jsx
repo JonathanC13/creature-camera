@@ -1,37 +1,35 @@
 import React from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import VideoItem from './VideoItem'
 
 const VideoList = ({
     cameraId,
     videosArr = []
 }) => {
+    
     // const sortCategory = localStorage.getItem(cameraId + '__cate')
     if (!localStorage.getItem(cameraId + '__sortDesc')) {
         localStorage.setItem(cameraId + '__sortDesc', true)
     }
     const sortDesc = localStorage.getItem(cameraId + '__sortDesc')
 
-    const [videos, setVideos] = useState(videosArr)
     const [descUploadTime, setDescUploadTime] = useState(sortDesc ?? true)
 
     const toggleDescUploadTime = () => {
         setDescUploadTime(!descUploadTime)
     }
 
-    useEffect(() => {
-        // console.log(videosArr)
-        // sort videos in original Array -> spread into new Array() so that setVideos state reference changed to new array, but the object reference within are the same as original which is one part to not re-render the item component.
-        setVideos(prevVideos =>
-            [...prevVideos].sort((a, b) => {
+    // sort videos in original Array -> spread into new Array() so that setVideos state reference changed to new array, but the object reference within are the same as original which is one part to not re-render the item component.
+    const sortedVideos = useMemo(() => {
+        return [...videosArr].sort((a, b) => 
+            {
                 if(descUploadTime) {
                     return new Date(b.birthtime) - new Date(a.birthtime)
                 } else {
                     return new Date(a.birthtime) - new Date(b.birthtime)
                 }
             })
-        );
-    }, [descUploadTime])   // so on change of createdDesc, the re-render will use the updated state for the sorting.
+    }, [videosArr, descUploadTime]);
 
     /* 
     1. Assigning videoComps to a variable does not inherently trigger re-renders.
@@ -44,7 +42,7 @@ const VideoList = ({
         }
     */
     // Component re-renders due to videos state change to re-order memoized VideoItem
-    const videoComps = videos.map(video => (
+    const videoComps = sortedVideos.map(video => (
         <VideoItem key={video.filename} cameraId={cameraId} videoInfo={video} />
     ));
     
@@ -57,7 +55,7 @@ const VideoList = ({
             {/* <p className="video-list__sort-opt-div__p">Sort</p> */}
             <button className="video-list__sort-upl-btn cursor_pointer" onClick={toggleDescUploadTime}>Sorted by upload time {descUploadTime ? 'desc' : 'asc'}</button>
         </div>
-        <p className="video-list__count-p">Number of videos: {videosArr.length}</p>
+        <p className="video-list__count-p">Number of videos: {sortedVideos.length}</p>
         <ul className='video-list__ul'>
             {videoComps}
         </ul>

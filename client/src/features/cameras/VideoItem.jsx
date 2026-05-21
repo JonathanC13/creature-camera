@@ -14,6 +14,7 @@ const VideoItem = memo(({
   cameraId,
   videoInfo
 }) => {
+    
     const {
       filename,
       birthtime,
@@ -21,7 +22,7 @@ const VideoItem = memo(({
       length_s,
       thumbnail
     } = videoInfo
-    
+    console.log('rerender: ', filename)
     const dispatch = useDispatch()
 
     const baseURL = import.meta.env.VITE_BACKEND_BASE_URL

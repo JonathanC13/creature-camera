@@ -16,6 +16,7 @@ const CameraList = () => {
     const {data, refetch, isFetching, isLoading, isError} = useGetSubVideosQuery(undefined, {
       pollingInterval: 600000,  // 10 minutes
     })
+    
     const dataResp = data?.response ? data.response : []
     
     let content = ''
