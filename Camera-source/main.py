@@ -102,7 +102,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
             # Do not extend if; 1. no motion, 2. extended the current recorded max number of times. 3. At max recording length for a single file.
             if (motionFlag == False or recordExtended >= processSettingsObj.getRecordExtendMultiple() or time.time() - startRecordTime >= maxRecordingLengthInSeconds):
                 #print(time.time() - startRecordTime)
-                print('Recording ended')
+                #print('Recording ended')
                 CameraControlObj.setRecord(False, '')
                 
                 # clear finished threads. Once found a thread still running, break.
@@ -132,7 +132,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
         
         if (CameraControlObj.getRecord() == False and motionFlag == True):
             # start recording
-            print('Recording started')
+            #print('Recording started')
             CompareImagesObj.resetFrameNumber()
             recordExtended = 0
             startRecordIntervalTime = time.time()

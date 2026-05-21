@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from setup import getConfigSettings
 
 def test():
-    url = 'http://192.168.1.22:5000/' # Example URL
+    url = 'http://192.168.1.2:5000/' # Example URL
     response = requests.get(url)
 
     # Check the status code (200 means success)
@@ -38,8 +38,8 @@ def convertAviToMP4(directory, filename):
     name = filename.split(".")[0]
     avi_path = directory + '/' + filename
     mp4_path = directory + '/' + name + '.mp4'
-    print(avi_path)
-    print(mp4_path)
+    #print(avi_path)
+    #print(mp4_path)
     # Convert AVI -> MP4 (H264)
     cmd = [
         "ffmpeg",
@@ -59,12 +59,12 @@ def convertAviToMP4(directory, filename):
         text=True
     )
 
-    if result.returncode != 0:
-        print("FFmpeg failed")
-        print(result.stderr)
-    else:
-        print("MP4 created:", mp4_path)
-        print("Size:", os.path.getsize(mp4_path))
+    #if result.returncode != 0:
+    #    print("FFmpeg failed")
+    #    print(result.stderr)
+    #else:
+    #    print("MP4 created:", mp4_path)
+    #    print("Size:", os.path.getsize(mp4_path))
         
     return mp4_path
 
