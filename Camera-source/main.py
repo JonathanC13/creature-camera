@@ -61,8 +61,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
     
     recordFolder = config['FOLDERS']['recorded_folder'] 
     recordFilename = ""
-    
-    #print('Camera running...')
+    print('\n**Camera: Running**\n')
     #while (True):
     while (time.time() - processSettingsObj.getStartTime() < processSettingsObj.getDurationMin() * 60 and processSettingsObj.getRunning() == True):
         #if (time.time() - logStart >= 1):
@@ -157,7 +156,7 @@ def threadFuncAnalyzeVideoStream(processSettingsObj):
             t.join()
         logger.info('Joined.')
             
-    print('\n**Current camera session completed.**\n')
+    print('\n**Camera: Current camera session completed.**\n')
     print('Enter a settings selection for the next session.')
     logger.info('===/ Camera Thread ===')
     return
@@ -223,7 +222,6 @@ def main():
         processSettingsObj.setRunning(True)
         threadAnalyzeVideoStream = threading.Thread(target=threadFuncAnalyzeVideoStream, args=(processSettingsObj,))
         threadAnalyzeVideoStream.start()
-        print('Camera: Running...')
         
         options = ''
         for k, v in processSettingsObj.changeOptions.items():
@@ -233,13 +231,19 @@ def main():
         while (running):
             print("=== Change settings ===")
             print(options)
+            print("*Enter 'status' to get camera status.")
             print("*Enter 'new' to choose new settings.")
             print("*Enter 'restart' to restart with same settings.")
             print("*Enter 'quit' to quit the program.")
             print('---')
             opt = input('If want to change a setting, enter a selection: ')
+            print(f'Input of: {opt}')
             
-            if (opt == 'new'):
+            if (opt == 'status'):
+                status = 'running' if threadAnalyzeVideoStream.is_alive() else 'standby'
+                print(f"Camera status: {status}")
+                continue
+            elif (opt == 'new'):
                 newSettings = True
                 processSettingsObj.setRunning(False)
                 threadAnalyzeVideoStream.join()
@@ -283,7 +287,7 @@ def main():
             print('\n')
         print('\n')
     
-    print('Camera: Stopped.')
+    print('= Main: Stopped.')
     processSettingsObj.setRunning(False)
     if (threadAnalyzeVideoStream is not None):  
         threadAnalyzeVideoStream.join()
