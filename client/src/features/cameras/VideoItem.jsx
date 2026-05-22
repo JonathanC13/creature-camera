@@ -22,12 +22,13 @@ const VideoItem = memo(({
       length_s,
       thumbnail
     } = videoInfo
-    console.log('rerender: ', filename)
+    // console.log('rerender: ', filename)
     const dispatch = useDispatch()
-
+    
     const baseURL = import.meta.env.VITE_BACKEND_BASE_URL
     const apiURL = import.meta.env.VITE_BACKEND_API_URL
 
+    const f_length_s = Math.round(length_s, 2)
     const uploadDate = (new Date(birthtime)).toString()
 
     const thumbnailOnClickHandler = (e) => {
@@ -46,8 +47,8 @@ const VideoItem = memo(({
         <img src={baseURL + thumbnail} alt={filename} className="video-item__section__img"/>
         <ul className='video-item__ul'>
           {descriptionItem('upload time', uploadDate)}
-          {descriptionItem('length (seconds)', length_s === 0 ? 'Could not retrieve length' : length_s)}
-          {descriptionItem('size', size)}
+          {descriptionItem('length (seconds)', f_length_s === 0 ? 'Could not retrieve length' : f_length_s)}
+          {descriptionItem('size (KB)', size)}
         </ul>
       </section>
     </li>
