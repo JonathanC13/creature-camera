@@ -220,7 +220,7 @@ body {
   padding: var(--PADDING-FORM-INPUT);
   background-color: var(--INPUT-BG-COLOR);
   width: 100%;
-  resize: none;
+  resize: vertical;
   font-family: var(--FONT-FAMILY);
 }
 

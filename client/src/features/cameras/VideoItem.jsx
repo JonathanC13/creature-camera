@@ -48,7 +48,7 @@ const VideoItem = memo(({
         <ul className='video-item__ul'>
           {descriptionItem('upload time', uploadDate)}
           {descriptionItem('length (seconds)', f_length_s === 0 ? 'Could not retrieve length' : f_length_s)}
-          {descriptionItem('size (KB)', size)}
+          {descriptionItem('size (KB)', size / 1000)}
         </ul>
       </section>
     </li>
