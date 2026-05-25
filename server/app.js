@@ -4,36 +4,41 @@ const express = require('express')
 // const multer = require("multer");
 const config = require('./config')
 const validateProjectDirectories = require('./functions/validateProjectDirectories')
+const validateRoleCollection = require('./functions/validateRoleCollection')
 // security
 const helmet = require('helmet')
 const cors = require('cors')
 const rateLimit = require('express-rate-limit')
 const xss = require('./middleware/xss-clean')
 const cookieParser = require('cookie-parser')
-
-// check directories
-if (validateProjectDirectories() === false) {
-    console.log('Could not validate or create the required project files. App terminating...')
-    process.exit(1)
-}
+const logger = require('./logging/logger')
 
 // db
-//const connectDB = require('./db/connect')
-
-// uploads
-// const upload = multer({ dest: config.uploadDir });
+const connectDB = require('./db/connect')
 
 // routers
+const authRouter = require('./routes/auth')
 const uploadVideoSingleRouter = require("./routes/uploadVideoSingle")
+const cameraRouter = require('./routes/cameras')
+const userRouter = require('./routes/users')
+const videoRouter = require('./routes/videos')
+const videoSrcRouter = require('./routes/videoSrc')
+const roleRouter = require('./routes/roles')
 
 // middleware
-const verifyCameraMiddleware = require('./middleware/verifyCamera')
+const authorizationMiddleware = require('./middleware/authorization')
+const validAdminMiddleware = require('./middleware/isValidAdmin')
+const authCameraMiddleware = require('./middleware/authCamera')
+const errorHandlerMiddleware = require('./middleware/errorHandler');
 
 // app
 const app = express()
 const port = config.app.port
-// Middleware to parse JSON bodies
-app.use(express.json());
+// Serve files from the 'public' folder
+// File Location: public/images/logo.png
+// Access URL: http://localhost:3000/images/logo.png
+app.use(express.static('public'));
+
 // Middleware to parse URL-encoded bodies (form submissions)
 app.use(express.urlencoded({ extended: true }));
 
@@ -41,13 +46,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 
 // extra security packages
-app.use(helmet())
-// app.use(cors(
-//     {
-//         origin: process.env.ACCESS_CONTROL_ALLOW_ORIGIN, // Adjust this to your frontend's URL
-//         credentials: true, // This allows cookies to be included in requests
-//     }
-// ))
+app.use(helmet({
+    crossOriginResourcePolicy: {
+      policy: "cross-origin"
+    }
+}))
+
+const allowedOrigins = [process.env.ACCESS_CONTROL_ALLOW_ORIGIN]
+app.use(cors(
+    {
+        origin: allowedOrigins, // Adjust this to your frontend's URL
+        credentials: true, // This allows cookies to be included in requests
+    }
+))
 app.use(xss()) // make sure this comes before any routes
 
 app.set('trust proxy', 1 /* number of proxies between user and server */)
@@ -65,20 +76,47 @@ app.get('/', (req, res) => {
     res.send('hello, world!')
 })
 
-app.use('/api/v1/uploadVideo', verifyCameraMiddleware, uploadVideoSingleRouter)
+// app.use("/video", express.static(uploadFolder));
 
+
+// ensure /uploadVideo is not on route of '/api'. Express pipeline is consuming/modifying the request body before multer reads it
+app.use('/uploadVideo', authCameraMiddleware, uploadVideoSingleRouter)
+
+// Middleware to parse JSON bodies
+app.use('/api', express.json());
+
+app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/camera', authorizationMiddleware, validAdminMiddleware, cameraRouter)
+app.use('/api/v1/user', authorizationMiddleware, validAdminMiddleware, userRouter)
+app.use('/api/v1/video', authorizationMiddleware, videoRouter)
+app.use('/api/v1/videoSrc', videoSrcRouter)
+app.use('/api/v1/role', authorizationMiddleware, roleRouter)
 // /routes
+
+app.use(errorHandlerMiddleware) // catch errors
 
 const start = async() => {
     try {
-        //await connectDB(process.env.MONGO_URI)
+        // check directories
+        if (!(await validateProjectDirectories())) {
+            logger.error('Could not validate or create the required project files. App terminating...')
+            process.exit(1)
+        }
+
+        await connectDB(config.app.mongoURI)
+
+        if (!(await validateRoleCollection())) {
+            logger.error('Could not validate or create the required project Roles. App terminating...')
+            process.exit(1)
+        }
 
         app.listen(port, '0.0.0.0', async() => {
+            logger.info(`Listening on port ${port}...`)
             console.log(`Listening on port ${port}...`)
         })
 
     } catch (err) {
-        console.log(`Listen error: ${err}`)
+        logger.error(`Listen error: ${err}`)
     }
 }
 

@@ -9,7 +9,7 @@ const videoFileFilter = (req, file, cb) => {
     return cb(null, true);
   } else {
 
-    cb(new Error('File type not accepted!'), false)
+    cb(new Error('Upload file type not accepted!'), false)
   }
 
   // You can always pass an error if something goes wrong:

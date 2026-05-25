@@ -1,21 +1,64 @@
 const multer = require("multer");
+const path = require("path");
 const { videoFileFilter } = require('../functions/videoFileFilter')
-const { BadRequestError } = require('../errors')
+const { BadRequestError, NotFoundError } = require('../errors')
 const config = require('../config')
+const { directoryExistsOrCreate } = require('../functions/fileSystem');
 
-var storage = multer.diskStorage({
-    destination: function (req, file, callback) {
-        callback(null, config.uploadsDir);
-    },
-    filename: function (req, file, callback) {
-        callback(null, file.originalname);
+const fs = require('fs');
+const crypto = require('crypto');
+
+const uploadVideoMulter = async(req, res, next) => {
+    const {
+        base
+    } = config
+    const { uploadFolder } = config.folders
+    const {
+        id
+    } = req.camera
+    
+    const dest = path.join(base, uploadFolder, id)
+    // check if folder exists or create
+    if (!(await directoryExistsOrCreate(dest))) {
+        throw new NotFoundError('Upload directory not found.')
     }
-});
+    const processedDest = path.join(dest, 'processed')
+    if (!(await directoryExistsOrCreate(processedDest))) {
+        throw new NotFoundError('Upload directory not found.')
+    }
+    
+    const storage = multer.diskStorage({
+        destination: function (req, file, callback) {
+            callback(null, dest);
+        },
+        filename: function (req, file, callback) {
+            // const extArray = file.mimetype.split('/')
+            // const ext = extArray[extArray.length - 1]
+            // console.log(extArray, ext)
+            // Math.round(Math.random() * 1e9) + '-' + 
+            callback(null, file.originalname);
+        }
+    });
 
-const upload = multer({ storage: storage, fileFilter: videoFileFilter }).single('file');    // That upload object has several methods (single, array, fields, none, etc.), and each method returns a middleware function that Express can use.
+    const upload = multer({ 
+        storage: storage, 
+        fileFilter: videoFileFilter, 
+        limits: {
+            fileSize: 1024 * 1024 * 500 // 500MB
+        }
+    }).single('file');    // That upload object has several methods (single, array, fields, none, etc.), and each method returns a middleware function that Express can use.
 
-const uploadVideoMulter = (req, res, next) => {
     upload(req, res, (err) => {
+        // console.log('Uploaded file:', req.file)
+        // console.log(req.headers['content-type']);
+        // const data = fs.readFileSync(req.file.path);
+
+        // console.log(
+        //     crypto.createHash('md5')
+        //         .update(data)
+        //         .digest('hex')
+        //     );
+
         if (err instanceof multer.MulterError) {
             // A Multer error occurred (e.g., file too large)
             throw new BadRequestError(err.message)

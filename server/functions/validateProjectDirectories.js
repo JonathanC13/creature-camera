@@ -1,33 +1,14 @@
-const fs = require('fs');
-const path = require("path");
+const { directoryExistsOrCreate } = require('./fileSystem')
+const config = require('../config')
+const path = require('path');
 
-const validateProjectDirectories = function() {
-    const directories = ['../uploads']
+async function validateProjectDirectories() {
+    const {
+        projectDirectories
+    } = config
 
-    for (let i = 0; i < directories.length; i ++) {
-        const dirPath = path.join(__dirname, directories[i]);
-
-        try {
-            const stats = fs.lstatSync(dirPath);
-
-            if (!stats.isDirectory()) {
-                throw new Error("A non-directory file exists at that path.");
-            }
-
-            // console.log("Directory already exists:", dirPath); // good
-        } catch (err) {
-            if (err.code === "ENOENT") {
-                // Directory does not exist, therefore create it
-                try {
-                    fs.mkdirSync(dirPath, { recursive: true });
-                    console.log("Directory created:", dirPath);
-                } catch (mkdirErr) {
-                    console.error("Error creating directory:", mkdirErr.message);
-                }
-            } else {
-                console.error("Error checking directory:", err.message);
-            }
-
+    for (let directory of projectDirectories) {
+        if (!(await directoryExistsOrCreate(directory))) {
             return false
         }
     }
