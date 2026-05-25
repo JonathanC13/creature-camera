@@ -2,23 +2,24 @@ import cv2
 import threading
 import numpy as np
 import os.path
+import logging
+from setup import getConfigSettings
 
-class OpenCVControl:
+class CameraControl:
     def __init__(self, rtspStreamURL):
         currPath = os.getcwd()
-        config = configparser.ConfigParser()
-        config_file_path=os.path.join(currPath, "config", "config.ini")
-        config.read(config_file_path)
+        self.config = getConfigSettings()
         
-        self.logger = logging.getLogger(config['LOG_INFO']['loggerName'])
+        self.logger = logging.getLogger(self.config['LOG_INFO']['logger_name'])
         self.rtspStreamURL = rtspStreamURL
         self.capture = cv2.VideoCapture(rtspStreamURL)
+        self.out = None
         self.quit = False
         self.record = False
         self.recordPath = ""
         
         self.ret = False
-        self.frame = np.ndarray(shape=(0,0))
+        self.frame = None
         
         self.maxReOpenRetry = 3
         self.maxFrameRetry = 3
@@ -42,35 +43,43 @@ class OpenCVControl:
         self.record = record
         #print('\n')
         if (record == True and path != ""): 
-            #print(f"OpenCVControl: **Trying to record to {path}")
-            self.logger.info(f"OpenCVControl: setRecord: **Trying to record to {path}")
+            #print(f"CameraControl: **Trying to record to {path}")
+            self.logger.info(f"CameraControl: setRecord: **Trying to record to {path}")
             self.recordPath = path
-            self.out = cv2.VideoWriter(path, self.fourcc, self.fps, (self.width, self.height))
+            self.out = cv2.VideoWriter(path, self.fourcc, self.fps, (self.width, self.height), True)    # For each video, need new VideoWriter
         else:
-            #print("OpenCVControl: **Recording end.")
-            self.logger.info("OpenCVControl: setRecord: **Recording end.")
-            #if (self.out is not None):
-            #    self.out.release()
+            #print("CameraControl: **Recording end.")
+            self.logger.info("CameraControl: setRecord: **Recording end.")
+            if (self.out is not None):
+                # must release after each video complete.
+                self.out.release()
+                self.out = None
             
     def getRecord(self):
         return self.record
         
     def setRecordProperties(self):
-        self.fourcc = cv2.VideoWriter_fourcc(*'XVID')  # Or 'MJPG', 'H264', etc.
+        self.fourcc = cv2.VideoWriter_fourcc(*'XVID')  # format files so client browser can load into <source>
         self.fps = self.capture.get(cv2.CAP_PROP_FPS)
         self.width = int(self.capture.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.height = int(self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.out = None
         
-    def writeFrame(self):
-        if (self.record == True and self.out is not None):
-            self.out.write(self.frame)
+    def writeFrame(self, frame=None):
+        frame = self.frame if frame is None else frame
+        if (frame is not None and self.out is not None):
+            self.out.write(frame)
+        elif (frame is None):
+            self.logger.error("ERR: CameraControl: writeFrame: Frame is None.")
         elif (self.out is None):
-            #print("OpenCVControl: Could not write for record.")
-            self.logger.error("ERR: OpenCVControl: writeFrame: Could not write for record.")
+            #print("CameraControl: Could not write for record.")
+            self.logger.error("ERR: CameraControl: writeFrame: Out is None.")
         elif (self.record == False):
-            #print("OpenCVControl: Record == False.")
-            self.logger.info("OpenCVControl: writeFrame: Record == False.")
+            #print("CameraControl: Record == False.")
+            self.logger.info("CameraControl: writeFrame: Record == False.")
+            
+    def writeProcessedFrame(self, frame):
+        self.writeFrame(frame)
         
     def getFrame(self):
         #self.frameLock.acquire(blocking=True)
@@ -98,18 +107,18 @@ class OpenCVControl:
         
         try:
             cv2.imwrite(fullPath, frame)
-            #print(f"OpenCVControl: Frame saved successfully as {fullPath}")
-            self.logger.info(f"OpenCVControl: saveCurrentFrameLocally: Frame saved successfully as {fullPath}")
+            #print(f"CameraControl: Frame saved successfully as {fullPath}")
+            self.logger.info(f"CameraControl: saveCurrentFrameLocally: Frame saved successfully as {fullPath}")
         except Exception as e:
-            #print(f"OpenCVControl: Frame could not be saved. {e}")
-            self.logger.error(f"ERR: OpenCVControl: Frame could not be saved. {e}")
+            #print(f"CameraControl: Frame could not be saved. {e}")
+            self.logger.error(f"ERR: CameraControl: Frame could not be saved. {e}")
     
     def retryOpenStream(self):
         retry = 1
         while (not self.capture.isOpened() and retry <= self.maxReOpenRetry):
-            #print(f"OpenCVControl capture: Retrying to re-open stream... {retry}")
-            self.logger.warning(f"WARN: OpenCVControl capture: Retrying to re-open stream... {retry}")
-            self.capture = cv2.VideoCapture(rtspStreamURL)
+            #print(f"CameraControl capture: Retrying to re-open stream... {retry}")
+            self.logger.warning(f"WARN: CameraControl capture: Retrying to re-open stream... {retry}")
+            self.capture.open()
             
             # record properties with new capture
             self.setRecordProperties()
@@ -117,19 +126,19 @@ class OpenCVControl:
             retry += 1
     
     def captureStream(self):
-        #print("== OpenCVControl capture: running.")
-        self.logger.info("== OpenCVControl: captureStream: running.")
+        #print("== CameraControl capture: running.")
+        self.logger.info("== CameraControl: captureStream: running.")
         self.retryOpenStream()
             
         if (not self.capture.isOpened()):
-            #print(f"OpenCVControl capture: Could not open video stream with URL {self.rtspStreamURL}")
-            self.logger.critical(f"ERR: OpenCVControl: captureStream: Could not open video stream with URL {self.rtspStreamURL}")
-            #print("==/ OpenCVControl capture: returned.")
-            self.logger.info("==/ OpenCVControl: captureStream: returned.")
+            #print(f"CameraControl capture: Could not open video stream with URL {self.rtspStreamURL}")
+            self.logger.critical(f"ERR: CameraControl: captureStream: Could not open video stream with URL {self.rtspStreamURL}")
+            #print("==/ CameraControl capture: returned.")
+            self.logger.info("==/ CameraControl: captureStream: returned.")
             return
         
         #print("Stream open")
-        self.logger.info("OpenCVControl: captureStream: Stream open")
+        self.logger.info("CameraControl: captureStream: Stream open")
         frameRetry = 0
         while(not self.quit):
             #self.frameLock.acquire(blocking=True):
@@ -138,8 +147,8 @@ class OpenCVControl:
             
             if (not self.ret):
                 if (frameRetry >= self.maxFrameRetry):
-                    #print(f"OpenCVControl capture: {self.maxFrameRetry} frame retries reached. Break.")
-                    self.logger.warning(f"WARN: OpenCVControl capture: {self.maxFrameRetry} frame retries reached. Break.")
+                    #print(f"CameraControl capture: {self.maxFrameRetry} frame retries reached. Break.")
+                    self.logger.warning(f"WARN: CameraControl capture: {self.maxFrameRetry} frame retries reached. Break.")
                     break
                 frameRetry += 1
                 self.retryOpenStream()
@@ -158,8 +167,8 @@ class OpenCVControl:
         self.capture.release() # Release the VideoCapture object
         cv2.destroyAllWindows() # Close all OpenCV windows
                 
-        #print("==/ OpenCVControl capture: returned.")
-        self.logger.info("==/ OpenCVControl capture: returned.")
+        #print("==/ CameraControl capture: returned.")
+        self.logger.info("==/ CameraControl capture: returned.")
         return
     
     def startThread(self):

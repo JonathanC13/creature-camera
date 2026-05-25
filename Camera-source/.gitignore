@@ -1,2 +1,6 @@
 # ignore any file named .env in the root directory and all its subdirectories.
 .env
+
+# Byte-compiled files
+__pycache__/
+*.pyc
