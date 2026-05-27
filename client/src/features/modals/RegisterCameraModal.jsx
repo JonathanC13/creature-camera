@@ -70,7 +70,7 @@ const RegisterCameraModal = () => {
             <FormInput
                 ref = {null}
                 required = {true}
-                text = 'name'
+                text = 'token'
                 inputType = 'text'
                 value = {cameraToken}
                 onChangeCB = {setCameraToken}

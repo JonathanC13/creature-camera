@@ -23,7 +23,7 @@ const uploadVideoSingle = async(req, res, next) => {
 
     const {
         id,
-        name
+        cameraName
     } = req.camera
     
     // if req.file populated, upload successful
@@ -60,20 +60,20 @@ const uploadVideoSingle = async(req, res, next) => {
             }
             //else throw new NotFoundError('Thumbnail directory not found.')
             
-            logger.info(`uploadVideoSingle: ${StatusCodes.CREATED} - Video uploaded successfully to ${filePath}`)
+            logger.info(`uploadVideoSingle: ${StatusCodes.CREATED} - Video uploaded successfully to ${outputPath}`)
             // send response
             res.status(StatusCodes.CREATED).json({
                 message: "Video uploaded successfully!",
             })
 
             // let run async
-            // sendNotifications(id, name, filename)
+            sendNotifications(id, cameraName, outputFileName)
         } else {
             throw new Error('No file.')
         }
     } catch (e) {
         logger.error('uploadVideoSingle: '+ e.message)
-        throw new UploadError(`uploadVideoSingle: Failed to save video for camera: ${name}`)
+        throw new UploadError(`uploadVideoSingle: Failed to save video for camera: ${cameraName}`)
     }
 
     return
