@@ -1,5 +1,7 @@
 # Creature Camera
 Motion detection camera project, named Creature Camera since an application can be a wildlife camera.
+<br>
+Video: https://youtu.be/OjeRwaH1ytA
 
 ## System components
 1. Wi-Fi camera connected to a RPi's Wi-Fi network
